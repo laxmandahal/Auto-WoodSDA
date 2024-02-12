@@ -1,0 +1,4 @@
+11	13	15	17 #index of 4 walls in grid A along x-direction
+11	13	15	17
+11	13	15	17
+11	13	15	17

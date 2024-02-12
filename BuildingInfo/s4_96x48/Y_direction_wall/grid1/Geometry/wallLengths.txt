@@ -1,0 +1,4 @@
+60	60 #1st floor 
+60	60 #2nd floor
+60	60 #3rd floor
+60	60 #4th floor

@@ -1,0 +1,4 @@
+96	120	120	96 #1st floor 
+96	120	120	96 #2nd floor
+96	120	120	96 #3rd floor
+96	120	120	96 #4th floor

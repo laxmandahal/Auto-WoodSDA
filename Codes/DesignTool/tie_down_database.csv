@@ -1,0 +1,23 @@
+Diameter(in),Ag(in^2),Ae(in^2),Fu(ksi),n,Capacity(kips),Assembly
+ 1/4,0.049,0.031820918,58,20,1.067650628,use 0.25in diameter threaded rod
+ 3/8,0.11,0.077489532,58,16,2.402213914,use 0.375in diameter threaded rod
+ 1/2,0.196,0.141898493,58,13,4.270602513,use 0.5in diameter threaded rod
+ 5/8,0.307,0.226001635,58,11,6.672816427,use 0.625in diameter threaded rod
+ 3/4,0.442,0.334459927,58,10,9.608855655,use 0.75in diameter threaded rod
+ 7/8,0.601,0.461733258,58,9,13.0787202,use 0.875in diameter threaded rod
+1,0.785,0.605743985,105,8,30.92505268,use 1in diameter threaded rod
+1 1/8,0.994,0.763273345,105,7,39.1395198,use 1.125in diameter threaded rod
+1 1/4,1.227,0.969109373,105,7,48.32039482,use 1.25in diameter threaded rod
+1 3/8,1.485,1.154880232,105,6,58.46767773,use 1.375in diameter threaded rod
+1 1/2,1.767,1.405248804,105,6,69.58136854,use 1.5in diameter threaded rod
+1 3/4,2.405,1.899454372,90,5,81.17826329,use 1.75in diameter threaded rod
+2,3.142,2.498220095,90,4.5,106.0287521,use 2in diameter threaded rod
+2 1/4,3.976,3.247681929,90,4.5,134.1926393,use 2.25in diameter threaded rod
+2 1/2,4.909,3.998818448,90,4,165.6699251,use 2.5in diameter threaded rod
+2 3/4,5.94,4.934001859,90,4,200.4606094,use 2.75in diameter threaded rod
+3,7.069,5.96736004,90,4,238.5646921,use 3in diameter threaded rod
+3 1/4,8.296,7.098892992,90,4,279.9821734,use 3.25in diameter threaded rod
+3 1/2,9.621,8.328600713,90,4,324.7130532,use 3.5in diameter threaded rod
+3 3/4,11.045,9.656483206,90,4,372.7573315,use 3.75in diameter threaded rod
+4,12.566,11.08254047,90,4,424.1150082,use 4in diameter threaded rod
+N/A,N/A,N/A,N/A,N/A,N/A,No tie-down required
