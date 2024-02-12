@@ -1,0 +1,14 @@
+Sheathing Type,Material,nail size,panel thickness,nail spacing,Vs (plf),Ga(OSB)(kips/in),Sheathed sides,LRFD(klf),ASD(klf),Assembly,OpenSeesTag,Test Program
+GWB,Gypsum,5d cooler,1/2in,7,200,5.2,1,0.16,0.1,Use 1/2in GWB with 5d cooler nails @ 7in o.c. spacing,14,ATC 116
+WSP,OSB,6d,3/8in,6,400,11,1,0.32,0.2,Use 3/8in WSP on 1 side with 6d nails @ 6o.c. spacing,3,Line et al
+WSP,OSB,8d,7/16in,6,480,15,1,0.384,0.24,Use 7/16in WSP on 1 side with 8d nails @ 6o.c. spacing,1,ATC 116
+WSP,OSB,10d,19/32in,6,680,19,1,0.544,0.34,Use 19/32in WSP on 1 side with 10d nails @ 6o.c. spacing,8,Line et al
+WSP,OSB,8d,7/16in,4,700,22,1,0.56,0.35,Use 7/16in WSP on 1 side with 8d nails @ 4o.c. spacing,7,FEMA P-795
+WSP,OSB,8d,15/32in,4,760,19,1,0.608,0.38,Use 15/32in WSP on 1 side with 8d nails @ 4o.c. spacing,12,Yi Dissertation
+WSP,OSB,8d,7/16in,3,900,28,1,0.72,0.45,Use 7/16in WSP on 1 side with 8d nails @ 3o.c. spacing,2,ATC 116
+WSP,OSB,10d,15/32in,4,920,30,1,0.736,0.46,Use 15/32in WSP on 1 side with 10d nails @ 4o.c. spacing,10,Yi Dissertation
+WSP,OSB,6d,3/8in,2,1020,32,1,0.816,0.51,Use 3/8in WSP on 1 side with 6d nails @ 2o.c. spacing,6,Line et al
+WSP,OSB,8d,7/16in,2,1170,42,1,0.936,0.585,Use 7/16in WSP on 1 side with 8d nails @ 2o.c. spacing,5,Line et al
+Structural I,OSB,8d,3/8in,2,1220,43,1,0.976,0.61,Use 3/8in Structural I on 1 side with 8d nails @ 2o.c. spacing,4,Line et al
+WSP,OSB,10d,15/32in,2,1540,52,1,1.232,0.77,Use 15/32in WSP on 1 side with 10d nails @ 2o.c. spacing,11,Yi Dissertation
+WSP,OSB,10d,19/32in,2,1740,48,1,1.392,0.87,Use 19/32in WSP on 1 side with 10d nails @ 2o.c. spacing,9,ATC 116

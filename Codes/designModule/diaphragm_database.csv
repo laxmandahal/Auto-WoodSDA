@@ -1,0 +1,61 @@
+Sheathing,nail size,panel thickness,min width of nailed face,nail spacing,Vs (plf),Ga(OSB)(kips/in),Ga(Ply)(kips/in),LRFD,ASD,Assembly
+WSP,6d,5/16,2,6,340,15,10,272,170,Use 5/16 in thick WSP panel  with 6d nails @ 6 o.c. spacing
+WSP,6d,5/16,3,6,380,12,9,304,190,Use 5/16 in thick WSP panel  with 6d nails @ 6 o.c. spacing
+WSP,6d,3/8,2,6,370,13,9.5,296,185,Use 3/8 in thick WSP panel  with 6d nails @ 6 o.c. spacing
+WSP,6d,3/8,3,6,420,10,8,336,210,Use 3/8 in thick WSP panel  with 6d nails @ 6 o.c. spacing
+WSP,8d,3/8,2,6,480,15,11,384,240,Use 3/8 in thick WSP panel  with 8d nails @ 6 o.c. spacing
+WSP,8d,3/8,3,6,540,12,9.5,432,270,Use 3/8 in thick WSP panel  with 8d nails @ 6 o.c. spacing
+WSP,8d,7/16,2,6,510,14,10,408,255,Use 7/16 in thick WSP panel  with 8d nails @ 6 o.c. spacing
+WSP,8d,7/16,3,6,570,11,9,456,285,Use 7/16 in thick WSP panel  with 8d nails @ 6 o.c. spacing
+WSP,8d,15/32,2,6,540,13,9.5,432,270,Use 15/32 in thick WSP panel  with 8d nails @ 6 o.c. spacing
+WSP,8d,15/32,3,6,600,10,8.5,480,300,Use 15/32 in thick WSP panel  with 8d nails @ 6 o.c. spacing
+WSP,10d,15/32,2,6,580,25,15,464,290,Use 15/32 in thick WSP panel  with 10d nails @ 6 o.c. spacing
+WSP,10d,15/32,3,6,650,21,14,520,325,Use 15/32 in thick WSP panel  with 10d nails @ 6 o.c. spacing
+WSP,10d,19/32,2,6,640,21,14,512,320,Use 19/32 in thick WSP panel  with 10d nails @ 6 o.c. spacing
+WSP,10d,19/32,3,6,720,17,12,576,360,Use 19/32 in thick WSP panel  with 10d nails @ 6 o.c. spacing
+WSP,6d,5/16,2,4,670,13,9.5,536,335,Use 5/16 in thick WSP panel  with 6d nails @ 4 o.c. spacing
+WSP,6d,5/16,3,4,760,10,8,608,380,Use 5/16 in thick WSP panel  with 6d nails @ 4 o.c. spacing
+WSP,6d,3/8,2,4,750,10,8,600,375,Use 3/8 in thick WSP panel  with 6d nails @ 4 o.c. spacing
+WSP,6d,3/8,3,4,840,8.5,7,672,420,Use 3/8 in thick WSP panel  with 6d nails @ 4 o.c. spacing
+WSP,8d,3/8,2,4,960,13,9.5,768,480,Use 3/8 in thick WSP panel  with 8d nails @ 4 o.c. spacing
+WSP,8d,3/8,3,4,1080,11,8.5,864,540,Use 3/8 in thick WSP panel  with 8d nails @ 4 o.c. spacing
+WSP,8d,7/16,2,4,1010,12,9.5,808,505,Use 7/16 in thick WSP panel  with 8d nails @ 4 o.c. spacing
+WSP,8d,7/16,3,4,1140,10,8,912,570,Use 7/16 in thick WSP panel  with 8d nails @ 4 o.c. spacing
+WSP,8d,15/32,2,4,1060,11,8.5,848,530,Use 15/32 in thick WSP panel  with 8d nails @ 4 o.c. spacing
+WSP,8d,15/32,3,4,1200,9,7.5,960,600,Use 15/32 in thick WSP panel  with 8d nails @ 4 o.c. spacing
+WSP,10d,15/32,2,4,1150,21,14,920,575,Use 15/32 in thick WSP panel  with 10d nails @ 4 o.c. spacing
+WSP,10d,15/32,3,4,1300,17,12,1040,650,Use 15/32 in thick WSP panel  with 10d nails @ 4 o.c. spacing
+WSP,10d,19/32,2,4,1280,18,12,1024,640,Use 19/32 in thick WSP panel  with 10d nails @ 4 o.c. spacing
+WSP,10d,19/32,3,4,1440,14,11,1152,720,Use 19/32 in thick WSP panel  with 10d nails @ 4 o.c. spacing
+WSP,6d,5/16,2,3,760,21,13,608,380,Use 5/16 in thick WSP panel  with 6d nails @ 3 o.c. spacing
+WSP,6d,5/16,3,3,860,17,12,688,430,Use 5/16 in thick WSP panel  with 6d nails @ 3 o.c. spacing
+WSP,6d,3/8,2,3,840,18,12,672,420,Use 3/8 in thick WSP panel  with 6d nails @ 3 o.c. spacing
+WSP,6d,3/8,3,3,950,14,10,760,475,Use 3/8 in thick WSP panel  with 6d nails @ 3 o.c. spacing
+WSP,8d,3/8,2,3,1090,21,13,872,545,Use 3/8 in thick WSP panel  with 8d nails @ 3 o.c. spacing
+WSP,8d,3/8,3,3,1220,18,12,976,610,Use 3/8 in thick WSP panel  with 8d nails @ 3 o.c. spacing
+WSP,8d,7/16,2,3,1150,20,13,920,575,Use 7/16 in thick WSP panel  with 8d nails @ 3 o.c. spacing
+WSP,8d,7/16,3,3,1290,17,12,1032,645,Use 7/16 in thick WSP panel  with 8d nails @ 3 o.c. spacing
+WSP,8d,15/32,2,3,1200,19,13,960,600,Use 15/32 in thick WSP panel  with 8d nails @ 3 o.c. spacing
+WSP,8d,15/32,3,3,1350,15,11,1080,675,Use 15/32 in thick WSP panel  with 8d nails @ 3 o.c. spacing
+WSP,10d,15/32,2,3,1310,33,18,1048,655,Use 15/32 in thick WSP panel  with 10d nails @ 3 o.c. spacing
+WSP,10d,15/32,3,3,1470,28,16,1176,735,Use 15/32 in thick WSP panel  with 10d nails @ 3 o.c. spacing
+WSP,10d,19/32,2,3,1460,28,17,1168,730,Use 19/32 in thick WSP panel  with 10d nails @ 3 o.c. spacing
+WSP,10d,19/32,3,3,1640,24,15,1312,820,Use 19/32 in thick WSP panel  with 10d nails @ 3 o.c. spacing
+Structural I,6d,5/16,2,6,370,15,12,296,185,Use 5/16 in thick Structural I panel  with 6d nails @ 6 o.c. spacing
+Structural I,6d,5/16,3,6,420,12,9.5,336,210,Use 5/16 in thick Structural I panel  with 6d nails @ 6 o.c. spacing
+Structural I,8d,3/8,2,6,540,14,11,432,270,Use 3/8 in thick Structural I panel  with 8d nails @ 6 o.c. spacing
+Structural I,8d,3/8,3,6,600,12,10,480,300,Use 3/8 in thick Structural I panel  with 8d nails @ 6 o.c. spacing
+Structural I,10d,15/32,2,6,640,24,17,512,320,Use 15/32 in thick Structural I panel  with 10d nails @ 6 o.c. spacing
+Structural I,10d,15/32,3,6,720,20,15,576,360,Use 15/32 in thick Structural I panel  with 10d nails @ 6 o.c. spacing
+Structural I,6d,5/16,2,4,750,12,10,600,375,Use 5/16 in thick Structural I panel  with 6d nails @ 4 o.c. spacing
+Structural I,6d,5/16,3,4,840,9.5,8.5,672,420,Use 5/16 in thick Structural I panel  with 6d nails @ 4 o.c. spacing
+Structural I,8d,3/8,2,4,1060,13,10,848,530,Use 3/8 in thick Structural I panel  with 8d nails @ 4 o.c. spacing
+Structural I,8d,3/8,3,4,1200,10,9,960,600,Use 3/8 in thick Structural I panel  with 8d nails @ 4 o.c. spacing
+Structural I,10d,15/32,2,4,1280,20,15,1024,640,Use 15/32 in thick Structural I panel  with 10d nails @ 4 o.c. spacing
+Structural I,10d,15/32,3,4,1440,16,13,1152,720,Use 15/32 in thick Structural I panel  with 10d nails @ 4 o.c. spacing
+Structural I,6d,5/16,2,3,950,20,15,760,475,Use 5/16 in thick Structural I panel  with 6d nails @ 3 o.c. spacing
+Structural I,6d,5/16,3,3,840,17,13,672,420,Use 5/16 in thick Structural I panel  with 6d nails @ 3 o.c. spacing
+Structural I,8d,3/8,2,3,1200,21,15,960,600,Use 3/8 in thick Structural I panel  with 8d nails @ 3 o.c. spacing
+Structural I,8d,3/8,3,3,1350,18,13,1080,675,Use 3/8 in thick Structural I panel  with 8d nails @ 3 o.c. spacing
+Structural I,10d,15/32,2,3,1460,31,21,1168,730,Use 15/32 in thick Structural I panel  with 10d nails @ 3 o.c. spacing
+Structural I,10d,15/32,3,3,1640,26,18,1312,820,Use 15/32 in thick Structural I panel  with 10d nails @ 3 o.c. spacing
