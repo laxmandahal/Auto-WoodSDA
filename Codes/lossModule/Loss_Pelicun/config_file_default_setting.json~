@@ -1,0 +1,79 @@
+{
+  "GeneralInformation": {
+    "PlanArea": 3600.0,
+    "NumberOfStories": 2,
+    "units": {
+      "force": "kip",
+      "length": "ft",
+      "temperature": "C",
+      "acceleration": "g",
+      "time": "sec"
+    }
+  },
+  "DamageAndLoss": {
+    "_method": "FEMA P58",
+    "ResponseModel": {
+      "ResponseDescription": {
+        "EDP_Distribution": "lognormal",
+        "BasisOfEDP_Distribution": "all results",
+        "Realizations": "1000"
+      },
+      "AdditionalUncertainty": {
+        "GroundMotion": "",
+        "Modeling": ""
+      },
+      "DetectionLimits": {
+        "PID": "0.10",
+        "PFA": ""
+      }
+    },
+    "DamageModel": {
+      "IrreparableResidualDrift": {
+        "Median": "10.",
+        "Beta": "0.0001"
+      },
+      "CollapseLimits": {
+        "PID": "0.20"
+      },
+      "CollapseProbability": {
+        "Value": "estimated",
+        "BasisOfEstimate": "sampled EDP"
+      }
+    },
+    "LossModel": {
+      "ReplacementCost": "50000000",
+      "ReplacementTime": "540",
+      "DecisionVariables": {
+        "Injuries": true,
+        "ReconstructionCost": true,
+        "ReconstructionTime": true,
+        "RedTag": true
+      },
+      "Inhabitants": {
+        "OccupancyType": "Multi-Unit Residential",
+        "PeakPopulation": "10, 10",
+        "PopulationDataFile": ""
+      }
+    },
+    "Dependencies": {
+      "CostAndTime": false,
+      "Fragilities": "per ATC recommendation",
+      "Injuries": "Independent",
+      "InjurySeverities": false,
+      "Quantities": "Independent",
+      "ReconstructionCosts": "Independent",
+      "ReconstructionTimes": "Independent",
+      "RedTagProbabilities": "Independent"
+    },
+    "CollapseModes": [
+      {
+        "affected_area": "1.0",
+        "injuries": "0.1, 0.9",
+        "name": "complete",
+        "weight": "1.0"
+      }
+    ],
+    //"ComponentDataFolder": "/Users/laxmandahal/Desktop/UCLA/Phd/Research/SurrogateModeling/DGP/woodSDA/Codes/Loss_Pelicun/FEMA_P58_Fragility_Database_2ed"
+      "ComponentDataFolder":"/u/home/l/laxmanda/project-hvburton/Regional_study/woodSDA/Codes/Loss_Pelicun/FEMA_P58_Fragility_Database_2ed"
+  }
+}

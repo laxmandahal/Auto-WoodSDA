@@ -1,0 +1,33 @@
+﻿cmpID,ID,Description,Units,Theta_0,Blocks,Family,Theta_1,Location,Direction,Incomplete,Changelog
+B1071.001,B.10.71.001,"Light framed wood walls with structural panel sheathing, gypsum wallboard and no hold-downs",SF,100,,N/A,N/A,all,"1,2",FALSE,
+B1071.012,B.10.71.012,"Light framed wood walls with structural panel sheathing, stucco, hold-downs",SF,100,,N/A,N/A,all,"1,2",FALSE,
+B1071.041,B.10.71.041,"Exterior Wall - Type: Gypsum with wood studs, Full Height, Fixed Below, Fixed Above",LF,100,,N/A,N/A,all,"1,2",FALSE,
+B2011.102,B.20.11.102,"Exterior Wall - Light framed wood walls with structural panel sheathing, stucco, hold-downs",SF,100,,N/A,N/A,all,"1,2",FALSE,
+C1011.011a,C.10.11.011a,"Wall Partition, Type: Gypsum with wood studs, Full Height, Fixed Below, Fixed Above",LF,100,,lognormal,0.4,all,"1,2",FALSE,
+C1011.001a,C.10.11.001a,"Wall Partition, Type: Gypsum with metal studs, Full Height, Fixed Below, Fixed Above",LF,100,,lognormal,0.4,all,"1,2",FALSE,
+C2011.001b,C.20.11.001b,Prefabricated steel stair with steel treads and landings with no seismic joint,EA,2,,N/A,N/A,all,"1,2",FALSE,
+D1014.021,D.10.14.021,"Hydraulic Elevator \u2013 Applies to most California Installations 1976 or later, most western states installations postdating 1982 and most U.S installations postdating 1998",EA,1,,N/A,N/A,all,1,FALSE,
+D2021.013a,D.20.21.013a,"Cold or Hot Potable - Small Diameter Threaded Steel - (2.5 inches in diameter or less), SDC D, E, or F, PIPING FRAGILITY",LF,1000,,lognormal,0.4,all,"1,2",FALSE,
+D2021.013b,D.20.21.013b,"Cold or Hot Potable - Small Diameter Threaded Steel - (2.5 inches in diameter or less), SDC D, E, or F, BRACING FRAGILITY",LF,1000,,lognormal,0.4,all,"1,2",FALSE,
+D2021.023a,D.20.21.023a,"Cold or Hot Potable Water Piping (dia > 2.5 inches), SDC D,E,F, PIPING FRAGILITY",LF,1000,,lognormal,0.4,all,"1,2",FALSE,
+D2021.023b,D.20.21.023b,"Cold or Hot Potable Water Piping (dia > 2.5 inches), SDC D,E,F, BRACING FRAGILITY",LF,1000,,lognormal,0.4,all,"1,2",FALSE,
+D2031.013b,D.20.31.013b,"Sanitary Waste Piping - Cast Iron w/flexible couplings, SDC D,E,F, BRACING FRAGILITY",LF,1000,,lognormal,0.4,all,"1,2",TRUE,"changed beta from undefined to 0.4, changed ""incomplete""to false from true"
+D3031.013a,D.30.31.013a,Chiller - Capacity: < 100 Ton - Equipment that is either hard anchored or is vibration isolated with seismic snubbers/restraints - Anchorage fragility only,EA,1,,N/A,N/A,all,1,TRUE,"added 0.8g as MedianEDP, 0.25 as beta, changed incomplete flag to false"
+D3031.013b,D.30.31.013b,Chiller - Capacity: < 100 Ton - Equipment that is either hard anchored or is vibration isolated with seismic snubbers/restraints - Equipment fragility only,EA,1,,N/A,N/A,all,1,FALSE,
+D3041.011c,D.30.41.011c,"HVAC Galvanized Sheet Metal Ducting less than 6 sq. ft in cross sectional area, SDC D, E, or F",LF,1000,,lognormal,0.4,all,"1,2",FALSE,
+D3041.032c,D.30.41.032c,"HVAC Drops / Diffusers without ceilings - supported by ducting only - No independent safety wires, SDC D, E, or F",EA,10,,N/A,N/A,roof,1,FALSE,
+D3041.102b,D.30.41.102b,HVAC Fan - Capacity: all - Vibration isolated equipment that is not snubbed or restrained - Equipment fragility only,EA,1,,N/A,N/A,roof,1,FALSE,
+D3041.103a,D.30.41.103a,HVAC Fan - Capacity: all - Equipment that is either hard anchored or is vibration isolated with seismic snubbers/restraints - Anchorage fragility only,EA,1,,N/A,N/A,roof,1,TRUE,"added 1.2g as MedianEDP, 0.6 as beta. Changed Incomplete flag to false"
+D3052.013a,D.30.52.013a,Air Handling Unit - Capacity: <5000 CFM - Equipment that is either hard anchored or is vibration isolated with seismic snubbers/restraints - Anchorage fragility only,EA,1,,N/A,N/A,roof,2,TRUE,"added 1.54g as MedianEDP, 0.6 as beta. Changed Incomplete flag to false"
+D3052.013b,D.30.52.013b,Air Handling Unit - Capacity: <5000 CFM - Equipment that is either hard anchored or is vibration isolated with seismic snubbers/restraints - Equipment fragility only,EA,1,,N/A,N/A,1,1,FALSE,
+D3067.012a,D.30.67.012a,Control Panel - Capacity: all - Equipment that is either hard anchored or is vibration isolated with seismic snubbers/restraints - Anchorage fragility only,EA,1,,N/A,N/A,1,1,TRUE,"added 3g as MedianEDP, 0.4 as beta. Changed Incomplete flag to false"
+D3067.012b,D.30.67.012b,Control Panel - Capacity: all - Equipment that is either hard anchored or is vibration isolated with seismic snubbers/restraints - Equipment fragility only,EA,1,,N/A,N/A,1,1,FALSE,
+D4011.023a,D.40.11.023a,"Fire Sprinkler Water Piping - Horizontal Mains and Branches - Old Style Victaulic - Thin Wall Steel - Poorly designed bracing, SDC D, E, or F , PIPING FRAGILITY",LF,1000,,lognormal,0.4,all,1,FALSE,
+D4011.074a,D.40.11.074a,"Fire Sprinkler Drop Standard Threaded Steel - No Ceiling - 6 ft. long drop maximum, SDC D, E, or F (OSHPD or sim)",EA,100,,lognormal,0.4,all,1,FALSE,
+D5011.011a,D.50.11.011a,Transformer/primary service - Capacity: <100 kVA - Unanchored equipment that is not vibration isolated - Equipment fragility only,EA,1,,N/A,N/A,1,1,TRUE,"added 2.5 as MedianEDP, 0.4 as beta. Changed incomplete flag to false"
+D5012.013d,D.50.12.013d,Motor Control Center - Capacity: all - Equipment that is either hard anchored or is vibration isolated with seismic snubbers/restraints - Combined anchorage/isolator & equipment fragility,EA,1,,N/A,N/A,1,1,FALSE,
+D5012.023a,D.50.12.023a,Low Voltage Switchgear - Capacity: 100 to <350 Amp - Equipment that is either hard anchored or is vibration isolated with seismic snubbers/restraints - Anchorage fragility only,EA,1,,N/A,N/A,1,1,TRUE,
+D5012.023b,D.50.12.023b,Low Voltage Switchgear - Capacity: 100 to <350 Amp - Equipment that is either hard anchored or is vibration isolated with seismic snubbers/restraints - Equipment fragility only,EA,1,,N/A,N/A,1,1,FALSE,
+D5012.033a,excessiveRID,excessive residual drift,EA,1,,,,all,"1,2",,
+D5012.033b,collapse,collapsed building,EA,1,,,,0,1,,
+,irreparable,irreparable building,EA,1,,,,0,1,,

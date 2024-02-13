@@ -1,0 +1,208 @@
+
+pelicun 3.1 | 
+
+System Information:
+         local time zone: PST
+         start time: 2024-02-13T00:50:28
+         python: 3.8.2 (default, Mar 25 2020, 11:22:43) 
+         [Clang 4.0.1 (tags/RELEASE_401/final)]
+         numpy: 1.22.4
+         pandas: 1.5.3
+         
+         --------------------------------------------------------------------------------
+00:50:28 Assessement Started
+         --------------------------------------------------------------------------------
+00:50:28 Loading demand data...
+         Removing event_ID from header...
+         Removing whitespace from header...
+         Demand data successfully parsed.
+         Removing event_ID from header...
+         Removing whitespace from header...
+         Demand units successfully parsed.
+         --------------------------------------------------------------------------------
+00:50:28 Calibrating demand model...
+         WARNING: Could not parse  provided as TruncateLower. Using NaN instead.
+         WARNING: Could not parse  provided as TruncateUpper. Using NaN instead.
+         
+         Calibration settings successfully parsed:
+                          Family  CensorLower  CensorUpper  TruncateLower  TruncateUpper  SigIncrease  Theta_0  Theta_1
+         type loc dir                                                                                                  
+         PFA  0   1    lognormal          NaN          NaN            NaN            NaN          NaN      NaN      NaN
+                  2    lognormal          NaN          NaN            NaN            NaN          NaN      NaN      NaN
+              1   1    lognormal          NaN          NaN            NaN            NaN          NaN      NaN      NaN
+                  2    lognormal          NaN          NaN            NaN            NaN          NaN      NaN      NaN
+              2   1    lognormal          NaN          NaN            NaN            NaN          NaN      NaN      NaN
+         ...                 ...          ...          ...            ...            ...          ...      ...      ...
+         PID  4   1    lognormal          NaN          NaN            NaN            NaN          NaN      NaN      NaN
+                  2    lognormal          NaN          NaN            NaN            NaN          NaN      NaN      NaN
+         RID  1   1    lognormal          NaN          NaN            NaN            NaN          NaN      NaN      NaN
+                  2    lognormal          NaN          NaN            NaN            NaN          NaN      NaN      NaN
+         SA   0   1    lognormal          NaN          NaN            NaN            NaN          NaN      NaN      NaN
+         
+         [21 rows x 8 columns]
+         
+         Demand data used for calibration:
+         type        PFA                                                                                                         PID                                                                             RID                SA
+         loc           0                    1                     2                     3                     4                    1                   2                   3                   4                   1                 0
+         dir           1         2          1          2          1          2          1          2          1          2         1         2         1         2         1         2         1         2         1         2       1
+         0     13.108264  8.978082   8.324549   8.488399   6.178688   7.393985   6.290865   6.514255   7.170899   7.281376  0.014439  0.020699  0.010216  0.013154  0.006351  0.007931  0.002063  0.002492  0.010134  0.008443  0.0889
+         1     13.108264  8.978082  14.757717  20.285167  17.607732  20.557159  19.057333  19.223898  18.157325  17.614229  0.038110  0.013005  0.012295  0.010241  0.006677  0.006560  0.002213  0.002653  0.038102  0.008648  0.0889
+         
+         Fitting the prescribed joint demand distribution...
+         
+         Calibration successful, processing results...
+         
+         Calibrated demand model marginal distributions:
+                          Family    Theta_0   Theta_1  TruncateLower  TruncateUpper
+         type loc dir                                                              
+         PFA  0   1    lognormal  13.108264  0.000003            NaN            NaN
+                  2    lognormal   8.978082  0.000002            NaN            NaN
+              1   1    lognormal  11.083832  0.286279            NaN            NaN
+                  2    lognormal  13.122065  0.435595            NaN            NaN
+              2   1    lognormal  10.430373  0.523616            NaN            NaN
+         ...                 ...        ...       ...            ...            ...
+         PID  4   1    lognormal   0.002137  0.035119            NaN            NaN
+                  2    lognormal   0.002571  0.031438            NaN            NaN
+         RID  1   1    lognormal   0.019650  0.662187            NaN            NaN
+                  2    lognormal   0.008545  0.011991            NaN            NaN
+         SA   0   1    lognormal   0.088900  0.000002            NaN            NaN
+         
+         [21 rows x 5 columns]
+         
+         Calibrated demand model correlation matrix:
+         type          PFA                                               PID                                     RID        SA
+         loc             0         1         2         3         4         1         2         3         4         1         0
+         dir             1    2    1    2    1    2    1    2    1    2    1    2    1    2    1    2    1    2    1    2    1
+         type loc dir                                                                                                         
+         PFA  0   1    1.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+                  2    0.0  1.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
+              1   1    0.0  0.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0 -1.0  1.0 -1.0  1.0 -1.0  1.0  1.0  1.0  1.0  0.0
+                  2    0.0  0.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0 -1.0  1.0 -1.0  1.0 -1.0  1.0  1.0  1.0  1.0  0.0
+              2   1    0.0  0.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0 -1.0  1.0 -1.0  1.0 -1.0  1.0  1.0  1.0  1.0  0.0
+         ...           ...  ...  ...  ...  ...  ...  ...  ...  ...  ...  ...  ...  ...  ...  ...  ...  ...  ...  ...  ...  ...
+         PID  4   1    0.0  0.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0 -1.0  1.0 -1.0  1.0 -1.0  1.0  1.0  1.0  1.0  0.0
+                  2    0.0  0.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0 -1.0  1.0 -1.0  1.0 -1.0  1.0  1.0  1.0  1.0  0.0
+         RID  1   1    0.0  0.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0 -1.0  1.0 -1.0  1.0 -1.0  1.0  1.0  1.0  1.0  0.0
+                  2    0.0  0.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0  1.0 -1.0  1.0 -1.0  1.0 -1.0  1.0  1.0  1.0  1.0  0.0
+         SA   0   1    0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  1.0
+         
+         [21 rows x 21 columns]
+         --------------------------------------------------------------------------------
+00:50:28 Generating sample from demand variables...
+         
+         21 random variables created.
+         
+         Correlations between 21 random variables successfully defined.
+         
+         Successfully generated 5000 realizations.
+         --------------------------------------------------------------------------------
+         --------------------------------------------------------------------------------
+00:50:28 Loading demand data...
+         Removing whitespace from header...
+         Demand data successfully parsed.
+         Removing whitespace from header...
+         Demand units successfully parsed.
+         --------------------------------------------------------------------------------
+         --------------------------------------------------------------------------------
+00:50:29 Loading component model...
+         
+         Parsing model file to characterize each component block
+         Model parameters successfully parsed. 115 performance groups identified
+         Converting model parameters to internal units...
+         Model parameters successfully loaded.
+         
+         Component model marginal distributions:
+                              Units Family    Theta_0  Theta_1  Blocks
+         cmp          loc dir                                         
+         B.10.71.002  1   1      SF    NaN  51.371665      NaN    15.0
+                          2      SF    NaN  51.371665      NaN    15.0
+                      2   1      SF    NaN  51.371665      NaN    15.0
+                          2      SF    NaN  51.371665      NaN    15.0
+                      3   1      SF    NaN  51.371665      NaN    15.0
+         ...                    ...    ...        ...      ...     ...
+         D.50.12.023b 1   1      EA    NaN   2.000000      NaN     1.0
+         collapse     0   1      ea    NaN   1.000000      NaN     1.0
+         excessiveRID 1   1      ea    NaN   1.000000      NaN     1.0
+                          2      ea    NaN   1.000000      NaN     1.0
+         irreparable  0   1      ea    NaN   1.000000      NaN     1.0
+         
+         [115 rows x 5 columns]
+         --------------------------------------------------------------------------------
+00:50:29 Generating sample from component quantity variables...
+         
+         115 random variables created.
+         
+         Successfully generated 5000 realizations.
+         --------------------------------------------------------------------------------
+         --------------------------------------------------------------------------------
+00:50:30 Loading damage model...
+         
+         WARNING: Damage model information is incomplete for the following component(s) Index(['D.20.31.013b', 'D.30.31.013a', 'D.30.41.103a', 'D.30.52.013a', 'D.30.67.012a', 'D.50.12.013d', 'D.50.12.023a'], dtype='object'). They were removed from the analysis.
+         
+         Damage model parameters successfully parsed.
+         --------------------------------------------------------------------------------
+00:50:30 Calculating damages...
+         Number of Performance Groups in Asset Model: 115
+         
+         WARNING: Damage model information is incomplete for some of the performance groups and they had to be removed from the analysis:
+         ('D.20.31.013b', '1', '1')
+         ('D.20.31.013b', '2', '1')
+         ('D.20.31.013b', '3', '1')
+         ('D.20.31.013b', '4', '1')
+         ('D.30.31.013a', '5', '1')
+         ('D.30.41.103a', '5', '1')
+         ('D.30.52.013a', '5', '2')
+         ('D.30.67.012a', '1', '1')
+         ('D.50.12.013d', '1', '1')
+         ('D.50.12.023a', '1', '1')
+         Number of Component Blocks: 940
+         1 batches of Performance Groups prepared for damage assessment
+00:50:30 Calculating damage for PG batch 1 with 940 blocks
+00:50:30 Generating capacity variables ...
+         2x2268 random variables created.
+00:50:30 Sampling capacities...
+00:50:31 Raw samples are available
+00:50:31 Successfully generated 5000 realizations.
+00:50:31 Collecting required demand information...
+00:50:31 Assembling demand data for calculation...
+00:50:31 Evaluating damage states...
+00:50:33 Calculating damage quantities...
+         Raw damage calculation successful.
+00:50:33 Applying damage processes...
+00:50:33 Applying task...
+         Damage process task successfully applied.
+00:50:33 Applying task...
+         Damage process task successfully applied.
+         Damage processes successfully applied.
+00:50:33 Damage calculation successfully completed.
+         --------------------------------------------------------------------------------
+00:50:33 Saving damage sample...
+         --------------------------------------------------------------------------------
+00:50:35 Saving damage sample...
+         --------------------------------------------------------------------------------
+00:50:36 Loading loss map for BldgRepair...
+         Loss map successfully parsed.
+         --------------------------------------------------------------------------------
+00:50:36 Loading loss parameters for BldgRepair...
+         Loss parameters successfully parsed.
+         --------------------------------------------------------------------------------
+00:50:36 Calculating losses...
+         
+         Aggregating damage quantities...
+         Successfully aggregated damage quantities.
+         
+         Calculating the median repair consequences...
+         Successfully determined median repair consequences.
+00:50:37 
+         Considering deviations from the median values to obtain random DV sample...
+         Preparing random variables for repair cost and time...
+         
+         404 random variables created.
+         
+         Successfully generated 5000 realizations of deviation from the median consequences.
+         Successfully obtained DV sample.
+00:50:38 Loss calculation successful.
+         --------------------------------------------------------------------------------
+00:50:38 Aggregating repair consequences...
+00:50:39 Repair consequences successfully aggregated.
+         --------------------------------------------------------------------------------
