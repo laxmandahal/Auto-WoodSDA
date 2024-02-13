@@ -382,7 +382,10 @@ class ComputeSeismicForce(object):
         # os.chdir(BaseDirectory + "/SeismicDesignParameters")
         os.chdir(os.path.join(BaseDirectory, 'SeismicDesignParameters'))
         # self.allowableDrift = np.genfromtxt("allowableDrift.txt")
-        designLevel = np.genfromtxt('DesignLevel_%s.txt'%self.seismic_design_level, dtype=None, encoding = None)
+        # designLevel = np.genfromtxt('DesignLevel_%s.txt'%self.seismic_design_level, dtype=None, encoding=None)
+        with open('DesignLevel_%s_workstation.txt'%self.seismic_design_level, 'r') as f:
+            designLevel = f.read()
+        designLevel = designLevel.split('\n')
         site_class = str(designLevel[0])
         # if SeismicDesignParameterFlag == 0:
         #     self.SeismicDesignParameter = None

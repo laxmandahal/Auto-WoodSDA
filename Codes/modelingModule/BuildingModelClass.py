@@ -220,7 +220,10 @@ class BuildingModel(object):
 # Seismic design parameter calculation follows ASCE 7-10 Chapter 12
 # In current wood frame building models, only used in defining pushover loading protocal 
       os.chdir(os.path.join(BaseDirectory, 'SeismicDesignParameters'))
-      designLevel = np.genfromtxt('DesignLevel_%s.txt'%self.seismic_design_level, dtype=None, encoding = None)
+      # designLevel = np.genfromtxt('DesignLevel_%s.txt'%self.seismic_design_level, dtype=None, encoding = None)
+      with open('DesignLevel_%s_workstation.txt' % self.seismic_design_level, 'r') as f:
+          designLevel = f.read()
+      designLevel = designLevel.split('\n')
       site_class = str(designLevel[0])
         # if SeismicDesignParameterFlag == 0:
         #     self.SeismicDesignParameter = None

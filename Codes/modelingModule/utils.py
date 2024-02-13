@@ -1457,7 +1457,7 @@ def generateModalAnalysisModel(ID, BuildingModel, BaseDirectory, DB_Directory, N
         copy_tree(BaseDirectory + "/BuildingInfo/%s/BaselineTclFiles/OpenSees3DModels/EigenValueAnalysis"%ID, 
                   ModelDirectory + '/EigenValueAnalysis')
         #copy Opensees into Model directory
-        copy_tree(os.path.join(BaseDirectory, *['BuildingInfo','OpenSeesSoftware']), ModelDirectory + '/EigenValueAnalysis')
+        # copy_tree(os.path.join(BaseDirectory, *['BuildingInfo','OpenSeesSoftware']), ModelDirectory + '/EigenValueAnalysis')
 
         os.chdir(ModelDirectory + '/EigenValueAnalysis')
         # Generate OpenSees model
@@ -1497,7 +1497,7 @@ def generatePushoverAnalysisModel(ID, BuildingModel, BaseDirectory, DB_Directory
         copy_tree(BaseDirectory + "/BuildingInfo/%s/BaselineTclFiles/OpenSees3DModels/PushoverAnalysis"%ID, 
                   ModelDirectory + '/PushoverAnalysis')
         #copy Opensees into Model directory
-        copy_tree(os.path.join(BaseDirectory, *['BuildingInfo','OpenSeesSoftware']), ModelDirectory + '/PushoverAnalysis')
+        # copy_tree(os.path.join(BaseDirectory, *['BuildingInfo','OpenSeesSoftware']), ModelDirectory + '/PushoverAnalysis')
 
         os.chdir(ModelDirectory + '/PushoverAnalysis')
         # Generate OpenSees model
@@ -1539,7 +1539,7 @@ def generateDynamicAnalysisModel(ID, BuildingModel, BaseDirectory, DB_Directory,
         copy_tree(BaseDirectory + "/BuildingInfo/%s/BaselineTclFiles/OpenSees3DModels/DynamicAnalysis"%ID, 
                   ModelDirectory + '/DynamicAnalysis')
         #copy Opensees into Model directory
-        copy_tree(os.path.join(BaseDirectory, *['BuildingInfo','OpenSeesSoftware']), ModelDirectory + '/DynamicAnalysis')
+        # copy_tree(os.path.join(BaseDirectory, *['BuildingInfo','OpenSeesSoftware']), ModelDirectory + '/DynamicAnalysis')
         os.chdir(ModelDirectory + '/DynamicAnalysis')
         # Generate OpenSees model
         defineNodes3DModel(ModelDirectory + '/DynamicAnalysis', BuildingModel)
