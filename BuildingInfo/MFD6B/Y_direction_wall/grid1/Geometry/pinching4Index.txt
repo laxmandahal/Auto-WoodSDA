@@ -1,0 +1,4 @@
+0	2 #index of 2 walls in grid A along x-direction
+0	2
+0	2
+0	2

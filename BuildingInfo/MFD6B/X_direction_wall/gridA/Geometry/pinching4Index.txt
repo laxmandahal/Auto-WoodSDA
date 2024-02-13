@@ -1,0 +1,4 @@
+0	2	4	6 #index of 4 walls in grid A along x-direction
+0	2	4	6 
+0	2	4	6 
+0	2	4	6

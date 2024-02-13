@@ -1,0 +1,4 @@
+15	16 #index of 2 walls in grid A along x-direction
+15	16
+15	16
+15	16

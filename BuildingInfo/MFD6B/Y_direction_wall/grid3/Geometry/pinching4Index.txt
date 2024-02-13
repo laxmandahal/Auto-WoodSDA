@@ -1,0 +1,4 @@
+5	6	7	8 #index of 2 walls in grid A along x-direction
+5	6	7	8
+5	6	7	8
+5	6	7	8
