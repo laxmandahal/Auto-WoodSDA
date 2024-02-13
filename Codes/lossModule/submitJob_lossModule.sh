@@ -4,7 +4,7 @@
 #$ -o joblog.$JOB_ID
 #$ -j y
 ## Edit the line below as needed:
-#$ -l h_rt=8:00:00,h_data=4G
+#$ -l h_rt=1:00:00,h_data=4G
 ## Speficy CPU type
 #$ -l arch=intel-gold-*
 ##$ -l exclusive

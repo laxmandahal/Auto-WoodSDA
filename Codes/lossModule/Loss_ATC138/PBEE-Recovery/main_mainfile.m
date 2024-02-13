@@ -5,11 +5,11 @@ close all
 
 %REGIONAL_STRATEGY = 'EA-VaFi';
 % ID = 's1_40x30_HWS_GWB_Heavy_Vs11';
-ID = 's2_60x32_Stucco_GWB_Light_Vs49';
+ID = 'MFD6B';
 
 % % haz_level = 'IL_1';
-baseDirectory = '/Users/laxmandahal/Desktop/UCLA/Phd/Research/RegionalStudy/woodSDPA' ;
-% baseDirectory = '/u/home/l/laxmanda/project-hvburton/Regional_study/woodSDPA';
+baseDirectory = '/Users/laxmandahal/Desktop/UCLA/Phd/Research/woodSDA/autoWoodSDA_public' ;
+% baseDirectory = '/u/home/l/laxmanda/project-hvburton/autoWoodSDA';
 codeDir = fullfile(baseDirectory, 'Codes', 'lossModule', 'Loss_ATC138', 'PBEE-Recovery');
 
 

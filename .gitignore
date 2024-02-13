@@ -10,6 +10,8 @@ __pycache__/
 **/ModelSingleScaleOutputBiDirection/
 **/Static-Pushover-Output-Model3D-XPushoverDirection/
 **/Static-Pushover-Output-Model3D-ZPushoverDirection/
+**/ATC138Output/
+**/PelicunOutput/
 
 OpenSees.exe
 OpenSeesMP.exe

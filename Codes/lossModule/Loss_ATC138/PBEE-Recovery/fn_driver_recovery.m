@@ -53,6 +53,6 @@ fprintf('Recovery assessment of model %s complete: %s\n',ID, haz_level)
 fileID = fopen(fullfile(loss_modelDir, 'ATC138Output', haz_level, 'recovery_outputs.json'),'w');
 fprintf(fileID,'%s',jsonencode(functionality));
 fclose(fileID);
-
+fprintf('Output saved to: %s \n', fullfile(loss_modelDir, 'ATC138Output', haz_level))
 end
 
