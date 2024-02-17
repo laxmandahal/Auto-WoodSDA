@@ -1,7 +1,7 @@
 {
   "DL": {
     "Asset": {
-      "ComponentAssignmentFile": "/Users/laxmandahal/Desktop/UCLA/Phd/Research/woodSDA/autoWoodSDA_public/BuildingInfo/MFD6B/ComponentsList/components_list_marginals.csv",
+      "ComponentAssignmentFile": "/u/home/l/laxmanda/project-hvburton/autoWoodSDA/BuildingInfo/MFD6B/ComponentsList/components_list_marginals.csv",
       "ComponentDatabase": "FEMA P-58",
       "NumberOfStories": "4",
       "OccupancyType": "Multi-Unit Residential",

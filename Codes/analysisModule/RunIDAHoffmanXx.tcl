@@ -162,8 +162,9 @@ for {set i 0} {$i <= $Model_Num-1} {incr i} {
 
 
 	# Setting up vector with MCE scale factor for each ground motion pair
-	set MCEScaleFactors {}; 
-	set MCEScaleFactorsFile [open $pathToTextFile/BiDirectionMCEScaleFactors.txt r];
+	set MCEScaleFactors {};
+	set MCEScaleFactorsFile [open $pathToTextFile/BiDirectionMCEScaleFactors.txt r]; 
+	# set MCEScaleFactorsFile [open $pathToTextFile/ScaleFactors.txt r];
 	while {[gets $MCEScaleFactorsFile line] >= 0} {
 		lappend MCEScaleFactors $line;
 	}
@@ -218,6 +219,7 @@ for {set i 0} {$i <= $Model_Num-1} {incr i} {
 	set An_dt [expr 0.5*$GM_dt];		# timestep of initial analysis	
 	set GM_time [expr $GM_dt*$GM_numPoints];
 
+	## the file names in FEMA P-695 FF set does not have .txt to their name
 	set GM_XFileName [format %s%s%s $baseDir /GM_sets/FEMAP695_FarFault_ATC116Model/$ScaleID1/histories/ [lindex $groundMotionFileNames [expr $GM_XNumber-1]].txt];
 	set GM_ZFileName [format %s%s%s $baseDir /GM_sets/FEMAP695_FarFault_ATC116Model/$ScaleID1/histories/ [lindex $groundMotionFileNames [expr $GM_ZNumber-1]].txt];
 

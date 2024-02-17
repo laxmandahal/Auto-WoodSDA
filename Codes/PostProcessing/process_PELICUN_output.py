@@ -19,8 +19,8 @@ def extract_pelicun_results(
         baseDir = r'/Users/laxmandahal/Desktop/UCLA/Phd/Research/woodSDA/autoWoodSDA_public'
 
 
-    HAZARD_LEVEL = [0.1, 0.3, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7, 1.9, 2.1, 2.3, 2.5, 2.7, 2.9, 3.1, 3.3, 3.5] #units: g
-
+    # HAZARD_LEVEL = [0.1, 0.3, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7, 1.9, 2.1, 2.3, 2.5, 2.7, 2.9, 3.1, 3.3, 3.5] #units: g
+    HAZARD_LEVEL = [0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 1.0, 1.2, 1.5, 1.8, 2.0, 2.5, 3.0]
 
     # BuildingList = np.genfromtxt(os.path.join(baseDir, 'BuildingModels', 'ID_for_NRHA',
     #                                         f'ArchetypeIDs_for_NRHA_{REGIONAL_STRATEGY}.txt'), dtype=str)
@@ -75,7 +75,7 @@ def extract_pelicun_results(
             hazard_level_arr.append(hazard_level)
             sa_val_arr.append(HAZARD_LEVEL[hazard_level - 1])
 
-            edp_df = pd.read_csv(os.path.join(baseDir, 'Results', ID,
+            edp_df = pd.read_csv(os.path.join(baseDir, 'Results', ID, 'LossAnalysis', 'PelicunInput',
                                             f'demands_IL{hazard_level}.csv'), index_col=0)
             
             pga_columns = ['1-PFA-0-1', '1-PFA-0-2']
@@ -129,9 +129,9 @@ def extract_pelicun_results(
 
 
 if __name__ == '__main__':
-	# parser = argparse.ArgumentParser()
+	parser = argparse.ArgumentParser()
 	# #defining the arguments to be parsed
-	# parser.add_argument('--regional_strategy', type=str, default='HiFi')
+	parser.add_argument('--run_on_Hoffman', type=bool, default=False)
 	# # #parse command-line arguments
-	# args = parser.parse_args()
-	extract_pelicun_results(run_on_Hoffman=False)
+	args = parser.parse_args()
+	extract_pelicun_results(run_on_Hoffman=args.run_on_Hoffman)

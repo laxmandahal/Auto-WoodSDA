@@ -29,18 +29,23 @@ BuildingList = np.genfromtxt(os.path.join(absDir, 'BuildingModels',
                                           f'BuildingNames_woodSDATest.txt'), dtype=str)
 BuildingList = ['MFD6B']
 
-HazardLevel = np.array([0.1, 0.3, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7, 1.9, 2.1, 2.3, 2.5, 2.7, 2.9, 3.1, 3.3, 3.5])
+# HazardLevel = np.array([0.1, 0.3, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7, 1.9, 2.1, 2.3, 2.5, 2.7, 2.9, 3.1, 3.3, 3.5])
+# NumGM = np.array([22] * len(HazardLevel), dtype=int) * 2 #should be multiplied by 2 if GMs are flipped 
+
+HazardLevel = np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 1.0, 1.2, 1.5, 1.8, 2.0, 2.5, 3.0])
+NumGM = np.array([30] * len(HazardLevel), dtype=int) * 2 #should be multiplied by 2 if GMs are flipped 
 # NumGM = np.array([20] * len(HazardLevel), dtype=int)
 
 # HazardLevel = np.array([0.156])
-NumGM = np.array([22] * len(HazardLevel), dtype=int) * 2 #should be multiplied by 2 if GMs are flipped 
+
 # NumGM = np.array([20], dtype=int)
 CollapseCriteria = 0.1
 DemolitionCriteria = 0.02
 
-
+site_agnostic_GM_fp = r'/u/home/l/laxmanda/project-hvburton/Regional_study/'
 ResultsDir = os.path.join(absDir, 'Results')
-gmDir = os.path.join(baseDir, *['GM_sets', 'FEMAP695_FarFault_ATC116Model'])
+# gmDir = os.path.join(baseDir, *['GM_sets', 'FEMAP695_FarFault_ATC116Model'])
+gmDir = os.path.join(site_agnostic_GM_fp, *['NGAWest2_database','Processed'])
 sys.path.append(gmDir)
 
 modelDir = os.path.join(absDir, 'BuildingModels')
@@ -51,7 +56,7 @@ Path(ResultsDir).mkdir(parents=True, exist_ok=True)
 # ProjectName = 'test_E2E'
 # projectDir = os.path.join(ResultsDir, ProjectName)
 # Path(projectDir).mkdir(parents=True, exist_ok=True)
-
+is_gm_P695 = False
 
 for i in range(1, len(BuildingList) + 1):
 	start = time.time()
@@ -68,11 +73,13 @@ for i in range(1, len(BuildingList) + 1):
 	# Perform post processing
 	ModelResults = BuildingModelDynamic(CaseID=ID, 
 			modelDir=modelDir,
+			gm_hist_dir=gmDir,
 			NumStory=NumStory, 
 			HazardLevel=HazardLevel, 
 			NumGM=NumGM, 
 			CollapseCriteria=CollapseCriteria, 
-			DemolitionCriteria=DemolitionCriteria)
+			DemolitionCriteria=DemolitionCriteria,
+			gm_FEMA_P695=False)
 
 
 	# resultsDir_buildingID = os.path.join(projectDir, ID)
@@ -86,8 +93,8 @@ for i in range(1, len(BuildingList) + 1):
 	ModelResults.PFA.to_csv(os.path.join(resultsDir_buildingID, 'EDP_data', 'PFA.csv'), sep=',', header = False, index = False)        
 
 	ModelResults.CollapseCount.to_csv(os.path.join(resultsDir_buildingID, 'EDP_data','CollapseCount.csv'), sep = ',', header = False, index = False)
-	ModelResults.CollapseFragility.to_csv(os.path.join(resultsDir_buildingID, 'EDP_data','CollapseFragility.csv'), sep='\t', header = False, index = False)    
-	ModelResults.DemolitionFragility.to_csv('DemolitionFragility.csv', sep='\t', header = False, index = False)
+	# ModelResults.CollapseFragility.to_csv(os.path.join(resultsDir_buildingID, 'EDP_data','CollapseFragility.csv'), sep='\t', header = False, index = False)    
+	# ModelResults.DemolitionFragility.to_csv('DemolitionFragility.csv', sep='\t', header = False, index = False)
 	finish = time.time()
 	print('Finished processing MSA results for %s in %s Minutes'%(ID, (finish-start)/60))    
 

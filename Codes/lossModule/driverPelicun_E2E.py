@@ -60,8 +60,10 @@ def main(
     ID = BuildingList[bldg_idx]
     # split_str = ID.split('_')
 
-    HAZARD_LEVEL = [0.1, 0.3, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7, 1.9, 2.1, 2.3, 2.5, 2.7, 2.9, 3.1, 3.3, 3.5]
-    NUM_GM = np.array([22] * len(HAZARD_LEVEL), dtype=int) * 2 #should be multiplied by 2 if GMs are flipped 
+    # HAZARD_LEVEL = [0.1, 0.3, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7, 1.9, 2.1, 2.3, 2.5, 2.7, 2.9, 3.1, 3.3, 3.5]
+    # NUM_GM = np.array([22] * len(HAZARD_LEVEL), dtype=int) * 2 #should be multiplied by 2 if GMs are flipped 
+    HAZARD_LEVEL = [0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 1.0, 1.2, 1.5, 1.8, 2.0, 2.5, 3.0]
+    NUM_GM = np.array([30] * len(HAZARD_LEVEL), dtype=int) * 2 #should be multiplied by 2 if GMs are flipped 
     
     # siteID = split_str[0]
     # baselineID = '_'.join([split_str[0], split_str[1]])
@@ -118,7 +120,7 @@ def main(
         # DL_input_path = os.path.join(baseDir, *['BuildingModels', REGIONAL_STRATEGY, ID, 'LossAnalysis', 'PelicunInput', 'model_config.json'])
         DL_input_path = os.path.join(baseDir, *['Results', ID, 'LossAnalysis', 'PelicunInput', 'model_config.json'])
         # edp_input_path = os.path.join(baseDir, *['Results', 'HiFi_FMA', ID, 'demands.csv'])
-        edp_input_path = os.path.join(baseDir, *['Results', ID, f'demands_IL{hazard_level}.csv'])
+        edp_input_path = os.path.join(baseDir, *['Results', ID, 'LossAnalysis', 'PelicunInput', f'demands_IL{hazard_level}.csv'])
         # specify and make output file path to store the .csv outputs from Pelicun 2.6
         # outputDir = os.path.join(baseDir, *['BuildingModels', REGIONAL_STRATEGY, ID, 'LossAnalysis', 'PelicunOutput', f'IL_{hazard_level}'])
         outputDir = os.path.join(baseDir, *['Results', ID, 'LossAnalysis', 'PelicunOutput', f'IL_{hazard_level}'])

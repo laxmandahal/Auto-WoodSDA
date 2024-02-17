@@ -33,10 +33,11 @@ module load singularity
 # SGE_TASK_ID=1
 
 ############## This command for OpenSees works fine
-singularity run $H2_CONTAINER_LOC/opensees-3.2.0.sif OpenSees RunIDAHoffmanXx.tcl $SGE_TASK_ID
-singularity run $H2_CONTAINER_LOC/opensees-3.2.0.sif OpenSees RunIDAHoffmanZz.tcl $SGE_TASK_ID
+# singularity run $H2_CONTAINER_LOC/opensees-3.2.0.sif OpenSees RunIDAHoffmanXx.tcl $SGE_TASK_ID
+# singularity run $H2_CONTAINER_LOC/opensees-3.2.0.sif OpenSees RunIDAHoffmanZz.tcl $SGE_TASK_ID
 
-
+singularity run $H2_CONTAINER_LOC/opensees-3.2.0.sif OpenSees RunNRHAXx.tcl $SGE_TASK_ID
+singularity run $H2_CONTAINER_LOC/opensees-3.2.0.sif OpenSees RunNRHAZz.tcl $SGE_TASK_ID
 
 ## using OpenSees MP in series                                                                                                                
 # time apptainer exec $H2_CONTAINER_LOC/h2-opensees_3.5.0.sif OpenSeesMP RunNRHA_EA_VaFi.tcl $SGE_TASK_ID EA-VaFi                        

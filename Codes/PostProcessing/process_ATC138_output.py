@@ -5,13 +5,17 @@ import json
 from pathlib import Path
 import argparse
 
-def extract_atc138_results():
+def extract_atc138_results(
+    run_on_Hoffman:bool = False
+):
 
-    # baseDir = r'/u/home/l/laxmanda/project-hvburton/autoWoodSDA/'
-    baseDir = r'/Users/laxmandahal/Desktop/UCLA/Phd/Research/woodSDA/autoWoodSDA_public'
+    if run_on_Hoffman:
+        baseDir = r'/u/home/l/laxmanda/project-hvburton/autoWoodSDA/'
+    else:
+        baseDir = r'/Users/laxmandahal/Desktop/UCLA/Phd/Research/woodSDA/autoWoodSDA_public'
 
-    HAZARD_LEVEL = [0.1, 0.3, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7, 1.9, 2.1, 2.3, 2.5, 2.7, 2.9, 3.1, 3.3, 3.5] #units: g
-    
+    # HAZARD_LEVEL = [0.1, 0.3, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7, 1.9, 2.1, 2.3, 2.5, 2.7, 2.9, 3.1, 3.3, 3.5] #units: g
+    HAZARD_LEVEL = [0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 1.0, 1.2, 1.5, 1.8, 2.0, 2.5, 3.0]
     # BuildingList = np.genfromtxt(os.path.join(baseDir, 'BuildingModels', 'ID_for_NRHA',
     #                                         f'ArchetypeIDs_for_NRHA_{REGIONAL_STRATEGY}.txt'), dtype=str)
     BuildingList = ['MFD6B']
@@ -88,9 +92,9 @@ def extract_atc138_results():
 
 
 if __name__ == '__main__':
-	# parser = argparse.ArgumentParser()
+	parser = argparse.ArgumentParser()
 	# #defining the arguments to be parsed
-	# parser.add_argument('--regional_strategy', type=str, default='HiFi')
+	parser.add_argument('--run_on_Hoffman', type=bool, default=False)
 	# # #parse command-line arguments
-	# args = parser.parse_args()
-	extract_atc138_results()
+	args = parser.parse_args()
+	extract_atc138_results(run_on_Hoffman=args.run_on_Hoffman)

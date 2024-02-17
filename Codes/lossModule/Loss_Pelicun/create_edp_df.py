@@ -56,7 +56,7 @@ def create_demands_df_pelicun(resultDir, buildingID, hazard_level, IM_value,
             
     df = pd.DataFrame(d)
     df['1-SA-0-1'] = IM_value
-    df.to_csv(os.path.join(resultDir, *[buildingID, f'demands_IL{hazard_level}.csv']))
+    df.to_csv(os.path.join(resultDir, *[buildingID, 'LossAnalysis', 'PelicunInput', f'demands_IL{hazard_level}.csv']))
 
     return df
 
