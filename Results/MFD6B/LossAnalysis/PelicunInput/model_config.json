@@ -1,7 +1,7 @@
 {
   "DL": {
     "Asset": {
-      "ComponentAssignmentFile": "/u/home/l/laxmanda/project-hvburton/autoWoodSDA/BuildingInfo/MFD6B/ComponentsList/components_list_marginals.csv",
+      "ComponentAssignmentFile": "/Users/laxmandahal/Desktop/UCLA/Phd/Research/woodSDA/autoWoodSDA_public/BuildingInfo/MFD6B/ComponentsList/components_list_marginals.csv",
       "ComponentDatabase": "FEMA P-58",
       "NumberOfStories": "4",
       "OccupancyType": "Multi-Unit Residential",
@@ -32,7 +32,7 @@
         }
       },
       "CollapseLimits": {
-        "PID": "0.1"
+        "PID": "0.5"
       },
       "DemandFilePath": "Loss_Pelicun/pelicun_3_1_master_new/examples/001/demands_s4.csv",
       "InferResidualDrift": "",

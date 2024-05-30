@@ -14,8 +14,8 @@ warnings.filterwarnings("ignore")
 
 
 
-baseDir = r'/u/home/l/laxmanda/project-hvburton/autoWoodSDA/'
-# baseDir = r'/Users/laxmandahal/Desktop/UCLA/Phd/Research/woodSDA/autoWoodSDA_public'
+# baseDir = r'/u/home/l/laxmanda/project-hvburton/autoWoodSDA/'
+baseDir = r'/Users/laxmandahal/Desktop/UCLA/Phd/Research/woodSDA/autoWoodSDA_public'
 
 
 sys.path.append(os.path.join(baseDir, *['Codes', 'lossModule', 'Loss_Pelicun']))
@@ -56,14 +56,15 @@ def main(
     # BuildingList = np.genfromtxt(os.path.join(baseDir, 'BuildingModels', 'ID_for_NRHA',
     #                                       f'ArchetypeIDs_for_NRHA_{REGIONAL_STRATEGY}.txt'), dtype=str)
     BuildingList = ['MFD6B']
+    # BuildingList = ['MFD6B_FEMA_P695']
     print(f'Initiating PELICUN Loss of {BuildingList[bldg_idx]} (idx: {bldg_idx})')
     ID = BuildingList[bldg_idx]
     # split_str = ID.split('_')
 
-    # HAZARD_LEVEL = [0.1, 0.3, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7, 1.9, 2.1, 2.3, 2.5, 2.7, 2.9, 3.1, 3.3, 3.5]
-    # NUM_GM = np.array([22] * len(HAZARD_LEVEL), dtype=int) * 2 #should be multiplied by 2 if GMs are flipped 
-    HAZARD_LEVEL = [0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 1.0, 1.2, 1.5, 1.8, 2.0, 2.5, 3.0]
-    NUM_GM = np.array([30] * len(HAZARD_LEVEL), dtype=int) * 2 #should be multiplied by 2 if GMs are flipped 
+    HAZARD_LEVEL = [0.1, 0.3, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7, 1.9, 2.1, 2.3, 2.5, 2.7, 2.9, 3.1, 3.3, 3.5]
+    NUM_GM = np.array([22] * len(HAZARD_LEVEL), dtype=int) * 2 #should be multiplied by 2 if GMs are flipped 
+    # HAZARD_LEVEL = [0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 1.0, 1.2, 1.5, 1.8, 2.0, 2.5, 3.0]
+    # NUM_GM = np.array([30] * len(HAZARD_LEVEL), dtype=int) * 2 #should be multiplied by 2 if GMs are flipped 
     
     # siteID = split_str[0]
     # baselineID = '_'.join([split_str[0], split_str[1]])
@@ -74,7 +75,7 @@ def main(
     archetype_width = 48
     total_plan_area = archetype_length * archetype_width
 
-    collapse_limit = 0.1
+    collapse_limit = 0.5
     num_stairs_per_floor = 2
     num_elevators = 1
 
@@ -98,6 +99,7 @@ def main(
                                     numRealization = 5000, 
                                     collapseLimit = collapse_limit,
                                     theta_collapse_g = 2.5,
+                                    demolition_limit=0.05,
                                     occupancyType = occupancy_type, 
                                     replacementCost = replacement_cost, 
                                     replacementTime = 365*2,

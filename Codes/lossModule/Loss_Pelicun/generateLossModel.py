@@ -84,6 +84,7 @@ def generateConfgFile_pelicun3p1new(baselineID,
                     BaseDirectory, planArea, numStories, numRealization = 1000, 
                     collapseLimit = 0.1, 
                     theta_collapse_g = 3.5,
+                    demolition_limit=0.05,
                     occupancyType= "Residential", 
                     replacementCost = 50000000, replacementTime = 540,
                     FEMA_residual_est = False):
@@ -125,7 +126,7 @@ def generateConfgFile_pelicun3p1new(baselineID,
     d_baseline['DL']['Damage']['CollapseFragility']["CapacityMedian"] = f"{theta_collapse_g * 386.088}"
     d_baseline['DL']['Damage']['CollapseFragility']["DemandType"] = "SA"
     d_baseline['DL']['Damage']['CollapseFragility']["Theta_1"] = "0.4"
-    d_baseline['DL']['Damage']['IrreparableDamage']["DriftCapacityMedian"] = "0.05"
+    d_baseline['DL']['Damage']['IrreparableDamage']["DriftCapacityMedian"] = "%s"%demolition_limit
     d_baseline['DL']['Damage']['IrreparableDamage']["DriftCapacityLogStd"] = "0.1"
     #DL -- Demands
     # d_baseline['DL']['Demands']['Calibration']['PID']['TruncateUpper'] = "%s"%collapseLimit

@@ -13,6 +13,9 @@ __pycache__/
 **/ATC138Output/
 **/PelicunOutput/
 **/MFD6B_FEMA_P695/
+**/MFD6B_collpse_0.1/
+**/MFD6B_collapse_10/
+**/LossAnalysis1/
 
 OpenSees.exe
 OpenSeesMP.exe
