@@ -58,7 +58,7 @@ SGE_TASK_ID=1
 # python -u debug/deleteNRHA_E2E_jobarray.py --regional_strategy $REGIONAL_STRATEGY --bldg_idx $SGE_TASK_ID
 
 ## copy EDP data from one folder to another to perform downstream risk assessment
-python3 -u debug/copy_edp_folders.py --regional_strategy_src HiFi --regional_strategy_dest $REGIONAL_STRATEGY --bldg_idx $SGE_TASK_ID
+# python3 -u debug/copy_edp_folders.py --regional_strategy_src HiFi --regional_strategy_dest $REGIONAL_STRATEGY --bldg_idx $SGE_TASK_ID
 
 # 11/4/2023- this works
 python3 -u loss_atc138/driverPelicun_E2E_jobarray.py --regional_strategy $REGIONAL_STRATEGY --bldg_idx $SGE_TASK_ID

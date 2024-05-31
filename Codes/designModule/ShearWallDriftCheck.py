@@ -51,6 +51,8 @@ class ShearWallDriftCheck:
         floorIndex,
         counter,
         wall_line_name,
+        Ss, 
+        S1,
         weight_factor = 1.0,
         seismic_design_level = 'Extreme',
         designScheme = 'LRFD',
@@ -79,6 +81,8 @@ class ShearWallDriftCheck:
 
         self.iterateFlag = iterateFlag
         self.counter = counter
+        self.Ss = Ss
+        self.S1 = S1
 
         self.userDefinedDriftTag = userDefinedDriftTag
         self.wallLengthHistory = []
@@ -107,6 +111,8 @@ class ShearWallDriftCheck:
             self.floorIndex,
             self.counter,
             self.wall_line_name,
+            self.Ss,
+            self.S1,
             self.seismic_weight_factor,
             self.seismic_design_level,
             self.designScheme,
@@ -182,6 +188,8 @@ class ShearWallDriftCheck:
                 self.floorIndex,
                 self.counter,
                 self.wall_line_name,
+                self.Ss,
+                self.S1,
                 self.seismic_weight_factor,
                 self.seismic_design_level,
                 self.designScheme,
@@ -241,3 +249,23 @@ class ShearWallDriftCheck:
     #     return self.tagPerWall
     #     # return self.tag
 
+
+if __name__ == '__main__':
+    import json
+    import os
+    cwd = r'/Users/laxmandahal/Desktop/UCLA/Phd/Research/RegionalStudy/Codes/woodSDPA'
+    baseDir = r'/Users/laxmandahal/Desktop/UCLA/Phd/Research/RegionalStudy'
+    dataDir = os.path.join(baseDir, 'data')
+    woodSDPA_dir = os.path.join(baseDir, *['Codes', 'woodSDPA'])
+    baseline_BIM = json.load(open(os.path.join(dataDir, 'Baseline_archetype_info_w_periods.json')))
+    caseID = list(baseline_BIM.keys())[0]
+    baseline_info_dir = os.path.join(cwd, *['BuildingInfo', caseID])
+    direction = baseline_BIM[caseID]['Directions']
+    wall_line_name = baseline_BIM[caseID]['wall_line_names']
+    num_walls_per_line = baseline_BIM[caseID]['num_walls_per_wallLine']
+    counter = 0
+
+    sw_design = ShearWallDriftCheck(caseID, baseline_info_dir, 'X', wallIndex=0, floorIndex=1, 
+                                counter=counter, wall_line_name='gridA', Ss=2, S1=0.7,
+                                weight_factor=1, seismic_design_level='High'
+                                )

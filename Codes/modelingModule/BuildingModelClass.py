@@ -5,9 +5,11 @@ import pandas as pd
 
 class BuildingModel(object):
 
-  def __init__(self, CaseID, BaseDirectory, seismic_design_level = 'Extreme', SeismicDesignParameterFlag = True):
-      self.ID = None
+  def __init__(self, CaseID, BaseDirectory, Ss, S1, seismic_design_level = 'High', SeismicDesignParameterFlag = True):
+      self.ID = CaseID
       self.seismic_design_level = seismic_design_level
+      self.Ss = Ss
+      self.S1 = S1
     ## Building Information
       self.numberOfStories = None
       self.storyHeights = None
@@ -220,10 +222,7 @@ class BuildingModel(object):
 # Seismic design parameter calculation follows ASCE 7-10 Chapter 12
 # In current wood frame building models, only used in defining pushover loading protocal 
       os.chdir(os.path.join(BaseDirectory, 'SeismicDesignParameters'))
-      # designLevel = np.genfromtxt('DesignLevel_%s.txt'%self.seismic_design_level, dtype=None, encoding = None)
-      with open('DesignLevel_%s_workstation.txt' % self.seismic_design_level, 'r') as f:
-          designLevel = f.read()
-      designLevel = designLevel.split('\n')
+      designLevel = np.genfromtxt('DesignLevel_%s.txt'%self.seismic_design_level, dtype=None, encoding = None)
       site_class = str(designLevel[0])
         # if SeismicDesignParameterFlag == 0:
         #     self.SeismicDesignParameter = None
@@ -233,8 +232,10 @@ class BuildingModel(object):
         #         site_class = myfile.read()
         # Ss = np.genfromtxt("Ss.txt")
         # S1 = np.genfromtxt("S1.txt")
-      Ss = float(designLevel[1])
-      S1 = float(designLevel[2])
+    #   Ss = float(designLevel[1])
+    #   S1 = float(designLevel[2])
+      Ss = self.Ss
+      S1 = self.S1
       Fa = self.determine_Fa_coefficient(site_class, Ss)
       Fv = self.determine_Fv_coefficient(site_class, S1)
       SMS, SM1, SDS, SD1 = self.calculate_DBE_acceleration(Ss, S1, Fa, Fv)

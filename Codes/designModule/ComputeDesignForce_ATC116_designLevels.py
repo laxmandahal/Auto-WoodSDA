@@ -48,8 +48,6 @@ class ComputeSeismicForce(object):
         direction,
         wall_line_name,
         wallIndex,
-        Ss,
-        S1,
         weight_factor = 1.0,
         seismic_design_level = 'Extreme',
         designScheme = 'LRFD',
@@ -67,8 +65,7 @@ class ComputeSeismicForce(object):
         self.BaseDirectory = BaseDirectory   
         self.seismic_design_level = seismic_design_level
         self.seismic_weight_factor = weight_factor
-        self.Ss = Ss
-        self.S1 = S1
+
         if (designScheme != 'ASD') and (designScheme != 'LRFD'):
             print("Invalid design scheme. Choose between ['ASD', 'LRFD']")
             sys.exit(1)
@@ -395,10 +392,8 @@ class ComputeSeismicForce(object):
         #         site_class = myfile.read()
         # Ss = np.genfromtxt("Ss.txt")
         # S1 = np.genfromtxt("S1.txt")
-        # Ss = float(designLevel[1])
-        # S1 = float(designLevel[2])
-        Ss = self.Ss
-        S1 = self.S1
+        Ss = float(designLevel[1])
+        S1 = float(designLevel[2])
         Fa = self.determine_Fa_coefficient(site_class, Ss)
         Fv = self.determine_Fv_coefficient(site_class, S1)
         SMS, SM1, SDS, SD1 = self.calculate_DBE_acceleration(Ss, S1, Fa, Fv)
@@ -777,25 +772,3 @@ class ComputeSeismicForce(object):
 
         return self.tension_demand
 
-
-if __name__ == '__main__':
-    import json
-
-    cwd = r'/Users/laxmandahal/Desktop/UCLA/Phd/Research/RegionalStudy/Codes/woodSDPA'
-    baseDir = r'/Users/laxmandahal/Desktop/UCLA/Phd/Research/RegionalStudy'
-    dataDir = os.path.join(baseDir, 'data')
-    woodSDPA_dir = os.path.join(baseDir, *['Codes', 'woodSDPA'])
-    baseline_BIM = json.load(open(os.path.join(dataDir, 'Baseline_archetype_info_w_periods.json')))
-    caseID = list(baseline_BIM.keys())[0]
-    baseline_info_dir = os.path.join(cwd, *['BuildingInfo', caseID])
-    direction = baseline_BIM[caseID]['Directions']
-    wall_line_name = baseline_BIM[caseID]['wall_line_names']
-    num_walls_per_line = baseline_BIM[caseID]['num_walls_per_wallLine']
-    counter = 0
-
-    seismic_force = ComputeSeismicForce(caseID, baseline_info_dir, 'X', wallIndex=0,
-                                 wall_line_name='gridA', Ss=2, S1=0.7,
-                                weight_factor=1, seismic_design_level='High'
-                                )
-    print(seismic_force.SeismicDesignParameter['ELF Base Shear'])
-    

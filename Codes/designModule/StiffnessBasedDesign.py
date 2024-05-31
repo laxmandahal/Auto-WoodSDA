@@ -53,6 +53,8 @@ class RDADesignIterationClass():
                 numWallsPerLine, 
                 counter, 
                 wall_line_name,
+                Ss, 
+                S1,
                 weight_factor = 1.0, 
                 seismic_design_level = 'Extreme',
                 designScheme = 'LRFD',
@@ -78,7 +80,8 @@ class RDADesignIterationClass():
         self.seismic_design_level = seismic_design_level
         self.mat_nsc_ext_int = mat_ext_int
         self.seismic_weight_factor = weight_factor
-        
+        self.Ss = Ss
+        self.S1 = S1
         self.iterateFlag = iterateFlag
         self.counter = counter
         
@@ -87,7 +90,9 @@ class RDADesignIterationClass():
 
         floorIndex = 0
         globals()['%s_wall%d'%(self.wall_line_name[0],0)] = ShearWallDriftCheck(self.caseID, self.BaseDirectory, self.direction[0], 0, floorIndex, self.counter, 
-                                                                                self.wall_line_name[0],self.seismic_weight_factor, self.seismic_design_level, 
+                                                                                self.wall_line_name[0], 
+                                                                                self.Ss, self.S1,
+                                                                                self.seismic_weight_factor, self.seismic_design_level, 
                                                                                 self.designScheme,
                                                                                 self.userDefinedDetailingTag, 
                                                                                 self.reDesignFlag, self.userDefinedDriftTag, self.userDefinedDCTag, 
@@ -130,9 +135,13 @@ class RDADesignIterationClass():
 
 
         for i in range(len(self.wall_line_name)):
+            # print(self.direction[i], self.wall_line_name[i])
             for j in range(numWallsPerLine[i]):
+                # print('j is ',j)
                 globals()['%s_wall%d'%(self.wall_line_name[i],j)] = ShearWallDriftCheck(self.caseID, self.BaseDirectory, self.direction[i], j, floorIndex, 
-                                                                                        self.counter, wall_line_name[i], self.seismic_weight_factor,
+                                                                                        self.counter, wall_line_name[i], 
+                                                                                        self.Ss, self.S1,
+                                                                                        self.seismic_weight_factor,
                                                                                         self.seismic_design_level, 
                                                                                         self.designScheme,
                                                                                         self.userDefinedDetailingTag, self.reDesignFlag, 
@@ -224,6 +233,7 @@ class RDADesignIterationClass():
             for jj in range(self.numWallsPerLine[ii]):
                 globals()['swDesign%s_wall%d'%(self.wall_line_name[ii],jj)] = FinalShearWallDesign(self.caseID, self.BaseDirectory, self.direction[ii], jj, 
                                                                                                    self.numStory, self.counter, self.wall_line_name[ii],
+                                                                                                   self.Ss, self.S1,
                                                                                                    self.seismic_weight_factor, self.seismic_design_level,
                                                                                                    self.designScheme, self.mat_nsc_ext_int,
                                                                                                    self.userDefinedDetailingTag, 
@@ -238,4 +248,23 @@ class RDADesignIterationClass():
         self.maindf = pd.concat(d, keys = wallname) #.reset_index(level = 1, drop = True)
 
 
+# if __name__ == '__main__':
+#     import json
 
+#     cwd = r'/Users/laxmandahal/Desktop/UCLA/Phd/Research/RegionalStudy/Codes/woodSDPA'
+#     baseDir = r'/Users/laxmandahal/Desktop/UCLA/Phd/Research/RegionalStudy'
+#     dataDir = os.path.join(baseDir, 'data')
+#     woodSDPA_dir = os.path.join(baseDir, *['Codes', 'woodSDPA'])
+#     baseline_BIM = json.load(open(os.path.join(dataDir, 'Baseline_archetype_info_w_periods.json')))
+#     caseID = list(baseline_BIM.keys())[0]
+#     baseline_info_dir = os.path.join(cwd, *['BuildingInfo', caseID])
+#     direction = baseline_BIM[caseID]['Directions']
+#     wall_line_name = baseline_BIM[caseID]['wall_line_names']
+#     num_walls_per_line = baseline_BIM[caseID]['num_walls_per_wallLine']
+#     counter = 0
+
+#     sw_design = RDADesignIterationClass(caseID, baseline_info_dir, direction=direction, numWallsPerLine=num_walls_per_line,
+#                                         counter=counter, wall_line_name=wall_line_name, Ss=2, S1=0.7,
+#                                 weight_factor=1, seismic_design_level='High',
+#                                 mat_ext_int='Stucco_GWB'
+                                # )

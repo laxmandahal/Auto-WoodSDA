@@ -23,7 +23,7 @@ import sys
 from global_variables import shearwall_database
 from global_variables import tiedown_database
 from ComputeDesignForce import ComputeSeismicForce
-
+# from Codes.designModule.ComputeDesignForce import ComputeSeismicForce
 
 class DesignShearWall:
     ''' 
@@ -38,6 +38,7 @@ class DesignShearWall:
     :param floorIndex: index of the wall to be designed. [0, 1, 2,,...] --> [floor1, floor2, ...], type: int
     :param counter: counter to keep track of shearwall assembly in shearwall_database, type: int 
     :param wall_line_name: Name of the wall line to be designed, type: str
+    :param Ss and S1: Design parameters, type: float
     :param userDefinedDetailingTag: flag to indicate of user-defined shear wall detailing is desired, type:bool 
     :param reDesignFlag: Flag to redesign, if True wall length increased by 0.5ft type: bool
     :param userDefinedDriftTag: Flag to indicate if user-defined drift limit is desired, type: bool 
@@ -56,7 +57,8 @@ class DesignShearWall:
         floorIndex,
         counter,
         wall_line_name,
-        # iterateFlag,
+        Ss, 
+        S1,
         weight_factor = 1.0,
         seismic_design_level = 'Extreme',
         designScheme = 'LRFD',
@@ -85,6 +87,8 @@ class DesignShearWall:
         self.counter = counter
         self.floorIndex = floorIndex
 
+        self.Ss = Ss
+        self.S1 = S1
         #instantiate ComputeSeismicForce class to be able to extract shear wall and tie-down demands
         ModelClass = ComputeSeismicForce(
             self.caseID,
@@ -92,19 +96,23 @@ class DesignShearWall:
             self.direction,
             self.wall_line_name,
             self.wallIndex,
+            self.Ss,
+            self.S1,
             self.seismic_weight_factor,
             self.seismic_design_level,
             self.designScheme,
             self.reDesignFlag,
             self.envelopeAnalysis,
         )
-        self.loads = ModelClass.loads
-        self.loadRatio = ModelClass.loadRatio
+        # self.loads = ModelClass.loads
+        # self.loadRatio = ModelClass.loadRatio
         self.Fx = ModelClass.SeismicDesignParameter["story_force"]
         self.Cd = ModelClass.SeismicDesignParameter["Cd"]
         self.Ie = ModelClass.SeismicDesignParameter["Ie"]
         self.numFloors = ModelClass.numberOfStories
+        # print(self.numFloors, ModelClass.floorArea)
         self.no_of_walls = ModelClass.no_of_walls
+        # print(self.no_of_walls)
 
         if self.designScheme == 'ASD':
             self.baseShear = ModelClass.SeismicDesignParameter["ELF Base Shear"] * 0.7
@@ -683,3 +691,24 @@ class DesignShearWall:
 
     #     return self.wallLength
 
+
+# if __name__ == '__main__':
+#     import json
+
+#     cwd = r'/Users/laxmandahal/Desktop/UCLA/Phd/Research/RegionalStudy/Codes/woodSDPA'
+#     baseDir = r'/Users/laxmandahal/Desktop/UCLA/Phd/Research/RegionalStudy'
+#     dataDir = os.path.join(baseDir, 'data')
+#     woodSDPA_dir = os.path.join(baseDir, *['Codes', 'woodSDPA'])
+#     baseline_BIM = json.load(open(os.path.join(dataDir, 'Baseline_archetype_info_w_periods.json')))
+#     caseID = list(baseline_BIM.keys())[0]
+#     baseline_info_dir = os.path.join(cwd, *['BuildingInfo', caseID])
+#     direction = baseline_BIM[caseID]['Directions']
+#     wall_line_name = baseline_BIM[caseID]['wall_line_names']
+#     num_walls_per_line = baseline_BIM[caseID]['num_walls_per_wallLine']
+#     counter = 0
+
+#     sw_design = DesignShearWall(caseID, baseline_info_dir, 'X', wallIndex=0, floorIndex=1, 
+#                                 counter=counter, wall_line_name='gridA', Ss=2, S1=0.7,
+#                                 weight_factor=1, seismic_design_level='High'
+#                                 )
+#     # print(sw_design.find_shearwall_candidate(shearwall_database))

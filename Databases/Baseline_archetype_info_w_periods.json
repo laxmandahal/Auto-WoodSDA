@@ -1,0 +1,446 @@
+{
+    "s4_96x48": {
+        "Num Story": 4, 
+        "Directions": [
+            "X", 
+            "X", 
+            "X", 
+            "Y", 
+            "Y", 
+            "Y", 
+            "Y", 
+            "Y", 
+            "Y", 
+            "Y"
+        ], 
+        "wall_line_names": [
+            "gridA", 
+            "gridB", 
+            "gridC", 
+            "grid1", 
+            "grid2", 
+            "grid3", 
+            "grid4", 
+            "grid5", 
+            "grid6", 
+            "grid7"
+        ], 
+        "num_walls_per_wallLine": [
+            4, 
+            4, 
+            4, 
+            2, 
+            2, 
+            4, 
+            2, 
+            4, 
+            2, 
+            2
+        ], 
+        "Periods": [
+            0.626165486653296, 
+            0.503548540737408, 
+            0.47918543163751404, 
+            0.22333868310109134
+        ]
+    }, 
+    "s4_60x32": {
+        "Num Story": 4, 
+        "Directions": [
+            "X", 
+            "X", 
+            "Y", 
+            "Y", 
+            "Y", 
+            "Y", 
+            "Y"
+        ], 
+        "wall_line_names": [
+            "gridA", 
+            "gridB", 
+            "grid1", 
+            "grid2", 
+            "grid3", 
+            "grid4", 
+            "grid5"
+        ], 
+        "num_walls_per_wallLine": [
+            6, 
+            6, 
+            1, 
+            1, 
+            1, 
+            1, 
+            1
+        ], 
+        "Periods": [
+            0.5871079542525208, 
+            0.5312221595188443, 
+            0.4520011073725896, 
+            0.21180070927568692
+        ]
+    }, 
+    "s3_96x48": {
+        "Num Story": 3, 
+        "Directions": [
+            "X", 
+            "X", 
+            "X", 
+            "Y", 
+            "Y", 
+            "Y", 
+            "Y", 
+            "Y", 
+            "Y", 
+            "Y"
+        ], 
+        "wall_line_names": [
+            "gridA", 
+            "gridB", 
+            "gridC", 
+            "grid1", 
+            "grid2", 
+            "grid3", 
+            "grid4", 
+            "grid5", 
+            "grid6", 
+            "grid7"
+        ], 
+        "num_walls_per_wallLine": [
+            4, 
+            4, 
+            4, 
+            2, 
+            2, 
+            4, 
+            2, 
+            4, 
+            2, 
+            2
+        ], 
+        "Periods": [
+            0.49977428274564767, 
+            0.4177026539852174, 
+            0.3951226923474871, 
+            0.1856716628284033
+        ]
+    }, 
+    "s3_60x32": {
+        "Num Story": 3, 
+        "Directions": [
+            "X", 
+            "X", 
+            "Y", 
+            "Y", 
+            "Y", 
+            "Y", 
+            "Y"
+        ], 
+        "wall_line_names": [
+            "gridA", 
+            "gridB", 
+            "grid1", 
+            "grid2", 
+            "grid3", 
+            "grid4", 
+            "grid5"
+        ], 
+        "num_walls_per_wallLine": [
+            6, 
+            6, 
+            1, 
+            1, 
+            1, 
+            1, 
+            1
+        ], 
+        "Periods": [
+            0.45778875926440177, 
+            0.41733388474763644, 
+            0.35410116896486055, 
+            0.16933555004327142
+        ]
+    }, 
+    "s2_96x48": {
+        "Num Story": 2, 
+        "Directions": [
+            "X", 
+            "X", 
+            "X", 
+            "Y", 
+            "Y", 
+            "Y", 
+            "Y", 
+            "Y", 
+            "Y", 
+            "Y"
+        ], 
+        "wall_line_names": [
+            "gridA", 
+            "gridB", 
+            "gridC", 
+            "grid1", 
+            "grid2", 
+            "grid3", 
+            "grid4", 
+            "grid5", 
+            "grid6", 
+            "grid7"
+        ], 
+        "num_walls_per_wallLine": [
+            4, 
+            4, 
+            4, 
+            2, 
+            2, 
+            4, 
+            2, 
+            4, 
+            2, 
+            2
+        ], 
+        "Periods": [
+            0.36034822549621387, 
+            0.31353364846043874, 
+            0.29059767245675666, 
+            0.15241374613595118
+        ]
+    }, 
+    "s2_60x32": {
+        "Num Story": 2, 
+        "Directions": [
+            "X", 
+            "X", 
+            "Y", 
+            "Y", 
+            "Y", 
+            "Y", 
+            "Y"
+        ], 
+        "wall_line_names": [
+            "gridA", 
+            "gridB", 
+            "grid1", 
+            "grid2", 
+            "grid3", 
+            "grid4", 
+            "grid5"
+        ], 
+        "num_walls_per_wallLine": [
+            6, 
+            6, 
+            1, 
+            1, 
+            1, 
+            1, 
+            1
+        ], 
+        "Periods": [
+            0.3467200020500555, 
+            0.3086155147552884, 
+            0.26004383473501685, 
+            0.14254582122231663
+        ]
+    }, 
+    "s2_48x32": {
+        "Num Story": 2, 
+        "Directions": [
+            "X", 
+            "X", 
+            "X", 
+            "Y", 
+            "Y", 
+            "Y"
+        ], 
+        "wall_line_names": [
+            "gridA", 
+            "gridB", 
+            "gridC", 
+            "grid1", 
+            "grid2", 
+            "grid3"
+        ], 
+        "num_walls_per_wallLine": [
+            3, 
+            3, 
+            3, 
+            2, 
+            2, 
+            2
+        ], 
+        "Periods": [
+            0.30001067306454204, 
+            0.2656433018579831, 
+            0.2481826792887269, 
+            0.12324316760280488
+        ]
+    }, 
+    "s2_40x30": {
+        "Num Story": 2, 
+        "Directions": [
+            "X", 
+            "X", 
+            "Y", 
+            "Y"
+        ], 
+        "wall_line_names": [
+            "gridA", 
+            "gridC", 
+            "grid1", 
+            "grid3"
+        ], 
+        "num_walls_per_wallLine": [
+            3, 
+            3, 
+            3, 
+            3
+        ], 
+        "Periods": [
+            0.2334187375408343, 
+            0.2158103628215074, 
+            0.20518879985534436, 
+            0.08919767029205143
+        ]
+    }, 
+    "s1_96x48": {
+        "Num Story": 1, 
+        "Directions": [
+            "X", 
+            "X", 
+            "X", 
+            "Y", 
+            "Y", 
+            "Y", 
+            "Y", 
+            "Y", 
+            "Y", 
+            "Y"
+        ], 
+        "wall_line_names": [
+            "gridA", 
+            "gridB", 
+            "gridC", 
+            "grid1", 
+            "grid2", 
+            "grid3", 
+            "grid4", 
+            "grid5", 
+            "grid6", 
+            "grid7"
+        ], 
+        "num_walls_per_wallLine": [
+            4, 
+            4, 
+            4, 
+            2, 
+            2, 
+            4, 
+            2, 
+            4, 
+            2, 
+            2
+        ], 
+        "Periods": [
+            0.21587502065799619, 
+            0.18990246443206882, 
+            0.17895271642185578, 
+            0.0006799788576189
+        ]
+    }, 
+    "s1_60x32": {
+        "Num Story": 1, 
+        "Directions": [
+            "X", 
+            "X", 
+            "Y", 
+            "Y", 
+            "Y", 
+            "Y", 
+            "Y"
+        ], 
+        "wall_line_names": [
+            "gridA", 
+            "gridB", 
+            "grid1", 
+            "grid2", 
+            "grid3", 
+            "grid4", 
+            "grid5"
+        ], 
+        "num_walls_per_wallLine": [
+            6, 
+            6, 
+            1, 
+            1, 
+            1, 
+            1, 
+            1
+        ], 
+        "Periods": [
+            0.24494077837073394, 
+            0.2186730755807741, 
+            0.18809568687146308, 
+            0.000568063947932
+        ]
+    }, 
+    "s1_48x32": {
+        "Num Story": 1, 
+        "Directions": [
+            "X", 
+            "X", 
+            "X", 
+            "Y", 
+            "Y", 
+            "Y"
+        ], 
+        "wall_line_names": [
+            "gridA", 
+            "gridB", 
+            "gridC", 
+            "grid1", 
+            "grid2", 
+            "grid3"
+        ], 
+        "num_walls_per_wallLine": [
+            3, 
+            3, 
+            3, 
+            2, 
+            2, 
+            2
+        ], 
+        "Periods": [
+            0.18747405533130265, 
+            0.16514355639415315, 
+            0.15423475774818096, 
+            0.000404668385748
+        ]
+    }, 
+    "s1_40x30": {
+        "Num Story": 1, 
+        "Directions": [
+            "X", 
+            "X", 
+            "Y", 
+            "Y"
+        ], 
+        "wall_line_names": [
+            "gridA", 
+            "gridC", 
+            "grid1", 
+            "grid3"
+        ], 
+        "num_walls_per_wallLine": [
+            3, 
+            3, 
+            3, 
+            3
+        ], 
+        "Periods": [
+            0.1548254199515979, 
+            0.14244814236488518, 
+            0.1341518871129004, 
+            0.00038640309982140007
+        ]
+    }
+}

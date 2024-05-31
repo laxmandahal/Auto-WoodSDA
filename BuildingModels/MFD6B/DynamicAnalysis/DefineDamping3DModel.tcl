@@ -1,8 +1,8 @@
 # This file will be used to define damping 
 
 # Define the periods to use for damping parameter calculation 
-set periodForRayleighDamping_1 0.479; 
-set periodForRayleighDamping_2 0.405; 
+set periodForRayleighDamping_1 0.626; 
+set periodForRayleighDamping_2 0.479; 
 # Define damping parameters 
 set omegaI [expr (2.0 * $pi) / ($periodForRayleighDamping_1)] 
 set omegaJ [expr (2.0 * $pi) / ($periodForRayleighDamping_2)] 

@@ -1,0 +1,2 @@
+BuildingID,Layout Type,SiteID,Latitude,Longitude,Site Class,Risk Category,R,Cd,Ie,Design Year,Ss(g),S1(g),wallMaterial,seismicWeight
+MFD6B,s4_96x48,1,33.9721,-118.42177,D,,,,,2020,1.855,0.654,Stucco_GWB,Normal
