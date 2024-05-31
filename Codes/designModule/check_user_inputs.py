@@ -73,6 +73,10 @@ def check_and_complete_inputs(
     if 'Design Year' in empty_columns:
         input_df['Design Year'] = 2020
         print('Missing design year detected. Assigned 2020 as the default design year')
+    if 'Allowable Drift' in empty_columns:
+        input_df['Allowable Drift'] = 0.02
+        print('Missing Allowable Drift detected. Assigned 2% as the default value')
+
     
     if ('Ss(g)' in empty_columns) or ('S1(g)' in empty_columns):
         if (('Latitude' in empty_columns) or ('Longitude' in empty_columns)):

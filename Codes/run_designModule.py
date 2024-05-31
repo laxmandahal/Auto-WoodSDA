@@ -91,8 +91,9 @@ def design_and_generate_model(
     building_design = RDADesignIterationClass(building_id, 
                                               building_info_dir, direction, num_walls_per_line, counter, wall_line_name,
                                               designScheme = 'LRFD', 
-                                                Ss=df_inputs_checked['Ss(g)'].values[0],
-                                                S1=df_inputs_checked['S1(g)'].values[0], 
+                                                # Ss=df_inputs_checked['Ss(g)'].values[0],
+                                                # S1=df_inputs_checked['S1(g)'].values[0],
+                                                df_inputs=df_inputs,
                                                 weight_factor=wt_factor_name_mapping[df_inputs_checked['seismicWeight'].values[0]], 
                                                 seismic_design_level='High', 
                                                 mat_ext_int=df_inputs_checked['wallMaterial'].values[0]
@@ -103,10 +104,10 @@ def design_and_generate_model(
     InfoDirectory = os.path.join(root_dir, *['BuildingInfo', building_id])
     # model class establishes some of the inputs required by the modeling module. Most of the code is redundant in this class, 
     ## needs future clean-up 
-    ModelClass = BuildingModel(building_id, InfoDirectory,
-                               Ss=df_inputs_checked['Ss(g)'].values[0],
-                               S1=df_inputs_checked['S1(g)'].values[0])
-    ModelClass.read_in_txt_inputs(building_id, InfoDirectory)
+    ModelClass = BuildingModel(building_id)
+    ModelClass.read_in_txt_inputs(building_id, InfoDirectory,
+                                  df_inputs=df_inputs
+                                  )
 
     
     if save_design_csv:

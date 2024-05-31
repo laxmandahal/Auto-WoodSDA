@@ -51,8 +51,9 @@ class FinalShearWallDesign():
                 numFloors, 
                 counter, 
                 wall_line_name,
-                Ss, 
-                S1,
+                # Ss, 
+                # S1,
+                df_inputs,
                 weight_factor = 1.0,
                 seismic_design_level = 'Extreme',
                 designScheme = 'LRFD',
@@ -77,8 +78,8 @@ class FinalShearWallDesign():
         self.seismic_design_level = seismic_design_level
         self.mat_nsc_ext_int = mat_ext_int
         self.seismic_weight_factor = weight_factor
-        self.Ss = Ss
-        self.S1 = S1
+        # self.Ss = Ss
+        # self.S1 = S1
         self.numFloors = numFloors
         
         self.iterateFlag = iterateFlag
@@ -91,19 +92,10 @@ class FinalShearWallDesign():
         
         #instantiate all the class methods so that the attributes can be used as class variables 
         self.read_inputs()
-        self.DesignIteration()
-        self.FinalDesign()
+        self.DesignIteration(df_inputs)
+        self.FinalDesign(df_inputs)
         # if self.numFloors == 1:
-        # dummysw = ShearWallDriftCheck(self.caseID, self.BaseDirectory, self.direction, self.wallIndex,
-        #                             0, self.counter, self.wall_line_name,self.seismic_weight_factor, self.seismic_design_level,
-        #                             self.designScheme, self.userDefinedDetailingTag,               
-        #                             self.reDesignFlag, self.userDefinedDriftTag, self.userDefinedDCTag, 
-        #                             self.iterateFlag, self.envelopeAnalysis)
-        # self.no_of_walls = dummysw.wallName.no_of_walls
-        # print(self.no_of_walls)
-        # self.getFinalWallLength()
-        # self.getFinalWallHeight()
-        # self.getOpenSeesTag()
+
     def read_inputs(self):
         """
         This method is used to read all the needed shear wall user inputs.
@@ -112,12 +104,6 @@ class FinalShearWallDesign():
         :return: instantiates required class variables and attributes 
         """
 
-        # os.chdir(
-        #     self.BaseDirectory
-        #     + "/%s_direction_wall" % self.direction
-        #     + "/%s" % self.wall_line_name
-        #     + "/MaterialProperties"
-        # )
         # self.pinching4IndexShearWall = np.genfromtxt("pinching4Index_shearWall%d.txt"%self.wallIndex).astype(int)
         ##### Changelog (12/29/2021): Moving pinching4index into geometry folder. Trying to make it work with only one .txt file input 
         os.chdir(
@@ -153,16 +139,10 @@ class FinalShearWallDesign():
                 # self.pinching4IndexShearWall = np.genfromtxt("pinching4Index.txt").astype(int)[:,None]
                 self.pinching4IndexShearWall = np.array([list(np.genfromtxt("pinching4Index.txt"))]).astype(int)[:None]
 
-        # if int(self.no_of_walls) == 1: 
-        #     self.pinching4IndexShearWall = np.genfromtxt("pinching4Index.txt").astype(int)[:,None]
-        # print(self.pinching4IndexShearWall, self.pinching4IndexShearWall.shape)
-        # self.pinching4IndexNonStructural = np.genfromtxt("pinching4Index_nsc%d.txt"%self.wallIndex).astype(int)
-        # self.pinching4MaterialNumber_nsc = np.genfromtxt("pinching4MaterialNumber_nsc%d.txt"%self.wallIndex).astype(int)
-
         os.chdir(self.BaseDirectory + "/StructuralProperties" + "/%sWoodPanels"%self.direction)
         self.pinching4MaterialNumber = np.genfromtxt("Pinching4MaterialNumber_%s.txt"%self.mat_nsc_ext_int)
 
-    def DesignIteration(self):
+    def DesignIteration(self, df_inputs):
         '''
         Method to iterate the design along the height of the building. 
 
@@ -176,7 +156,7 @@ class FinalShearWallDesign():
         for i in range(0, self.numFloors):
             sw = ShearWallDriftCheck(self.caseID, self.BaseDirectory, self.direction, self.wallIndex,
                                      i, self.counter, self.wall_line_name,
-                                     self.Ss, self.S1,
+                                     df_inputs,
                                      self.seismic_weight_factor, self.seismic_design_level,
                                      self.designScheme, self.userDefinedDetailingTag,               
                                      self.reDesignFlag, self.userDefinedDriftTag, self.userDefinedDCTag, 
@@ -203,11 +183,6 @@ class FinalShearWallDesign():
                     # print(i, self.pinching4IndexShearWall[[kk]][j])
                     self.pinching4MaterialNumber[i, self.pinching4IndexShearWall[[kk]][j][self.wallIndex]] = tag[kk]
                     # print(self.pinching4MaterialNumber)
-                    # for idx in range(len(self.pinching4IndexShearWall[[kk]][j])):
-                        # print(i, self.pinching4IndexShearWall[[kk]][j][idx])
-                        # self.pinching4MaterialNumber[i, idx] = tag[kk]
-                # for jj in range(len(self.pinching4IndexNonStructural)):
-                #     self.pinching4MaterialNumber[i+1, self.pinching4IndexNonStructural[jj]] = 
 
         os.chdir(self.BaseDirectory + "/StructuralProperties" + "/%sWoodPanels"%self.direction)
         # print(self.pinching4MaterialNumber)
@@ -221,7 +196,7 @@ class FinalShearWallDesign():
         # return self.sw_final_design
         return self.finalWallLength
         
-    def FinalDesign(self):
+    def FinalDesign(self, df_inputs):
         ''' Method to instantiate the ShearWallDriftCheck class with the final design length
 
         :return: shear wall and tie-down design that meets the specified drift demand 
@@ -234,7 +209,7 @@ class FinalShearWallDesign():
         for i in range(0, self.numFloors):
             sw = ShearWallDriftCheck(self.caseID, self.BaseDirectory, self.direction, self.wallIndex, 
                                       i, self.counter, self.wall_line_name, 
-                                      self.Ss, self.S1, 
+                                      df_inputs,
                                       self.seismic_weight_factor, self.seismic_design_level,
                                       self.designScheme, self.userDefinedDetailingTag,               
                                       self.reDesignFlag, self.userDefinedDriftTag, self.userDefinedDCTag, 
@@ -251,55 +226,28 @@ class FinalShearWallDesign():
         
         return self.sw_final_design, self.tiedown_final_design
         
-    #def savePinching4Number(self):
 
 
-
-    # def getFinalWallLength(self):
-    #     tempLen = [[max(self.finalWallLength)],]  # convert into a list for list manipulation
-    #     length_ops = tempLen * int(self.numFloors)
-    #     length_ops = np.array(length_ops)  #length for opensees modeling
-    #     length_perWallLine = np.repeat(length_ops, int(self.wallsPerLine), axis = 1) 
-    #     return length_perWallLine
         
-    
-    # def getFinalWallHeight(self):
-    #     height_ops = self.finalWallHeight.reshape((-1,1))
-    #     height_perWallLine = np.repeat(height_ops, int(self.wallsPerLine), axis = 1)
-    #     return height_perWallLine
-    
-    
-    # # # #define a getter method that returns the openseestag for wall modelling in opensees
-    # def getOpenSeesTag(self):
-        
-    #     tag = self.sw_final_design['OpenSees Tag'].values  #extracts tag as an row array 
-    #     tag = tag[::-1]  #changes first row from roof to first story
-    #     tag = tag.reshape((-1,1))  #converts row array to column array
-    #     tag = np.repeat(tag, 2, axis = 0)  #repeat array for x, and y coordinates per Zhengxiang's code input
-    #     # tag = np.tile(tag, (1,2)) #double the rows 
-    #     self.tagPerWall = np.tile(tag, (1, int(self.wallsPerLine)))
-    #     return self.tagPerWall
-    #     # return self.tag
-        
-if __name__ == '__main__':
-    import json
+# if __name__ == '__main__':
+#     import json
 
-    cwd = r'/Users/laxmandahal/Desktop/UCLA/Phd/Research/RegionalStudy/Codes/woodSDPA'
-    baseDir = r'/Users/laxmandahal/Desktop/UCLA/Phd/Research/RegionalStudy'
-    dataDir = os.path.join(baseDir, 'data')
-    woodSDPA_dir = os.path.join(baseDir, *['Codes', 'woodSDPA'])
-    baseline_BIM = json.load(open(os.path.join(dataDir, 'Baseline_archetype_info_w_periods.json')))
-    caseID = list(baseline_BIM.keys())[0]
-    baseline_info_dir = os.path.join(cwd, *['BuildingInfo', caseID])
-    direction = baseline_BIM[caseID]['Directions']
-    wall_line_name = baseline_BIM[caseID]['wall_line_names']
-    num_walls_per_line = baseline_BIM[caseID]['num_walls_per_wallLine']
-    counter = 0
+#     cwd = r'/Users/laxmandahal/Desktop/UCLA/Phd/Research/RegionalStudy/Codes/woodSDPA'
+#     baseDir = r'/Users/laxmandahal/Desktop/UCLA/Phd/Research/RegionalStudy'
+#     dataDir = os.path.join(baseDir, 'data')
+#     woodSDPA_dir = os.path.join(baseDir, *['Codes', 'woodSDPA'])
+#     baseline_BIM = json.load(open(os.path.join(dataDir, 'Baseline_archetype_info_w_periods.json')))
+#     caseID = list(baseline_BIM.keys())[0]
+#     baseline_info_dir = os.path.join(cwd, *['BuildingInfo', caseID])
+#     direction = baseline_BIM[caseID]['Directions']
+#     wall_line_name = baseline_BIM[caseID]['wall_line_names']
+#     num_walls_per_line = baseline_BIM[caseID]['num_walls_per_wallLine']
+#     counter = 0
 
-    sw_design = FinalShearWallDesign(caseID, baseline_info_dir, 'X', wallIndex=0, numFloors=int(caseID.split('_')[0][1]), 
-                                counter=counter, wall_line_name='gridA', Ss=2, S1=0.7,
-                                weight_factor=1, seismic_design_level='High'
-                                )
+#     sw_design = FinalShearWallDesign(caseID, baseline_info_dir, 'X', wallIndex=0, numFloors=int(caseID.split('_')[0][1]), 
+#                                 counter=counter, wall_line_name='gridA', Ss=2, S1=0.7,
+#                                 weight_factor=1, seismic_design_level='High'
+#                                 )
         
         
         

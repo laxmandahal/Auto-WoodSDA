@@ -51,8 +51,7 @@ class ShearWallDriftCheck:
         floorIndex,
         counter,
         wall_line_name,
-        Ss, 
-        S1,
+        df_inputs,
         weight_factor = 1.0,
         seismic_design_level = 'Extreme',
         designScheme = 'LRFD',
@@ -81,21 +80,19 @@ class ShearWallDriftCheck:
 
         self.iterateFlag = iterateFlag
         self.counter = counter
-        self.Ss = Ss
-        self.S1 = S1
 
         self.userDefinedDriftTag = userDefinedDriftTag
         self.wallLengthHistory = []
         self.driftHistory = []
 
         # instantiate all the class methods so that the attributes can be used as class variables
-        self.driftCheckAndRedesign()
+        self.driftCheckAndRedesign(df_inputs)
         self.getShearWallDesign()
         self.getTieDownDesign()
         self.getFinalWallLength()
         # self.getOpenSeesTag()
 
-    def driftCheckAndRedesign(self):
+    def driftCheckAndRedesign(self, df_inputs):
         """
         This method is used to check the story drift for each floor, and redesign  
         drift does not meet the drift limit (whether it is code or user imposed)
@@ -111,8 +108,7 @@ class ShearWallDriftCheck:
             self.floorIndex,
             self.counter,
             self.wall_line_name,
-            self.Ss,
-            self.S1,
+            df_inputs,
             self.seismic_weight_factor,
             self.seismic_design_level,
             self.designScheme,
@@ -153,27 +149,6 @@ class ShearWallDriftCheck:
                 print('Drift is {} at iteration no {} with unit shear demand{} & Ga:{}'.format(self.drift, self.counter, self.wallName.target_unit_shear, self.wallName.sw_dict["Ga(k/in)"]))
                 print(self.driftHistory)
                 sys.exit(1) 
-                
-            
-            # if (
-            #     self.wallName.sw_design["%s(klf)" % self.designScheme].values
-            #     >= self.wallName.target_unit_shear / 0.7
-            # ) | (
-            #     self.wallName.sw_design["%s(klf)" % self.designScheme].values
-            #     == shearwall_database["%s(klf)" % self.designScheme].iloc[-1]
-            # ):
-            #     print('This shouldnt be true')
-            #     self.reDesignFlag = True
-            #     self.wallLength += 0.5
-            #     self.counter = 0
-
-            # else:
-            #     print('how about this')
-            #     self.iterateFlag = True
-            #     self.counter += 1
-
-            # if self.dfCheck.all():
-            #     break
 
             # keeping track of the length increase
             self.wallLengthHistory.append(self.wallName.wallLength)
@@ -188,8 +163,7 @@ class ShearWallDriftCheck:
                 self.floorIndex,
                 self.counter,
                 self.wall_line_name,
-                self.Ss,
-                self.S1,
+                df_inputs,
                 self.seismic_weight_factor,
                 self.seismic_design_level,
                 self.designScheme,

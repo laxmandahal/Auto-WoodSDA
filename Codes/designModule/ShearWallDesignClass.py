@@ -57,8 +57,9 @@ class DesignShearWall:
         floorIndex,
         counter,
         wall_line_name,
-        Ss, 
-        S1,
+        # Ss, 
+        # S1,
+        df_inputs,
         weight_factor = 1.0,
         seismic_design_level = 'Extreme',
         designScheme = 'LRFD',
@@ -87,8 +88,8 @@ class DesignShearWall:
         self.counter = counter
         self.floorIndex = floorIndex
 
-        self.Ss = Ss
-        self.S1 = S1
+        # self.Ss = Ss
+        # self.S1 = S1
         #instantiate ComputeSeismicForce class to be able to extract shear wall and tie-down demands
         ModelClass = ComputeSeismicForce(
             self.caseID,
@@ -96,8 +97,9 @@ class DesignShearWall:
             self.direction,
             self.wall_line_name,
             self.wallIndex,
-            self.Ss,
-            self.S1,
+            # self.Ss,
+            # self.S1,
+            df_inputs,
             self.seismic_weight_factor,
             self.seismic_design_level,
             self.designScheme,
@@ -195,22 +197,6 @@ class DesignShearWall:
             self.tribuitaryWidth = np.genfromtxt("tribuitaryWidth.txt")
             # each column represents each SW line in Y direction
             self.tribuitaryLength = np.genfromtxt("tribuitaryLength.txt")
-        # wall stiffness of each wall segment
-        # self.totalArea = np.genfromtxt("floorAreas.txt") 
-        # number of walls per shear wall line. Used to distribute load 
-        # self.wallsPerLine = np.genfromtxt("wallsPerLine.txt")
-        #allowable drift limit
-        # self.allowableDrift = np.genfromtxt("allowableDrift.txt")
-
-        # read in shear wall lineal load
-        # os.chdir(
-        #     self.BaseDirectory
-        #     + "/%s_direction_wall" % self.direction
-        #     + "/%s" % self.wall_line_name
-        #     + "/Loads"
-        # )
-        # self.loads = np.genfromtxt("shearWall_load.txt")
-        # self.loadRatio = np.genfromtxt("tribuitaryLoadRatio.txt")[self.wallIndex]
 
         # reading material inputs
         os.chdir(
@@ -675,21 +661,6 @@ class DesignShearWall:
         self.drift_check = self.driftLimit >= self.story_drift
         # print(self.drift_check)
         return self.drift_check
-
-    # def increaseLength(self):
-    #     """
-    #     This method is used to increase the lenght of the shear wall if
-    #     redesign tag is True
-
-    #     returns: updated wallLenght attribute
-
-    #     """
-    #     if self.reDesignFlag:
-    #         self.wallLength += 0.5
-    #     else:
-    #         pass
-
-    #     return self.wallLength
 
 
 # if __name__ == '__main__':

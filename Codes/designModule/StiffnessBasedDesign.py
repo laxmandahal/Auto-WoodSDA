@@ -53,8 +53,7 @@ class RDADesignIterationClass():
                 numWallsPerLine, 
                 counter, 
                 wall_line_name,
-                Ss, 
-                S1,
+                df_inputs,
                 weight_factor = 1.0, 
                 seismic_design_level = 'Extreme',
                 designScheme = 'LRFD',
@@ -80,8 +79,7 @@ class RDADesignIterationClass():
         self.seismic_design_level = seismic_design_level
         self.mat_nsc_ext_int = mat_ext_int
         self.seismic_weight_factor = weight_factor
-        self.Ss = Ss
-        self.S1 = S1
+        self.df_inputs = df_inputs
         self.iterateFlag = iterateFlag
         self.counter = counter
         
@@ -91,7 +89,7 @@ class RDADesignIterationClass():
         floorIndex = 0
         globals()['%s_wall%d'%(self.wall_line_name[0],0)] = ShearWallDriftCheck(self.caseID, self.BaseDirectory, self.direction[0], 0, floorIndex, self.counter, 
                                                                                 self.wall_line_name[0], 
-                                                                                self.Ss, self.S1,
+                                                                                df_inputs,
                                                                                 self.seismic_weight_factor, self.seismic_design_level, 
                                                                                 self.designScheme,
                                                                                 self.userDefinedDetailingTag, 
@@ -117,9 +115,6 @@ class RDADesignIterationClass():
         for x in range(self.numStory):
             self.shearWallShearX_AllFloor[x], self.shearWallShearY_AllFloor[x], self.totalStoryForceX_All[x], self.totalStoryForceY_All[x] = self.BatchDesign(wall_line_name, numWallsPerLine, x)
 
-        # for x in range(self.numStory):
-        #     self.shearWallShearX_AllFloor[x], self.shearWallShearY_AllFloor[x] = self.BatchDesign(wall_line_name, numWallsPerLine, x)
-        
         self.saveData()
         self.UltimateDesign()
 
@@ -139,8 +134,7 @@ class RDADesignIterationClass():
             for j in range(numWallsPerLine[i]):
                 # print('j is ',j)
                 globals()['%s_wall%d'%(self.wall_line_name[i],j)] = ShearWallDriftCheck(self.caseID, self.BaseDirectory, self.direction[i], j, floorIndex, 
-                                                                                        self.counter, wall_line_name[i], 
-                                                                                        self.Ss, self.S1,
+                                                                                        self.counter, wall_line_name[i],                                                                                         self.df_inputs,
                                                                                         self.seismic_weight_factor,
                                                                                         self.seismic_design_level, 
                                                                                         self.designScheme,
@@ -151,9 +145,7 @@ class RDADesignIterationClass():
                     self.GaValX.append(globals()['%s_wall%d'%(self.wall_line_name[i],j)].getApparentStiffness())
                     self.wallLengthX.append(globals()['%s_wall%d'%(self.wall_line_name[i],j)].wallLength)
 
-                    #self.Fx = globals()['%s_wall%d'%(self.wall_line_name[0],0)].wallName.Fx[::-1][[floorIndex]]
-                    #self.Fx = globals()['%s_wall%d'%(self.wall_line_name[0],0)].wallName.Fx[[floorIndex]]
-                    #print(self.GaValX)
+
                     #print('this at level %s is %s'%(floorIndex, self.Fx))
                     self.ex = globals()['%s_wall%d'%(self.wall_line_name[i],j)].wallName.accidentalTorsion
                     self.Ax = globals()['%s_wall%d'%(self.wall_line_name[i],j)].wallName.torsionalIrregularity
@@ -232,8 +224,7 @@ class RDADesignIterationClass():
         for ii in range(len(self.wall_line_name)):
             for jj in range(self.numWallsPerLine[ii]):
                 globals()['swDesign%s_wall%d'%(self.wall_line_name[ii],jj)] = FinalShearWallDesign(self.caseID, self.BaseDirectory, self.direction[ii], jj, 
-                                                                                                   self.numStory, self.counter, self.wall_line_name[ii],
-                                                                                                   self.Ss, self.S1,
+                                                                                                   self.numStory, self.counter, self.wall_line_name[ii],                                                                                                   self.df_inputs,
                                                                                                    self.seismic_weight_factor, self.seismic_design_level,
                                                                                                    self.designScheme, self.mat_nsc_ext_int,
                                                                                                    self.userDefinedDetailingTag, 

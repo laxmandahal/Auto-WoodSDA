@@ -20,6 +20,11 @@ __author__ = "Laxman Dahal"
 import numpy as np
 import os
 import sys
+# import pandas as pd
+
+cwd = os.path.dirname(__file__)
+code_dir = os.path.dirname(cwd)
+root_dir = os.path.dirname(code_dir)
 
 
 class ComputeSeismicForce(object):
@@ -48,14 +53,12 @@ class ComputeSeismicForce(object):
         direction,
         wall_line_name,
         wallIndex,
-        Ss,
-        S1,
+        df_inputs,
         weight_factor = 1.0,
         seismic_design_level = 'Extreme',
         designScheme = 'LRFD',
         reDesignFlag = False,
         envelopeAnalysis = False,
-        SeismicDesignParameterFlag=True,
     ):
 
         self.direction = direction
@@ -67,20 +70,19 @@ class ComputeSeismicForce(object):
         self.BaseDirectory = BaseDirectory   
         self.seismic_design_level = seismic_design_level
         self.seismic_weight_factor = weight_factor
-        self.Ss = Ss
-        self.S1 = S1
+
         if (designScheme != 'ASD') and (designScheme != 'LRFD'):
             print("Invalid design scheme. Choose between ['ASD', 'LRFD']")
             sys.exit(1)
         else: pass
 
         # call the methods
-        self.read_in_txt_inputs(CaseID, BaseDirectory)
+        self.read_in_txt_inputs(CaseID, BaseDirectory, df_inputs)
         self.SW_shear_demand()
         self.Anchorage_demand()
 
     def read_in_txt_inputs(
-        self, CaseID, BaseDirectory, SeismicDesignParameterFlag=True
+        self, CaseID, BaseDirectory, df_inputs
     ):
         '''
         Method to read required inputs (building properties) from different folders to be used to design and create openSEES models
@@ -132,49 +134,6 @@ class ComputeSeismicForce(object):
             "ZDirectionWoodPanelsZCoordinates.txt"
         )
 
-        # temp1 = np.zeros(
-        #     [
-        #         self.XDirectionWoodPanelsXCoordinates.shape[0],
-        #         self.XDirectionWoodPanelsXCoordinates.shape[1],
-        #     ]
-        # )
-        # temp2 = np.zeros(
-        #     [
-        #         self.XDirectionWoodPanelsXCoordinates.shape[0],
-        #         self.XDirectionWoodPanelsXCoordinates.shape[1],
-        #     ]
-        # )
-
-        # temp3 = np.zeros(
-        #     [
-        #         self.ZDirectionWoodPanelsZCoordinates.shape[0],
-        #         self.ZDirectionWoodPanelsZCoordinates.shape[1],
-        #     ]
-        # )
-        # temp4 = np.zeros(
-        #     [
-        #         self.ZDirectionWoodPanelsZCoordinates.shape[0],
-        #         self.ZDirectionWoodPanelsZCoordinates.shape[1],
-        #     ]
-        # )
-
-        # for i in range (self.numberOfStories):
-
-        #     for j in range(self.numberOfXDirectionWoodPanels[i]):
-
-        #         temp1[i,j] = (i+1)*10000+1000+(j+1)*10+1
-        #         temp2[i,j] = (i+1)*10000+1000+(j+1)*10+2
-        #     self.XDirectionWoodPanelsBotTag = temp1
-        #     self.XDirectionWoodPanelsTopTag = temp2
-
-        # for i in range (self.numberOfStories):
-        #   for j in range(self.numberOfZDirectionWoodPanels[i]):
-
-        #     temp3[i,j] = (i+1)*10000+3000+(j+1)*10+1
-        #     temp4[i,j] = (i+1)*10000+3000+(j+1)*10+2
-        # self.ZDirectionWoodPanelsBotTag = temp3
-        # self.ZDirectionWoodPanelsTopTag = temp4
-
         ##################################################################################################
         # Read in Loads
         # os.chdir(BaseDirectory + "\Loads")
@@ -221,9 +180,8 @@ class ComputeSeismicForce(object):
 
         ##################################################################################################
         # Read in Structural Material Property
-        # os.chdir(BaseDirectory + "\StructuralProperties\Pinching4Materials")
-        os.chdir(os.path.join(BaseDirectory, *['StructuralProperties', 'Pinching4Materials']))
-
+        # os.chdir(os.path.join(BaseDirectory, *['StructuralProperties', 'Pinching4Materials']))
+        os.chdir(os.path.join(root_dir, *['Databases', 'Pinching4_parameters']))
         # For now, Pinching4 material is used
         MaterialLabel = np.genfromtxt("materialNumber.txt")
         d1 = np.genfromtxt("d1.txt")
@@ -317,20 +275,13 @@ class ComputeSeismicForce(object):
                 self.wallLength = (np.genfromtxt("wallLengths.txt").astype(list)[:,None][:, self.wallIndex] / 12)[::-1]
            
 
-            # self.wallLength = (np.genfromtxt("wallLengths.txt").astype(list)[:,None][:, self.wallIndex] / 12)[::-1]
         if self.reDesignFlag:
             self.wallLength += 0.5
         else:
             pass
         
-        #self.tribuitaryLength = np.genfromtxt("tribuitaryLength.txt")[:, self.wallIndex]  # each column represents each SW line in Y direction
-        # self.totalArea = np.genfromtxt("floorAreas.txt")  # wall stiffness of each wall segment
-        # self.wallsPerLine = np.genfromtxt("wallsPerLine.txt")
-        # self.allowableDrift = np.genfromtxt("allowableDrift.txt")
-        
 
         # read in shear wall lineal load
-        #os.chdir(self.BaseDirectory + "/%s_direction_wall" % self.direction + "/%s" % self.wall_line_name + "/Loads")
         os.chdir(os.path.join(BaseDirectory, *["%s_direction_wall" % self.direction, "%s" % self.wall_line_name,"Loads"]))
         if self.no_of_walls > 1:
             if self.numberOfStories == 1:
@@ -338,7 +289,6 @@ class ComputeSeismicForce(object):
             else:
                 self.loads = np.genfromtxt("shearWall_load.txt")[:, self.wallIndex] * self.seismic_weight_factor
 
-            # self.loads = np.genfromtxt("shearWall_load.txt")[:, self.wallIndex] * self.seismic_weight_factor
             self.loadRatio = np.genfromtxt("tribuitaryLoadRatio.txt")[self.wallIndex]
 
         else:
@@ -347,13 +297,10 @@ class ComputeSeismicForce(object):
             else:
                 self.loads = np.genfromtxt("shearWall_load.txt")[:,None][:, self.wallIndex] * self.seismic_weight_factor
             self.loadRatio = np.genfromtxt("tribuitaryLoadRatio.txt")
-        # self.asdDesignTag = np.loadtxt("asdDesignFlag.txt")
         
 
         # reading material inputs
-        # os.chdir(self.BaseDirectory+ "/%s_direction_wall" % self.direction+ "/%s" % self.wall_line_name+ "/MaterialProperties")
         os.chdir(os.path.join(BaseDirectory, *["%s_direction_wall" % self.direction, "%s" % self.wall_line_name,"MaterialProperties"]))
-        #   self.userInputFlag = np.loadtxt('userInputFlagShearWall.txt')
         self.initial_moisture_content = np.genfromtxt(
             "initial_moisture_content.txt"
         ).astype(float)
@@ -362,57 +309,32 @@ class ComputeSeismicForce(object):
         ).astype(float)
         self.elastic_modulus = np.genfromtxt("wood_modulusOfElasticity.txt").astype(int)
         self.nailSpacing = open("preferred_nail_spacing.txt").read()
-        # self.nailSpacing = np.genfromtxt('preferred_nail_spacing.txt').astype(int)
 
         self.nailSize = open("preferred_nail_size.txt", "r").read()
         self.panelThickness = open("preferred_panel_thickness.txt", "r").read()
         self.takeup_deflection = np.genfromtxt("takeUpDeflection.txt")
         self.chordArea = np.genfromtxt("chordArea.txt")
 
-        # self.userDefinedDrift = np.loadtxt("userDefinedDriftLimit.txt")
-        # self.userDefinedDCRatio = np.loadtxt("userDefinedDCRatio.txt")
-        # self.userDefinedDCRatioFlag_TieDown = np.loadtxt(
-        #     "userDefinedDCRatioFlag_TieDown.txt"
-        # )
-        # self.userDefinedDCRatio_TieDown = np.loadtxt("userDefinedDCRatio_TieDown.txt")
-
-        # self.Fx = np.genfromtxt("Fx_ToTestTheCode.txt")
-
         ##################################################################################################
         # Define read in Seismic Design Parameter
         # Seismic design parameter calculation follows ASCE 7-10 Chapter 12
         # In current wood frame building models, only used in defining pushover loading protocal
-        # os.chdir(BaseDirectory + "/SeismicDesignParameters")
-        os.chdir(os.path.join(BaseDirectory, 'SeismicDesignParameters'))
-        # self.allowableDrift = np.genfromtxt("allowableDrift.txt")
-        designLevel = np.genfromtxt('DesignLevel_%s.txt'%self.seismic_design_level, dtype=None, encoding = None)
-        site_class = str(designLevel[0])
-        # if SeismicDesignParameterFlag == 0:
-        #     self.SeismicDesignParameter = None
 
-        # else:
-        #     with open("SiteClass.txt", "r") as myfile:
-        #         site_class = myfile.read()
-        # Ss = np.genfromtxt("Ss.txt")
-        # S1 = np.genfromtxt("S1.txt")
-        # Ss = float(designLevel[1])
-        # S1 = float(designLevel[2])
-        Ss = self.Ss
-        S1 = self.S1
+        site_class = str(df_inputs['Site Class'].values[0])
+
+        Ss = float(df_inputs['Ss(g)'].values[0])
+        S1 = float(df_inputs['S1(g)'].values[0])
         Fa = self.determine_Fa_coefficient(site_class, Ss)
         Fv = self.determine_Fv_coefficient(site_class, S1)
         SMS, SM1, SDS, SD1 = self.calculate_DBE_acceleration(Ss, S1, Fa, Fv)
         Cu = self.determine_Cu_coefficient(SD1)
         self.SDS = SDS
-        # R = np.genfromtxt("R.txt")
-        # Ie = np.genfromtxt("I.txt")
-        # Cd = np.genfromtxt("Cd.txt")
-        # TL = np.genfromtxt("TL.txt")
-        R = float(designLevel[3])
-        Ie = float(designLevel[4])
-        Cd = float(designLevel[5])
-        TL = float(designLevel[6])
-        self.allowableDrift = float(designLevel[7])
+
+        R = float(df_inputs['R'].values[0])
+        Ie = float(df_inputs['Ie'].values[0])
+        Cd = float(df_inputs['Cd'].values[0])
+        TL = 8.0
+        self.allowableDrift = float(df_inputs['Allowable Drift'].values[0])
         x = 0.75  # for 'All other structural systems' specified in ASCE 7-16 Table 12.8-2
         Ct = 0.02  # for 'All other structural systems' specified in ASCE 7-16 Table 12.8-2
         if self.numberOfStories == 1:
@@ -778,24 +700,24 @@ class ComputeSeismicForce(object):
         return self.tension_demand
 
 
-if __name__ == '__main__':
-    import json
+# if __name__ == '__main__':
+#     import json
 
-    cwd = r'/Users/laxmandahal/Desktop/UCLA/Phd/Research/RegionalStudy/Codes/woodSDPA'
-    baseDir = r'/Users/laxmandahal/Desktop/UCLA/Phd/Research/RegionalStudy'
-    dataDir = os.path.join(baseDir, 'data')
-    woodSDPA_dir = os.path.join(baseDir, *['Codes', 'woodSDPA'])
-    baseline_BIM = json.load(open(os.path.join(dataDir, 'Baseline_archetype_info_w_periods.json')))
-    caseID = list(baseline_BIM.keys())[0]
-    baseline_info_dir = os.path.join(cwd, *['BuildingInfo', caseID])
-    direction = baseline_BIM[caseID]['Directions']
-    wall_line_name = baseline_BIM[caseID]['wall_line_names']
-    num_walls_per_line = baseline_BIM[caseID]['num_walls_per_wallLine']
-    counter = 0
+#     cwd = r'/Users/laxmandahal/Desktop/UCLA/Phd/Research/RegionalStudy/Codes/woodSDPA'
+#     baseDir = r'/Users/laxmandahal/Desktop/UCLA/Phd/Research/RegionalStudy'
+#     dataDir = os.path.join(baseDir, 'data')
+#     woodSDPA_dir = os.path.join(baseDir, *['Codes', 'woodSDPA'])
+#     baseline_BIM = json.load(open(os.path.join(dataDir, 'Baseline_archetype_info_w_periods.json')))
+#     caseID = list(baseline_BIM.keys())[0]
+#     baseline_info_dir = os.path.join(cwd, *['BuildingInfo', caseID])
+#     direction = baseline_BIM[caseID]['Directions']
+#     wall_line_name = baseline_BIM[caseID]['wall_line_names']
+#     num_walls_per_line = baseline_BIM[caseID]['num_walls_per_wallLine']
+#     counter = 0
 
-    seismic_force = ComputeSeismicForce(caseID, baseline_info_dir, 'X', wallIndex=0,
-                                 wall_line_name='gridA', Ss=2, S1=0.7,
-                                weight_factor=1, seismic_design_level='High'
-                                )
-    print(seismic_force.SeismicDesignParameter['ELF Base Shear'])
+#     seismic_force = ComputeSeismicForce(caseID, baseline_info_dir, 'X', wallIndex=0,
+#                                  wall_line_name='gridA', Ss=2, S1=0.7,
+#                                 weight_factor=1, seismic_design_level='High'
+#                                 )
+#     print(seismic_force.SeismicDesignParameter['ELF Base Shear'])
     

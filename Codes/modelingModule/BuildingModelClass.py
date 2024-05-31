@@ -2,14 +2,15 @@ import numpy as np
 import os 
 import pandas as pd
 
+cwd = os.path.dirname(__file__)
+code_dir = os.path.dirname(cwd)
+root_dir = os.path.dirname(code_dir)
 
 class BuildingModel(object):
 
-  def __init__(self, CaseID, BaseDirectory, Ss, S1, seismic_design_level = 'High', SeismicDesignParameterFlag = True):
+  def __init__(self, CaseID):
       self.ID = CaseID
-      self.seismic_design_level = seismic_design_level
-      self.Ss = Ss
-      self.S1 = S1
+
     ## Building Information
       self.numberOfStories = None
       self.storyHeights = None
@@ -57,7 +58,7 @@ class BuildingModel(object):
     ## Seismic Design Parameters   
       self.SeismicDesignParameter = None
 
-  def read_in_txt_inputs(self, CaseID, BaseDirectory, SeismicDesignParameterFlag = True):
+  def read_in_txt_inputs(self, CaseID, BaseDirectory, df_inputs):
 
       
       self.ID = CaseID
@@ -156,8 +157,9 @@ class BuildingModel(object):
         
 ##################################################################################################        
 # Read in Structural Material Property
-      os.chdir(os.path.join(BaseDirectory, *['StructuralProperties','Pinching4Materials']))
-
+    #   os.chdir(os.path.join(BaseDirectory, *['StructuralProperties','Pinching4Materials']))
+      os.chdir(os.path.join(root_dir, *['Databases', 'Pinching4_parameters']))
+    
       # For now, Pinching4 material is used
       MaterialLabel = np.genfromtxt('materialNumber.txt')
       d1 = np.genfromtxt('d1.txt')
@@ -221,9 +223,10 @@ class BuildingModel(object):
 # Define read in Seismic Design Parameter 
 # Seismic design parameter calculation follows ASCE 7-10 Chapter 12
 # In current wood frame building models, only used in defining pushover loading protocal 
-      os.chdir(os.path.join(BaseDirectory, 'SeismicDesignParameters'))
-      designLevel = np.genfromtxt('DesignLevel_%s.txt'%self.seismic_design_level, dtype=None, encoding = None)
-      site_class = str(designLevel[0])
+    #   os.chdir(os.path.join(BaseDirectory, 'SeismicDesignParameters'))
+    #   designLevel = np.genfromtxt('DesignLevel_%s.txt'%self.seismic_design_level, dtype=None, encoding = None)
+    #   site_class = str(designLevel[0])
+      site_class = str(df_inputs['Site Class'].values[0])
         # if SeismicDesignParameterFlag == 0:
         #     self.SeismicDesignParameter = None
 
@@ -234,8 +237,10 @@ class BuildingModel(object):
         # S1 = np.genfromtxt("S1.txt")
     #   Ss = float(designLevel[1])
     #   S1 = float(designLevel[2])
-      Ss = self.Ss
-      S1 = self.S1
+    #   Ss = self.Ss
+      Ss = float(df_inputs['Ss(g)'].values[0])
+    #   S1 = self.S1
+      S1 = float(df_inputs['S1(g)'].values[0])
       Fa = self.determine_Fa_coefficient(site_class, Ss)
       Fv = self.determine_Fv_coefficient(site_class, S1)
       SMS, SM1, SDS, SD1 = self.calculate_DBE_acceleration(Ss, S1, Fa, Fv)
@@ -245,10 +250,13 @@ class BuildingModel(object):
         # Ie = np.genfromtxt("I.txt")
         # Cd = np.genfromtxt("Cd.txt")
         # TL = np.genfromtxt("TL.txt")
-      R = float(designLevel[3])
-      Ie = float(designLevel[4])
-      Cd = float(designLevel[5])
-      TL = float(designLevel[6])
+    #   R = float(designLevel[3])
+      R = float(df_inputs['R'].values[0])
+    #   Ie = float(designLevel[4])
+      Ie = float(df_inputs['Ie'].values[0])
+    #   Cd = float(designLevel[5])
+      Cd = float(df_inputs['Cd'].values[0])
+      TL = 8.0
       x = 0.75 # for 'All other structural systems' specified in ASCE 7-16 Table 12.8-2
       Ct = 0.02 # for 'All other structural systems' specified in ASCE 7-16 Table 12.8-2
       hn = sum(self.storyHeights)/12 # transfer unit to ft
@@ -491,75 +499,6 @@ class BuildingModel(object):
       Cvx = weight_floor_height/np.sum(weight_floor_height)
       return Cvx       
 
-#   def extractRetrofitFrameInfo(self, FrameInfoDirectory, numFrames):
-#       FrameInfo = []
-    
-#       for i in range(int(numFrames)):
-#         # go into the directory containing the information of each frame 
-#         os.chdir(FrameInfoDirectory + '/Frame%i'%(i+1))
-        
-#         # Beam section can be None to represent canteliver retrofit case
-#         BeamSection = []
-#         with open('BeamSection.txt','rb') as f:
-#             for line in f:
-#                 BeamSection.append(line.decode().strip())
-
-#         ColSection = []
-#         with open('ColumnSection.txt','rb') as f:
-#             for line in f:
-#                 ColSection.append(line.decode().strip())
-#         os.chdir(FrameInfoDirectory + '/Frame%i/Beams'%(i+1))  
-#         BeamArea = np.loadtxt('A.txt').tolist()
-#         BeamI = np.loadtxt('I.txt').tolist()
-
-#         os.chdir(FrameInfoDirectory + '/Frame%i/BeamHinges'%(i+1))  
-#         BeamHingeParam = {
-#             'Lambda': np.loadtxt('lambda.txt').tolist(),
-#             'McMy': 1.11,
-#             'My': np.loadtxt('My.txt').tolist(),
-#             'theta_pc': np.loadtxt('thetaPC.txt').tolist(),
-#             'theta_p': np.loadtxt('thetaCap.txt').tolist(),
-#             'theta_u': 0.4
-#         }
-#         os.chdir(FrameInfoDirectory + '/Frame%i/Columns'%(i+1))  
-#         ColumnArea = np.loadtxt('A.txt').tolist()
-#         ColumnI = np.loadtxt('I.txt').tolist()
-#         os.chdir(FrameInfoDirectory + '/Frame%i/ColumnHinges'%(i+1))  
-#         ColumnHingeParam = {
-#             'Lambda': np.loadtxt('lambda.txt').tolist(),
-#             'McMy': 1.11,
-#             'My': np.loadtxt('My.txt').tolist(),
-#             'theta_pc': np.loadtxt('thetaPC.txt').tolist(),
-#             'theta_p': np.loadtxt('thetaCap.txt').tolist(),
-#             'theta_u': 0.4
-#         }
-
-#         os.chdir(FrameInfoDirectory + '/Frame%i/FrameNodes'%(i+1))
-#         BeamHingeCoor = np.loadtxt('BeamHingeNodeCoordinates.txt').tolist()
-#         BeamHingeOSLabel = np.loadtxt('BeamHingeNodeNumbers.txt').tolist()
-#         ColHingeCoor = np.loadtxt('ColumnHingeNodeCoordinates.txt').tolist()
-#         ColHingeOSLabel = np.loadtxt('ColumnHingeNodeNumbers.txt').tolist()
-#         JointCoor = np.loadtxt('JointNodeCoordinates.txt').tolist()
-#         JointOSLabel = np.loadtxt('JointNodeNumbers.txt').tolist()
-        
-#         SingleFrameInfo = {'BeamSection': BeamSection,
-#                           'ColSection': ColSection,
-#                           'BeamArea': BeamArea,
-#                           'BeamI':BeamI,
-#                           'BeamHingeParameter': BeamHingeParam,
-#                           'ColumnArea': ColumnArea,
-#                           'ColumnI': ColumnI,
-#                           'ColumnHingeParameter': ColumnHingeParam,
-#                           'BeamHingeCoor': BeamHingeCoor,
-#                           'BeamHingeOSLabel': BeamHingeOSLabel,
-#                           'ColHingeCoor': ColHingeCoor,
-#                           'ColHingeOSLabel': ColHingeOSLabel,
-#                           'JointCoor': JointCoor,
-#                           'JointOSLabel' : JointOSLabel}
-        
-#         FrameInfo.append(SingleFrameInfo)
-        
-#       return FrameInfo
 
 
 
