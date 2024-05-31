@@ -13,9 +13,11 @@ import warnings
 warnings.filterwarnings("ignore")
 
 
-
+cwd = os.path.dirname(__file__)
+code_dir = os.path.dirname(cwd)
+baseDir = os.path.dirname(code_dir)
 # baseDir = r'/u/home/l/laxmanda/project-hvburton/autoWoodSDA/'
-baseDir = r'/Users/laxmandahal/Desktop/UCLA/Phd/Research/woodSDA/autoWoodSDA_public'
+# baseDir = r'/Users/laxmandahal/Desktop/UCLA/Phd/Research/woodSDA/autoWoodSDA_public'
 
 
 sys.path.append(os.path.join(baseDir, *['Codes', 'lossModule', 'Loss_Pelicun']))
@@ -46,19 +48,22 @@ def delete_files_from_directory(directory, keep):
         os.chdir(baseDir)
 
 def main(
-	bldg_idx: int,
+	buildingID: str,
+    num_story:int, 
+    archetype_length:float,
+    archetype_width:float,
     norm_cmp_qty: bool = True,
     im_period: float = 0.3
 ):
     start = time.time()
 
-    bldg_idx = int(bldg_idx) - 1
+    # bldg_idx = int(bldg_idx) - 1
     # BuildingList = np.genfromtxt(os.path.join(baseDir, 'BuildingModels', 'ID_for_NRHA',
     #                                       f'ArchetypeIDs_for_NRHA_{REGIONAL_STRATEGY}.txt'), dtype=str)
-    BuildingList = ['MFD6B']
+    # BuildingList = ['MFD6B']
     # BuildingList = ['MFD6B_FEMA_P695']
-    print(f'Initiating PELICUN Loss of {BuildingList[bldg_idx]} (idx: {bldg_idx})')
-    ID = BuildingList[bldg_idx]
+    print(f'Initiating PELICUN Loss of {buildingID}...')
+    ID = buildingID
     # split_str = ID.split('_')
 
     HAZARD_LEVEL = [0.1, 0.3, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7, 1.9, 2.1, 2.3, 2.5, 2.7, 2.9, 3.1, 3.3, 3.5]
@@ -69,10 +74,10 @@ def main(
     # siteID = split_str[0]
     # baselineID = '_'.join([split_str[0], split_str[1]])
     baselineID = ID
-    num_story = 4
+    # num_story = 4
     # geom_str = split_str[1].split('x')
-    archetype_length = 96
-    archetype_width = 48
+    # archetype_length = 96
+    # archetype_width = 48
     total_plan_area = archetype_length * archetype_width
 
     collapse_limit = 0.5
@@ -147,7 +152,7 @@ def main(
         #                                         ])
         if norm_cmp_qty:
             normalize_comp_units(outputDir, static_table_fp)
-        print(f'Finished PELICUN Loss of {BuildingList[bldg_idx]} (idx: {bldg_idx}) @ IL-{hazard_level} ')
+        print(f'Finished PELICUN Loss of {buildingID} @ IL-{hazard_level} ')
 
     # it saves building_model.json file inside the "ATC138Input" folder
     ## Note: building model .json file is hazard-level agnostic
@@ -186,12 +191,12 @@ def main(
                             [archetype_length * archetype_width / 10]*num_story, 
                             occupancyID=occupancy_id
                             )
-    print(f'Generated ATC-138 input files for {BuildingList[bldg_idx]} (idx: {bldg_idx})')
+    print(f'Generated ATC-138 input files for {buildingID}...')
     finish = time.time()
     print('Loss module for %s Took %s Seconds'%(ID, (finish-start)))
 
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
     # parser = argparse.ArgumentParser()
     # #defining the arguments to be parsed
     # parser.add_argument('--regional_strategy', type=str, default='HiFi')
@@ -208,7 +213,7 @@ if __name__ == '__main__':
     #     for idx in range(1, len(BuildingList)+1):
     #         main(REGIONAL_STRATEGY, bldg_idx=idx, norm_cmp_qty=True)
     # else:
-    main(bldg_idx=0, norm_cmp_qty=True)
+    # main(bldg_idx=0, norm_cmp_qty=True)
 
 
 

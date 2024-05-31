@@ -91,8 +91,6 @@ def design_and_generate_model(
     building_design = RDADesignIterationClass(building_id, 
                                               building_info_dir, direction, num_walls_per_line, counter, wall_line_name,
                                               designScheme = 'LRFD', 
-                                                # Ss=df_inputs_checked['Ss(g)'].values[0],
-                                                # S1=df_inputs_checked['S1(g)'].values[0],
                                                 df_inputs=df_inputs,
                                                 weight_factor=wt_factor_name_mapping[df_inputs_checked['seismicWeight'].values[0]], 
                                                 seismic_design_level='High', 
@@ -141,30 +139,33 @@ def design_and_generate_model(
     finish = time.time()
     print(f'Model creation for {building_id} took {finish - start} seconds')
 
+    return building_design
 
 
 
 
 
 if __name__ == '__main__':
-    # parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser()
     # #defining the arguments to be parsed
-    # parser.add_argument('--regional_strategy', type=str, default='HiFi')
+    parser.add_argument('--buildingID', type=str, default='MFD6B')
     # parser.add_argument('--bldg_idx', type=int, default=1)
 
     # # #parse command-line arguments
-    # args = parser.parse_args()
+    args = parser.parse_args()
     ## In local computer
     # baseDir = r'/Users/laxmandahal/Desktop/UCLA/Phd/Research/RegionalStudy'
     # baseDir = r'/u/home/l/laxmanda/project-hvburton/Regional_study'
     dataDir = os.path.join(root_dir, 'Databases')
-    # woodSDPA_dir = os.path.join(baseDir, 'woodSDPA')
 
     baseline_BIM = json.load(open(os.path.join(dataDir, 'Baseline_archetype_info_w_periods.json')))
 
-    design_and_generate_model(building_id='MFD6B',
+    design_summary = design_and_generate_model(building_id=args.buildingID,
                               baseline_building_info=baseline_BIM,
                               save_design_csv=False,
+                              generate_static_models=False,
+                              run_pushover=False,
+                              generate_dynamic_models=True
                               )
 
 

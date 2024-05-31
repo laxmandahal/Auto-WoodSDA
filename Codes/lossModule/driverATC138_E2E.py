@@ -9,8 +9,10 @@ import sys
 import time
 from typing import List
 
-
-baseDir = r'/u/home/l/laxmanda/project-hvburton/autoWoodSDA/'
+cwd = os.path.dirname(__file__)
+code_dir = os.path.dirname(cwd)
+baseDir = os.path.dirname(code_dir)
+# baseDir = r'/u/home/l/laxmanda/project-hvburton/autoWoodSDA/'
 # baseDir = r'/Users/laxmandahal/Desktop/UCLA/Phd/Research/woodSDA/autoWoodSDA_public'
 
 # sys.path.append(os.path.join(baseDir, *['Codes', 'Loss_ATC138', 'PBEE-Recovery-ubc-study']))
@@ -97,23 +99,19 @@ def delete_files_from_directory(
 
 
 def main_hazard_agnostic(
-	bldg_idx: int
+	buildingID: int
 ):
     start = time.time()
 
-    bldg_idx = int(bldg_idx) - 1
-
-    # BuildingList = np.genfromtxt(os.path.join(baseDir, 'BuildingModels', 'ID_for_NRHA',
-    #                                       f'ArchetypeIDs_for_NRHA_{REGIONAL_STRATEGY}.txt'), dtype=str)
     BuildingList = ['MFD6B']
-    print(f'Initiating ATC_138 Loss of {BuildingList[bldg_idx]} (idx: {bldg_idx})')
-    ID = BuildingList[bldg_idx]
+    print(f'Initiating ATC_138 Loss of {buildingID}')
+    # ID = buildingID
     
-    atcDir_perBldg = os.path.join(baseDir, 'Results', ID, 'LossAnalysis')
+    atcDir_perBldg = os.path.join(baseDir, 'Results', buildingID, 'LossAnalysis')
     with open (os.path.join(atcDir, 'main_mainfile.m'), 'r') as matfile:
         matCode = matfile.readlines()
     # matCode[5] = 'REGIONAL_STRATEGY = "%s" ;\n'%REGIONAL_STRATEGY
-    matCode[7] = 'ID = "%s" ;\n'%ID
+    matCode[7] = 'ID = "%s" ;\n'%buildingID
     matCode[10] = 'baseDirectory = "%s";\n'%baseDir
     with open (os.path.join(atcDir, f'main_mainfile_auto.m'), 'w') as matfile:
         matCode = matfile.writelines(matCode)
@@ -127,7 +125,7 @@ def main_hazard_agnostic(
     
 
     finish = time.time()
-    print(f'Finished ATC-138 Loss of {BuildingList[bldg_idx]} (idx: {bldg_idx}) in {finish - start} seconds')
+    print(f'Finished ATC-138 Loss of {buildingID} in {finish - start} seconds')
 
     files_to_delete = ['driver_convert_PELICUN_woodSDA_auto.m', 
                        'build_input_main_auto.m', 
@@ -137,7 +135,7 @@ def main_hazard_agnostic(
 
 
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
     # parser = argparse.ArgumentParser()
     # #defining the arguments to be parsed
     # parser.add_argument('--regional_strategy', type=str, default='HiFi')
@@ -155,4 +153,4 @@ if __name__ == '__main__':
     #         main(REGIONAL_STRATEGY, bldg_idx=idx)
     # else:
 
-    main_hazard_agnostic(bldg_idx=0)
+    # main_hazard_agnostic(bldg_idx=0)

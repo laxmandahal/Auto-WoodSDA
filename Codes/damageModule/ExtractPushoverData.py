@@ -9,8 +9,10 @@ from scipy import interpolate
 
 def pushoverdata(ModelDirectory, Direction, Story, w, NumStory):
     Results = []
-    BaseDirectory = ModelDirectory + 'Static-Pushover-Output-Model3D-' + Direction + 'PushoverDirection'
-    BRDirectory = BaseDirectory + '\\BaseReactions\\'
+    # BaseDirectory = ModelDirectory + 'Static-Pushover-Output-Model3D-' + Direction + 'PushoverDirection'
+    BaseDirectory = os.path.join(ModelDirectory, f'Static-Pushover-Output-Model3D-{Direction}PushoverDirection')
+    # BRDirectory = BaseDirectory + '\\BaseReactions\\'
+    BRDirectory = os.path.join(BaseDirectory, 'BaseReactions')
     os.chdir(BRDirectory) # Change working directory to base reaction folder
     NodeBS = np.loadtxt(r'LeaningColumnBaseNode' + Direction + 'HorizontalReactions.out') 
     
@@ -36,7 +38,8 @@ def pushoverdata(ModelDirectory, Direction, Story, w, NumStory):
     
     Results.append(np.abs(BR))# Only base shear of master node should be considered, here the master node is center leaning column
     
-    SDRDirectory = BaseDirectory + '\\StoryDrifts'
+    # SDRDirectory = BaseDirectory + '\\StoryDrifts'
+    SDRDirectory = os.path.join(BaseDirectory, 'StoryDrifts')
     os.chdir(SDRDirectory)
     DR = np.abs(np.loadtxt(r'LeaningColumn' + Direction + 'Drift.out'))
     DR = DR[0:idx,:]

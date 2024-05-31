@@ -5,7 +5,7 @@
       "ComponentDatabase": "FEMA P-58",
       "NumberOfStories": "4",
       "OccupancyType": "Multi-Unit Residential",
-      "PlanArea": "4608"
+      "PlanArea": "9216.0"
     },
     "Damage": {
       "CollapseFragility": {
@@ -44,7 +44,7 @@
         "MapApproach": "Automatic",
         "ReplacementCost": {
           "Distribution": "normal",
-          "Median": "7133184",
+          "Median": "14266368.0",
           "Theta_1": "0.000003",
           "Unit": "USD_2011"
         },

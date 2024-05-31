@@ -236,7 +236,7 @@ class RDADesignIterationClass():
                 df = globals()['swDesign%s_wall%d'%(self.wall_line_name[ii],jj)].sw_design
                 d.append(df)
         
-        self.maindf = pd.concat(d, keys = wallname) #.reset_index(level = 1, drop = True)
+        self.final_design = pd.concat(d, keys = wallname) #.reset_index(level = 1, drop = True)
 
 
 # if __name__ == '__main__':
