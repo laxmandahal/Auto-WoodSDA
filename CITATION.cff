@@ -1,0 +1,14 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: >-
+  Auto-WoodSDA: A scalable end-to-end automation tool to perform probabilistic seismic risk and resilience analysis of new residential woodframe buildings
+message: >-
+  If you use codes from this repository, please site
+  the code and paper
+type: software
+authors:
+  - given-names: Laxman Dahal
+    affiliation: UCLA
+    orcid: 'https://orcid.org/0000-0001-7490-0798'
