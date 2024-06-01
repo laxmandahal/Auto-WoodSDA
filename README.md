@@ -5,6 +5,10 @@ An end-to-end computational tool to automate seismic design, analysis, and loss 
 ## Overview
 Auto-WoodSDA (WoodSDA in short) is designed to streamline four major tasks: 1) generate code-compliant seismic design, 2) create numerical models, 3) perform nonlinear analyses, and 4) assess earthquake-induced financial losses and functional recovery time. This tool implements a comprehensive probabilistic framework that integrates code-compliant building design, the FEMA P-58 methodology, and the ATC-138 methodology. Given the set of user inputs, it sequentially executes the four tasks/modules without intermediate human intervention to produce seismic performance metrics such as the expected annual loss or functional recovery time. Please refer to [this paper](https://www.researchgate.net/profile/Laxman-Dahal/publication/364127145_An_End-to-End_Computational_Platform_to_Automate_Seismic_Design_Nonlinear_Analysis_and_Loss_Assessment_of_Woodframe_Buildings/links/633bbb16ff870c55cefc4a2a/An-End-to-End-Computational-Platform-to-Automate-Seismic-Design-Nonlinear-Analysis-and-Loss-Assessment-of-Woodframe-Buildings.pdf) for an in-depth description.
 
+
+![Auto-WoodSDA](WoodSDA_E2E_workflow.png)
+
+
 ## Modules
 
 - **Design Module**: Automates the code-compliant seismic design of woodframe buildings.
