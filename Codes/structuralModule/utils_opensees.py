@@ -1157,6 +1157,8 @@ def setupEigenAnalysis(ModelDirectory, BuildingModel, NumModes = 4):
     tclfile.write('close $period_file\n\n')
 
     tclfile.write('puts "eigen value analysis - periods done!" \n\n')
+    
+    tclfile.write('modalProperties -file "Analysis_Results/ModalReport.txt" -unorm \n\n')
 
     tclfile.write('# Saving mode shapes\n')
     tclfile.write('set mode_file [open $recorderdir/mode_shape.out w];\n')
