@@ -1,0 +1,20 @@
+﻿cmpID,ID,Description,Units,Normative Qty,Theta_0_normalized,Theta_0,Blocks,Family,Theta_1,Location,Direction,Incomplete,Changelog
+B1071.002,B.10.71.002,"Light framed wood walls with structural panel sheathing, gypsum wallboard and no hold-downs",SF,100,1.8432,184.32,2,N/A,N/A,1,"1,2",FALSE,
+B1071.041,B.10.71.041,"Exterior Wall - Type: Gypsum with wood studs, Full Height, Fixed Below, Fixed Above",LF,100,1.8432,184.32,2,N/A,N/A,1,"1,2",FALSE,
+B2011.111,B.20.11.111,"Exterior Wall - Light framed wood walls with structural panel sheathing, stucco, no hold-downs",SF,100,12.8,1280,2,N/A,N/A,1,"1,2",FALSE,
+B3011.012,B.30.11.012,"Clay roof tile, tiles secured and compliant with UBC 94",SF,100,21.5,2150,,N/A,N/A,roof,1,FALSE,
+C1011.011a,C.10.11.011a,"Wall Partition, Type: Gypsum with wood studs, Full Height, Fixed Below, Fixed Above",LF,100,2.304,230.4,4,lognormal,0.4,1,"1,2",FALSE,
+C1011.001a,C.10.11.001a,"Wall Partition, Type: Gypsum with metal studs, Full Height, Fixed Below, Fixed Above",LF,100,2.304,230.4,4,lognormal,0.4,1,"1,2",FALSE,
+D2021.013a,D.20.21.013a,"Cold or Hot Potable - Small Diameter Threaded Steel - (2.5 inches in diameter or less), SDC D, E, or F, PIPING FRAGILITY",LF,1000,0.162816,162.816,,lognormal,0.2,all,"1,2",FALSE,
+D2021.013b,D.20.21.013b,"Cold or Hot Potable - Small Diameter Threaded Steel - (2.5 inches in diameter or less), SDC D, E, or F, BRACING FRAGILITY",LF,1000,0.02304,23.04,,lognormal,0.2,all,"1,2",FALSE,
+D2021.023a,D.20.21.023a,"Cold or Hot Potable Water Piping (dia > 2.5 inches), SDC D,E,F, PIPING FRAGILITY",LF,1000,0.325632,325.632,,lognormal,0.2,all,"1,2",FALSE,
+D2021.023b,D.20.21.023b,"Cold or Hot Potable Water Piping (dia > 2.5 inches), SDC D,E,F, BRACING FRAGILITY",LF,1000,0.04608,46.08,,lognormal,0.2,all,"1,2",FALSE,
+D2031.013b,D.20.31.013b,"Sanitary Waste Piping - Cast Iron w/flexible couplings, SDC D,E,F, BRACING FRAGILITY",LF,1000,0.185856,185.856,,lognormal,0.1,all,"1,2",TRUE,"changed beta from undefined to 0.4, changed ""incomplete""to false from true"
+D3031.013a,D.30.31.013a,Chiller - Capacity: < 100 Ton - Equipment that is either hard anchored or is vibration isolated with seismic snubbers/restraints - Anchorage fragility only,EA,1,1,1,,N/A,N/A,1,1,TRUE,"added 0.8g as MedianEDP, 0.25 as beta, changed incomplete flag to false"
+D3041.011c,D.30.41.011c,"HVAC Galvanized Sheet Metal Ducting less than 6 sq. ft in cross sectional area, SDC D, E, or F",LF,1000,0.0768,76.8,,lognormal,0.1,all,"1,2",FALSE,
+D3041.032c,D.30.41.032c,"HVAC Drops / Diffusers without ceilings - supported by ducting only - No independent safety wires, SDC D, E, or F",EA,10,4,40,,N/A,N/A,roof,1,FALSE,
+D3041.102b,D.30.41.102b,HVAC Fan - Capacity: all - Vibration isolated equipment that is not snubbed or restrained - Equipment fragility only,EA,1,1,1,,N/A,N/A,all,1,FALSE,
+D3041.103a,D.30.41.103a,HVAC Fan - Capacity: all - Equipment that is either hard anchored or is vibration isolated with seismic snubbers/restraints - Anchorage fragility only,EA,1,1,1,,N/A,N/A,all,1,TRUE,
+,excessiveRID,excessive residual drift,EA,1,1,1,,,,all,"1,2",,
+,collapse,collapsed building,EA,1,1,1,,,,0,1,,
+,irreparable,irreparable building,EA,1,1,1,,,,0,1,,

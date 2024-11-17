@@ -1,0 +1,1 @@
+8	10	12 #index of 3 walls in grid A along x-direction
