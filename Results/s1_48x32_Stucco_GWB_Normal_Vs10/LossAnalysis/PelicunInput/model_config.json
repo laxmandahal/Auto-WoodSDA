@@ -1,0 +1,68 @@
+{
+  "DL": {
+    "Asset": {
+      "ComponentAssignmentFile": "/u/home/l/laxmanda/project-hvburton/Regional_study/woodSDPA/BuildingInfo/s1_48x32/ComponentsList/components_list_marginals.csv",
+      "ComponentDatabase": "FEMA P-58",
+      "NumberOfStories": "1",
+      "OccupancyType": "Single-Unit Residential",
+      "PlanArea": "1536"
+    },
+    "Damage": {
+      "CollapseFragility": {
+        "CapacityDistribution": "lognormal",
+        "CapacityMedian": "1351.308",
+        "DemandType": "SA",
+        "Theta_1": "0.4"
+      },
+      "DamageProcess": "FEMA P-58",
+      "IrreparableDamage": {
+        "DriftCapacityLogStd": "0.1",
+        "DriftCapacityMedian": "0.05"
+      }
+    },
+    "Demands": {
+      "Calibration": {
+        "ALL": {
+          "DistributionFamily": "lognormal"
+        },
+        "PID": {
+          "DistributionFamily": "lognormal",
+          "TruncateLower": "",
+          "TruncateUpper": ""
+        }
+      },
+      "CollapseLimits": {
+        "PID": "0.2"
+      },
+      "DemandFilePath": "Loss_Pelicun/pelicun_3_1_master_new/examples/001/demands_s4.csv",
+      "InferResidualDrift": "",
+      "SampleSize": "1000"
+    },
+    "Losses": {
+      "BldgRepair": {
+        "ConsequenceDatabase": "FEMA P-58",
+        "MapApproach": "Automatic",
+        "ReplacementCost": {
+          "Distribution": "normal",
+          "Median": "691200",
+          "Theta_1": "0.003",
+          "Unit": "USD_2011"
+        },
+        "ReplacementTime": {
+          "Distribution": "lognormal",
+          "Median": "730",
+          "Theta_1": "0.004",
+          "Unit": "worker_day"
+        }
+      }
+    }
+  },
+  "GeneralInformation": {
+    "units": {
+      "force": "kips",
+      "length": "in",
+      "temperature": "C",
+      "time": "sec"
+    }
+  }
+}

@@ -1,0 +1,70 @@
+# This file will be used to define all fixities; 
+
+# Defining fixity at x-direction wood panel nodes 
+# Story 1 
+fix	11011	1	1	1	1	1	1;
+fix	11012	0	1	0	1	0	1;
+fix	11021	1	1	1	1	1	1;
+fix	11022	0	1	0	1	0	1;
+fix	11031	1	1	1	1	1	1;
+fix	11032	0	1	0	1	0	1;
+fix	11041	1	1	1	1	1	1;
+fix	11042	0	1	0	1	0	1;
+fix	11051	1	1	1	1	1	1;
+fix	11052	0	1	0	1	0	1;
+fix	11061	1	1	1	1	1	1;
+fix	11062	0	1	0	1	0	1;
+fix	11071	1	1	1	1	1	1;
+fix	11072	0	1	0	1	0	1;
+fix	11081	1	1	1	1	1	1;
+fix	11082	0	1	0	1	0	1;
+fix	11091	1	1	1	1	1	1;
+fix	11092	0	1	0	1	0	1;
+fix	11101	1	1	1	1	1	1;
+fix	11102	0	1	0	1	0	1;
+fix	11111	1	1	1	1	1	1;
+fix	11112	0	1	0	1	0	1;
+fix	11121	1	1	1	1	1	1;
+fix	11122	0	1	0	1	0	1;
+fix	11131	1	1	1	1	1	1;
+fix	11132	0	1	0	1	0	1;
+puts "fixities at x-direction wood panel nodes defined" 
+# Defining fixity at z-direction wood panel nodes 
+# Story 1 
+fix	13011	1	1	1	1	1	1;
+fix	13012	0	1	0	1	0	1;
+fix	13021	1	1	1	1	1	1;
+fix	13022	0	1	0	1	0	1;
+fix	13031	1	1	1	1	1	1;
+fix	13032	0	1	0	1	0	1;
+fix	13041	1	1	1	1	1	1;
+fix	13042	0	1	0	1	0	1;
+fix	13051	1	1	1	1	1	1;
+fix	13052	0	1	0	1	0	1;
+fix	13061	1	1	1	1	1	1;
+fix	13062	0	1	0	1	0	1;
+fix	13071	1	1	1	1	1	1;
+fix	13072	0	1	0	1	0	1;
+fix	13081	1	1	1	1	1	1;
+fix	13082	0	1	0	1	0	1;
+puts "fixities at z-direction wood panel nodes defined" 
+# Defining fixity at leaning column nodes 
+fix	1000	1	1	1	1	1	1;
+fix	2000	0	0	0	1	0	1;
+fix	1100	1	1	1	1	1	1;
+fix	2100	0	0	0	1	0	1;
+fix	1200	1	1	1	1	1	1;
+fix	2200	0	0	0	1	0	1;
+fix	1300	1	1	1	1	1	1;
+fix	2300	0	0	0	1	0	1;
+fix	1400	1	1	1	1	1	1;
+fix	2400	0	0	0	1	0	1;
+fix	1500	1	1	1	1	1	1;
+fix	2500	0	0	0	1	0	1;
+fix	1600	1	1	1	1	1	1;
+fix	2600	0	0	0	1	0	1;
+fix	1700	1	1	1	1	1	1;
+fix	2700	0	0	0	1	0	1;
+fix	1800	1	1	1	1	1	1;
+fix	2800	0	0	0	1	0	1;
+puts "fixities at leaning column nodes defined" 

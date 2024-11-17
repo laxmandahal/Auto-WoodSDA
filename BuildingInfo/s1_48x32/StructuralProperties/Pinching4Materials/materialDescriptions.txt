@@ -1,0 +1,23 @@
+1	OSB Low	7/16in OSB with 8d @6 in oc 
+2	OSB Medium	7/16in OSB with 8d @3 in  oc 
+3	Line et al	3/8in_WSP_OSB_6d@6in
+4	Line et al	3/8in_Structural I_OSB_8d@2in
+5	Line et al	7/16in OSB with 8d @2 in oc 
+6	Line et al	3/8in_WSP_OSB_6d@2in oc
+7	FEMA P-795	7/16in OSB with 8d @4 in oc 
+8	Line et al	19/32in_WSP_OSB_10d@6in
+9	OSB High 	19/32in OSB with 10d @2 in oc
+10	Yi Dissertation	15/32in WSP with 10d@4 in oc
+11	Yi Dissertation	15/32in WSP with 10d@2 in oc
+12	Yi Dissertation	15/32in WSP with 8d@4 in oc
+13	OSB Nonstruc	7/16in OSB with 8d @12 in oc 
+14	Min- Gyp	1/2in GWB with 5d cooler @ 7 in oc
+15	Nonstruct Gyp	1/2in GWB with 5d cooler @ 12 in oc
+16	Stucco-PEER CEA	Exterior (Ref. CEA comparison study w/ Timber3D )
+17	GWB- PEER CEA	Interior (Ref. CEA comparison study w/ Timber3D)
+18	HWS- PEER CEA	Exterior (Combined backbone from PEER CEA)
+19	Plaster on Lath- PEER CEA	Interior (Combined backbone from PEER CEA)
+20	Stucco + GWB- PEER CEA	Ref. CEA comparison study w/ Timber3D
+21	Stucco - ATC 116	Calibrated using SAWS parameters in ATC 116
+22	Siding- ATC 116	Calibrated using SAWS parameters in ATC 116
+23	Max-Gyp	5/8in GWB with 6d cooler @ 4 in oc

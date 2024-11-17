@@ -1,0 +1,9 @@
+D	# site class based on soil property. ASCE 7-16 Section 11.4.3
+1.5	# Mapped spectral response accl at short period. Use ATC Hazard Tool (Ss)
+0.6	# Mapped spectral response accl at 1s period. Use ATC Hazard Tool (S1)
+6.5	# response modification factor (R)
+1	# Importance factor (Ie)
+4	# Displacement amplification factor (Cd)
+8	# Long period (TL)
+0.02	# allowable drift (percent)
+

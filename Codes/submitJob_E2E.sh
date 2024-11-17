@@ -32,8 +32,8 @@ module load singularity
 module load python/3.9.6
 # source $HOME/mpi_env/mpi_env/bin/activate
 
-buildingID="MFD6B"
-
+# buildingID="MFD6B"
+buildingID="s1_48x32_Stucco_GWB_Normal_Vs10"
 
 python3 -u run_designModule.py --buildingID $buildingID 
 
