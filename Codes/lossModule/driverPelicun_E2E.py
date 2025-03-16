@@ -8,7 +8,7 @@ import time
 import pickle
 
 from pathlib import Path
-
+from typing import List
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -47,11 +47,23 @@ def delete_files_from_directory(directory, keep):
     finally:
         os.chdir(baseDir)
 
+occ_type_to_id_mapping = {
+    'single-unit residential': 7,
+    'single unit residential': 7,
+    'sfd':7,
+    'multi-unit residential': 1,
+    'multi unit residential': 1,
+    'mfd':1
+    }
+
 def main(
 	buildingID: str,
-    num_story:int, 
-    archetype_length:float,
-    archetype_width:float,
+    HAZARD_LEVEL: List[float],
+    NUM_GM: List[int],
+    num_story:int,
+    per_story_area: float,
+    occupancy_type: str = 'Single-Unit Residential',
+    collapse_limit: float=0.1,
     norm_cmp_qty: bool = True,
     im_period: float = 0.3
 ):
@@ -66,8 +78,8 @@ def main(
     ID = buildingID
     # split_str = ID.split('_')
 
-    HAZARD_LEVEL = [0.1, 0.3, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7, 1.9, 2.1, 2.3, 2.5, 2.7, 2.9, 3.1, 3.3, 3.5]
-    NUM_GM = np.array([22] * len(HAZARD_LEVEL), dtype=int) * 2 #should be multiplied by 2 if GMs are flipped 
+    # HAZARD_LEVEL = [0.1, 0.3, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7, 1.9, 2.1, 2.3, 2.5, 2.7, 2.9, 3.1, 3.3, 3.5]
+    # NUM_GM = np.array([22] * len(HAZARD_LEVEL), dtype=int) * 2 #should be multiplied by 2 if GMs are flipped 
     # HAZARD_LEVEL = [0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 1.0, 1.2, 1.5, 1.8, 2.0, 2.5, 3.0]
     # NUM_GM = np.array([30] * len(HAZARD_LEVEL), dtype=int) * 2 #should be multiplied by 2 if GMs are flipped 
     
@@ -78,25 +90,25 @@ def main(
     # geom_str = split_str[1].split('x')
     # archetype_length = 96
     # archetype_width = 48
-    total_plan_area = archetype_length * archetype_width
+    # total_plan_area = archetype_length * archetype_width
+    total_plan_area = per_story_area * num_story
 
-    collapse_limit = 0.5
-    num_stairs_per_floor = 2
-    num_elevators = 1
+    # collapse_limit = 0.5
+    # num_stairs_per_floor = 2
+    # num_elevators = 1
 
     if num_story == 1: 
-        collapse_limit = 0.2
         num_stairs_per_floor = 1
         num_elevators = 0
-
-    if baselineID in ['SFD1B', 'SFD2B', 'SFD3B', 'SFD4B']:
         replacement_cost = 450 * total_plan_area * num_story
-        occupancy_type = 'Single-Unit Residential'
-        occupancy_id = 7
     else:
+        num_stairs_per_floor = 2
+        num_elevators = 1
         replacement_cost = 387 * total_plan_area * num_story
-        occupancy_type = 'Multi-Unit Residential'
-        occupancy_id = 1
+
+    occupancy_id = occ_type_to_id_mapping[occupancy_type.lower()]
+    
+    
     ## create loss_model_config.json file that is used as an input by pelicun 3.1 most updated version (cloned: Oct 2023)
     ## Note: loss model config file is hazard-level-agnostic 
     generateConfgFile_pelicun3p1new(baselineID, 
@@ -157,9 +169,9 @@ def main(
     # it saves building_model.json file inside the "ATC138Input" folder
     ## Note: building model .json file is hazard-level agnostic
     create_building_model(baseDir, ID, num_story, total_plan_area, 
-                        area_per_story=[archetype_length * archetype_width]*num_story, 
+                        area_per_story=[per_story_area]*num_story, 
                         height_per_story=[10]*num_story, 
-                        edge_lengths=[[archetype_length, archetype_width],]*num_story,
+                        edge_lengths=[[per_story_area],]*num_story,
                         struct_bay_area_per_story=[100]*num_story, 
                         stairs_per_story=[num_stairs_per_floor]*num_story, 
                         building_value = replacement_cost, 
@@ -187,8 +199,8 @@ def main(
         water_potable=False, water_sanitary=False, hvac_ventilation=False, hvac_heating=False,
         hvac_cooling=False, hvac_exhaust=False
         )
-    tenant_unit_df = create_tenant_unit_list(ATC138Input_dir, num_story, [archetype_length * archetype_width]*num_story, 
-                            [archetype_length * archetype_width / 10]*num_story, 
+    tenant_unit_df = create_tenant_unit_list(ATC138Input_dir, num_story, [per_story_area]*num_story, 
+                            [per_story_area / 10]*num_story, 
                             occupancyID=occupancy_id
                             )
     print(f'Generated ATC-138 input files for {buildingID}...')

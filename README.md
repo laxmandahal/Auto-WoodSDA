@@ -40,7 +40,7 @@ Ensure you have the following software and libraries installed:
 
 ### Installation
 
-Clone the repository to your local machine:
+First, fork this repo. To clone the repository to your local machine:
 ```bash
 git clone https://github.com/<user>/Auto-WoodSDA.git
 cd Auto-WoodSDA
