@@ -168,101 +168,98 @@ def ExtractRDR (DynamicDirectory, HazardLevel, NumGM, NumStory):
 
 
 
-# def ExtractPGA (GMDirectory, HazardLevel, NumGM):
-#     NumHazardLevel = len(HazardLevel)
-#     TotalNumGM = np.sum(NumGM)*2 # Number of rows
-#     NumGM_temp1 = np.insert(NumGM,0,0)*2
-#     NumGM_temp2 = np.cumsum(NumGM_temp1)
-    
-#     PGA = pd.DataFrame(0, index=range(np.sum(TotalNumGM)), columns=range(1))
-
-
-#     for i in range(NumHazardLevel):
-#         # Define ground motion information stored directory, the information of ground motion of each hazard level shouled be stored in 
-#         # seperate folder. 
-
-#         GMHistoryDirectory =  os.path.join(GMDirectory, '%s'%(i+1), 'histories')
-#         GMInfoDirectory = os.path.join(GMDirectory, '%s'%(i+1), 'GroundMotionInfo')
-#         if NumHazardLevel == 1:
-#             GMHistoryDirectory =  os.path.join(GMDirectory, 'histories')
-#             GMInfoDirectory = os.path.join(GMDirectory, 'GroundMotionInfo')
-        
-#         sys.path.append(GMInfoDirectory)
-#         sys.path.append(GMHistoryDirectory)
-
-#         # os.chdir (GMInfoDirectory)
-#         ScalingFactor = np.loadtxt(os.path.join(GMInfoDirectory, 'BiDirectionMCEScaleFactors.txt'))
-#         GMName = np.loadtxt(os.path.join(GMInfoDirectory, 'GMFileNames.txt'), dtype=str)
-
-#         # We have 2 perpendicular directions, also consider the responses in each direction respectively
-#         for j in range(NumGM[i]):
-#             # os.chdir(GMHistoryDirectory)
-#             XPGA = max(np.abs(np.loadtxt(os.path.join(GMHistoryDirectory, GMName[2*j]), dtype = float)))*ScalingFactor[j]
-#             ZPGA = max(np.abs(np.loadtxt(os.path.join(GMHistoryDirectory, GMName[2*j+1]), dtype = float)))*ScalingFactor[j]
-#             # XPGA = max(np.abs(np.loadtxt('%s'%GMName[2*j], dtype = float)))
-#             # ZPGA = max(np.abs(np.loadtxt('%s'%GMName[2*j+1], dtype = float)))
-#             PGA.loc[j+NumGM_temp2[i],0] = XPGA
-#             PGA.loc[j+NumGM_temp2[i]+NumGM[i],0] = ZPGA
-#             PGA.loc[j+NumGM[i]+NumGM_temp2[i],0] = ZPGA
-#             PGA.loc[j+NumGM[i]+NumGM_temp2[i]+NumGM[i],0] = XPGA
-#     return PGA
-
-def ExtractPGA (GMDirectory, GMHistoryDirectory, HazardLevel, NumGM, FEMA_P695=False):
-# def ExtractPGA (GMHistoryDirectory, GMInfoDirectory, HazardLevel, NumGM): 
-    numRecords = np.array(NumGM, dtype=int) * 2
+def ExtractPGA (GMDirectory, HazardLevel, NumGM):
     NumHazardLevel = len(HazardLevel)
-    TotalNumGM = np.sum(numRecords)*2 # Number of rows
-    NumGM_temp1 = np.insert(numRecords,0,0)*2
+    TotalNumGM = np.sum(NumGM)*2 # Number of rows
+    NumGM_temp1 = np.insert(NumGM,0,0)*2
     NumGM_temp2 = np.cumsum(NumGM_temp1)
     
-    pga_all = []
+    PGA = pd.DataFrame(0, index=range(np.sum(TotalNumGM)), columns=range(1))
+
 
     for i in range(NumHazardLevel):
-        if FEMA_P695:
-            GMHistoryDirectory =  os.path.join(GMDirectory, '%s'%(i+1), 'histories')
-            GMInfoDirectory_fp = os.path.join(GMDirectory, '%s'%(i+1), 'GroundMotionInfo')
-        else:
-            GMInfoDirectory_fp = os.path.join(GMDirectory, '%s'%(i+1))
-        # if the ground motion set is intensity-agnostic
-        # il_str = str(HazardLevel[i]).replace('.', 'p')
-        
+        # Define ground motion information stored directory, the information of ground motion of each hazard level shouled be stored in 
+        # seperate folder. 
 
-       # if NumHazardLevel == 1:
-        #    GMHistoryDirectory =  os.path.join(GMDirectory, 'histories')
-         #   GMInfoDirectory = os.path.join(GMDirectory, 'GroundMotionInfo')
+        GMHistoryDirectory =  os.path.join(GMDirectory, '%s'%(i+1), 'histories')
+        GMInfoDirectory = os.path.join(GMDirectory, '%s'%(i+1), 'GroundMotionInfo')
         
-        sys.path.append(GMInfoDirectory_fp)
+        sys.path.append(GMInfoDirectory)
         sys.path.append(GMHistoryDirectory)
-        
-        if FEMA_P695:
-            ScalingFactor = np.loadtxt(os.path.join(GMInfoDirectory_fp, 'BiDirectionMCEScaleFactors.txt'))
-        else:
-            ScalingFactor = np.loadtxt(os.path.join(GMInfoDirectory_fp, 'ScaleFactors.txt'))
-        GMName = np.loadtxt(os.path.join(GMInfoDirectory_fp, 'GMFileNames.txt'), dtype=str)
+
+        # os.chdir (GMInfoDirectory)
+        ScalingFactor = np.loadtxt(os.path.join(GMInfoDirectory, 'BiDirectionMCEScaleFactors.txt'))
+        GMName = np.loadtxt(os.path.join(GMInfoDirectory, 'GMFileNames.txt'), dtype=str)
 
         # We have 2 perpendicular directions, also consider the responses in each direction respectively
-        xpga = []
-        zpga = []
         for j in range(NumGM[i]):
             # os.chdir(GMHistoryDirectory)
-            if FEMA_P695:
-                XPGA = max(np.abs(np.loadtxt(os.path.join(GMHistoryDirectory, f'{GMName[::2][j]}.txt'), dtype = float)))*ScalingFactor[j]
-                ZPGA = max(np.abs(np.loadtxt(os.path.join(GMHistoryDirectory, f'{GMName[1::2][j]}.txt'), dtype = float)))*ScalingFactor[j]
-            else:
-                XPGA = max(np.abs(np.loadtxt(os.path.join(GMHistoryDirectory, GMName[::2][j]), dtype = float)))*ScalingFactor[j]
-                ZPGA = max(np.abs(np.loadtxt(os.path.join(GMHistoryDirectory, GMName[1::2][j]), dtype = float)))*ScalingFactor[j]
-            xpga.append(XPGA)
-            zpga.append(ZPGA)
+            XPGA = max(np.abs(np.loadtxt(os.path.join(GMHistoryDirectory, GMName[2*j]), dtype = float)))*ScalingFactor[j]
+            ZPGA = max(np.abs(np.loadtxt(os.path.join(GMHistoryDirectory, GMName[2*j+1]), dtype = float)))*ScalingFactor[j]
+            # XPGA = max(np.abs(np.loadtxt('%s'%GMName[2*j], dtype = float)))
+            # ZPGA = max(np.abs(np.loadtxt('%s'%GMName[2*j+1], dtype = float)))
+            PGA.loc[j+NumGM_temp2[i],0] = XPGA
+            PGA.loc[j+NumGM_temp2[i]+NumGM[i],0] = ZPGA
+            PGA.loc[j+NumGM[i]+NumGM_temp2[i],0] = ZPGA
+            PGA.loc[j+NumGM[i]+NumGM_temp2[i]+NumGM[i],0] = XPGA
+    return PGA
+
+# def ExtractPGA (GMDirectory, GMHistoryDirectory, HazardLevel, NumGM, FEMA_P695=False):
+# # def ExtractPGA (GMHistoryDirectory, GMInfoDirectory, HazardLevel, NumGM): 
+#     numRecords = np.array(NumGM, dtype=int) * 2
+#     NumHazardLevel = len(HazardLevel)
+#     TotalNumGM = np.sum(numRecords)*2 # Number of rows
+#     NumGM_temp1 = np.insert(numRecords,0,0)*2
+#     NumGM_temp2 = np.cumsum(NumGM_temp1)
+    
+#     pga_all = []
+
+#     for i in range(NumHazardLevel):
+#         if FEMA_P695:
+#             GMHistoryDirectory =  os.path.join(GMDirectory, '%s'%(i+1), 'histories')
+#             GMInfoDirectory_fp = os.path.join(GMDirectory, '%s'%(i+1), 'GroundMotionInfo')
+#         else:
+#             GMInfoDirectory_fp = os.path.join(GMDirectory, '%s'%(i+1))
+#         # if the ground motion set is intensity-agnostic
+#         # il_str = str(HazardLevel[i]).replace('.', 'p')
         
 
-        pga_all.append(xpga)
-        pga_all.append(xpga)
-        pga_all.append(zpga)
-        pga_all.append(zpga)
+#        # if NumHazardLevel == 1:
+#         #    GMHistoryDirectory =  os.path.join(GMDirectory, 'histories')
+#          #   GMInfoDirectory = os.path.join(GMDirectory, 'GroundMotionInfo')
+        
+#         sys.path.append(GMInfoDirectory_fp)
+#         sys.path.append(GMHistoryDirectory)
+        
+#         if FEMA_P695:
+#             ScalingFactor = np.loadtxt(os.path.join(GMInfoDirectory_fp, 'BiDirectionMCEScaleFactors.txt'))
+#         else:
+#             ScalingFactor = np.loadtxt(os.path.join(GMInfoDirectory_fp, 'ScaleFactors.txt'))
+#         GMName = np.loadtxt(os.path.join(GMInfoDirectory_fp, 'GMFileNames.txt'), dtype=str)
+
+#         # We have 2 perpendicular directions, also consider the responses in each direction respectively
+#         xpga = []
+#         zpga = []
+#         for j in range(NumGM[i]):
+#             # os.chdir(GMHistoryDirectory)
+#             if FEMA_P695:
+#                 XPGA = max(np.abs(np.loadtxt(os.path.join(GMHistoryDirectory, f'{GMName[::2][j]}.txt'), dtype = float)))*ScalingFactor[j]
+#                 ZPGA = max(np.abs(np.loadtxt(os.path.join(GMHistoryDirectory, f'{GMName[1::2][j]}.txt'), dtype = float)))*ScalingFactor[j]
+#             else:
+#                 XPGA = max(np.abs(np.loadtxt(os.path.join(GMHistoryDirectory, GMName[::2][j]), dtype = float)))*ScalingFactor[j]
+#                 ZPGA = max(np.abs(np.loadtxt(os.path.join(GMHistoryDirectory, GMName[1::2][j]), dtype = float)))*ScalingFactor[j]
+#             xpga.append(XPGA)
+#             zpga.append(ZPGA)
+        
+
+#         pga_all.append(xpga)
+#         pga_all.append(xpga)
+#         pga_all.append(zpga)
+#         pga_all.append(zpga)
     
-    d = {0:np.array(pga_all).flatten()}
-    PGA = pd.DataFrame(d)
-    return PGA
+#     d = {0:np.array(pga_all).flatten()}
+#     PGA = pd.DataFrame(d)
+#     return PGA
     
 def ExtractPFA (DynamicDirectory, HazardLevel, NumGM, NumStory, PGA, g = 386.4):   
     NumHazardLevel = len(HazardLevel)
