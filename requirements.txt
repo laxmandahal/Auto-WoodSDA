@@ -1,0 +1,11 @@
+# Core dependencies for the design/structural/schema pipeline
+# (Codes/designModule, Codes/structuralModule, Codes/schema).
+#
+# This is not yet a full audit of the repo's dependencies -- lossModule
+# (pelicun, ATC-138/MATLAB Engine) and damageModule pull in additional
+# packages (scipy, statsmodels, sympy, seaborn, matlab.engine, etc.) not
+# captured here yet.
+numpy
+pandas
+pydantic>=2
+pyyaml
