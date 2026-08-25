@@ -1,0 +1,753 @@
+building_id: s1_48x32
+geometry:
+  number_of_stories: 1
+  story_heights:
+  - 120.0
+  floor_max_x_dimension:
+  - 576.0
+  - 576.0
+  floor_max_z_dimension:
+  - 384.0
+  - 384.0
+  floor_areas:
+  - 1536.0
+  - 1536.0
+  leaning_column_node_tags:
+  - - 1000
+    - 1100
+    - 1200
+    - 1300
+    - 1400
+    - 1500
+    - 1600
+    - 1700
+    - 1800
+  - - 2000
+    - 2100
+    - 2200
+    - 2300
+    - 2400
+    - 2500
+    - 2600
+    - 2700
+    - 2800
+  leaning_column_node_x:
+  - - 288.0
+    - 0.0
+    - 288.0
+    - 576.0
+    - 0.0
+    - 0.0
+    - 288.0
+    - 576.0
+    - 576.0
+  - - 288.0
+    - 0.0
+    - 288.0
+    - 576.0
+    - 0.0
+    - 0.0
+    - 288.0
+    - 576.0
+    - 576.0
+  leaning_column_node_z:
+  - - 192.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - 192.0
+    - 384.0
+    - 384.0
+    - 384.0
+    - 192.0
+  - - 192.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - 192.0
+    - 384.0
+    - 384.0
+    - 384.0
+    - 192.0
+  n_x_panels:
+  - 13
+  n_z_panels:
+  - 8
+  x_panel_x_coords:
+  - - 24.0
+    - 144.0
+    - 288.0
+    - 432.0
+    - 552.0
+    - 48.0
+    - 288.0
+    - 528.0
+    - 24.0
+    - 144.0
+    - 288.0
+    - 432.0
+    - 552.0
+  x_panel_z_coords:
+  - - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - 192.0
+    - 192.0
+    - 192.0
+    - 384.0
+    - 384.0
+    - 384.0
+    - 384.0
+    - 384.0
+  z_panel_x_coords:
+  - - 0.0
+    - 0.0
+    - 0.0
+    - 288.0
+    - 288.0
+    - 576.0
+    - 576.0
+    - 576.0
+  z_panel_z_coords:
+  - - 24.0
+    - 192.0
+    - 360.0
+    - 48.0
+    - 336.0
+    - 24.0
+    - 192.0
+    - 360.0
+loads:
+  floor_weights:
+  - 51.0
+  live_loads:
+  - 0.000345
+  - 0.000345
+  - 0.000345
+  - 0.000345
+  leaning_column_loads:
+  - - 13.25
+    - 3.3125
+    - 6.625
+    - 3.3125
+    - 6.625
+    - 3.3125
+    - 6.625
+    - 3.3125
+    - 6.625
+  interior_wall_weight: 11.0
+static_analysis:
+  pushover_increment: 0.001
+  pushover_x_drift: 10.0
+  pushover_z_drift: 10.0
+dynamic_analysis:
+  collapse_drift_limit: 0.1
+  demolition_drift_limit: 0.01
+  damping_model: TangentRayleigh
+  damping_ratio: 0.05
+x_wall_lines:
+- name: gridA
+  direction: X
+  geometry:
+    wall_lengths:
+    - - 48.0
+      - 48.0
+      - 48.0
+    pinching4_index:
+    - - 0
+      - 2
+      - 4
+    tributary_length:
+    - - 60.0
+      - 40.0
+      - 60.0
+    tributary_width:
+    - - 75.0
+      - 45.0
+      - 45.0
+  loads:
+    shear_wall_load:
+    - - 8.075
+      - 8.075
+      - 8.075
+    tributary_load_ratio:
+    - 0.08333
+    - 0.08333
+    - 0.08333
+  material_properties:
+    initial_moisture_content: 15.0
+    final_moisture_content: 10.0
+    wood_modulus_of_elasticity: 1700000.0
+    nail_spacing:
+    - - 3.0
+      - 3.0
+      - 3.0
+    nail_size:
+    - - 10d
+      - 10d
+      - 10d
+    panel_thickness:
+    - - 15/32in
+      - 15/32in
+      - 15/32in
+    take_up_deflection:
+    - 0.03
+    chord_area:
+    - 105.0
+    sheathing_material_type: ''
+    sheathing_type: ''
+  design_constraints:
+    user_defined_drift_limit: 0.02
+    user_defined_dc_ratio: 0.9
+    user_defined_dc_ratio_flag_tiedown: false
+    user_defined_dc_ratio_tiedown: 0.9
+    tie_down_system_flag: true
+  rigid_diaphragm_assumption:
+    accidental_torsion_ex: 90.0
+    torsional_irregularity_ax: 1.25
+    redundancy_factor: 1.3
+    moment_arm:
+    - 240.0
+    - 240.0
+    - 240.0
+  envelope_shear_wall_demand:
+  - - 0.3864701773068462
+    - 0.3864701773068462
+    - 0.3864701773068462
+- name: gridB
+  direction: X
+  geometry:
+    wall_lengths:
+    - - 48.0
+      - 96.0
+      - 48.0
+    pinching4_index:
+    - - 5
+      - 6
+      - 7
+    tributary_length:
+    - - 60.0
+      - 40.0
+      - 60.0
+    tributary_width:
+    - - 75.0
+      - 45.0
+      - 45.0
+  loads:
+    shear_wall_load:
+    - - 8.075
+      - 8.075
+      - 8.075
+    tributary_load_ratio:
+    - 0.125
+    - 0.25
+    - 0.125
+  material_properties:
+    initial_moisture_content: 15.0
+    final_moisture_content: 10.0
+    wood_modulus_of_elasticity: 1700000.0
+    nail_spacing:
+    - - 3.0
+      - 3.0
+      - 3.0
+    nail_size:
+    - - 10d
+      - 10d
+      - 10d
+    panel_thickness:
+    - - 15/32in
+      - 15/32in
+      - 15/32in
+    take_up_deflection:
+    - 0.03
+    chord_area:
+    - 105.0
+    sheathing_material_type: ''
+    sheathing_type: ''
+  design_constraints:
+    user_defined_drift_limit: 0.02
+    user_defined_dc_ratio: 0.9
+    user_defined_dc_ratio_flag_tiedown: false
+    user_defined_dc_ratio_tiedown: 0.9
+    tie_down_system_flag: true
+  rigid_diaphragm_assumption:
+    accidental_torsion_ex: 90.0
+    torsional_irregularity_ax: 1.25
+    redundancy_factor: 1.3
+    moment_arm:
+    - 240.0
+    - 240.0
+    - 240.0
+  envelope_shear_wall_demand:
+  - - 0.6675393971663707
+    - 0.41039062499999995
+    - 0.6675393971663707
+- name: gridC
+  direction: X
+  geometry:
+    wall_lengths:
+    - - 48.0
+      - 48.0
+      - 48.0
+    pinching4_index:
+    - - 8
+      - 10
+      - 12
+    tributary_length:
+    - - 60.0
+      - 40.0
+      - 60.0
+    tributary_width:
+    - - 75.0
+      - 45.0
+      - 45.0
+  loads:
+    shear_wall_load:
+    - - 8.075
+      - 8.075
+      - 8.075
+    tributary_load_ratio:
+    - 0.08333
+    - 0.08333
+    - 0.08333
+  material_properties:
+    initial_moisture_content: 15.0
+    final_moisture_content: 10.0
+    wood_modulus_of_elasticity: 1700000.0
+    nail_spacing:
+    - - 3.0
+      - 3.0
+      - 3.0
+    nail_size:
+    - - 10d
+      - 10d
+      - 10d
+    panel_thickness:
+    - - 15/32in
+      - 15/32in
+      - 15/32in
+    take_up_deflection:
+    - 0.03
+    chord_area:
+    - 105.0
+    sheathing_material_type: ''
+    sheathing_type: ''
+  design_constraints:
+    user_defined_drift_limit: 0.02
+    user_defined_dc_ratio: 0.9
+    user_defined_dc_ratio_flag_tiedown: false
+    user_defined_dc_ratio_tiedown: 0.9
+    tie_down_system_flag: true
+  rigid_diaphragm_assumption:
+    accidental_torsion_ex: 90.0
+    torsional_irregularity_ax: 1.25
+    redundancy_factor: 1.3
+    moment_arm:
+    - 240.0
+    - 240.0
+    - 240.0
+  envelope_shear_wall_demand:
+  - - 0.3864701773068462
+    - 0.3864701773068462
+    - 0.3864701773068462
+y_wall_lines:
+- name: grid1
+  direction: Y
+  geometry:
+    wall_lengths:
+    - - 48.0
+      - 48.0
+    pinching4_index:
+    - - 0
+      - 2
+    tributary_length:
+    - - 60.0
+      - 40.0
+    tributary_width:
+    - - 75.0
+      - 45.2
+  loads:
+    shear_wall_load:
+    - - 8.075
+      - 8.075
+    tributary_load_ratio:
+    - 0.125
+    - 0.125
+  material_properties:
+    initial_moisture_content: 15.0
+    final_moisture_content: 10.0
+    wood_modulus_of_elasticity: 1700000.0
+    nail_spacing:
+    - - 3.0
+      - 3.0
+    nail_size:
+    - - 10d
+      - 10d
+    panel_thickness:
+    - - 15/32in
+      - 15/32in
+    take_up_deflection:
+    - 0.03
+    chord_area:
+    - 105.0
+    sheathing_material_type: ''
+    sheathing_type: ''
+  design_constraints:
+    user_defined_drift_limit: 0.02
+    user_defined_dc_ratio: 0.9
+    user_defined_dc_ratio_flag_tiedown: false
+    user_defined_dc_ratio_tiedown: 0.9
+    tie_down_system_flag: true
+  rigid_diaphragm_assumption:
+    accidental_torsion_ex: 90.0
+    torsional_irregularity_ax: 1.25
+    redundancy_factor: 1.3
+    moment_arm:
+    - 240.0
+    - 240.0
+  envelope_shear_wall_demand:
+  - - 0.7075775069224682
+    - 0.7075775069224682
+- name: grid2
+  direction: Y
+  geometry:
+    wall_lengths:
+    - - 96.0
+      - 96.0
+    pinching4_index:
+    - - 3
+      - 4
+    tributary_length:
+    - - 60.0
+      - 40.0
+    tributary_width:
+    - - 75.0
+      - 45.2
+  loads:
+    shear_wall_load:
+    - - 8.075
+      - 8.075
+    tributary_load_ratio:
+    - 0.25
+    - 0.25
+  material_properties:
+    initial_moisture_content: 15.0
+    final_moisture_content: 10.0
+    wood_modulus_of_elasticity: 1700000.0
+    nail_spacing:
+    - - 3.0
+      - 3.0
+    nail_size:
+    - - 10d
+      - 10d
+    panel_thickness:
+    - - 15/32in
+      - 15/32in
+    take_up_deflection:
+    - 0.03
+    chord_area:
+    - 105.0
+    sheathing_material_type: ''
+    sheathing_type: ''
+  design_constraints:
+    user_defined_drift_limit: 0.02
+    user_defined_dc_ratio: 0.9
+    user_defined_dc_ratio_flag_tiedown: false
+    user_defined_dc_ratio_tiedown: 0.9
+    tie_down_system_flag: true
+  rigid_diaphragm_assumption:
+    accidental_torsion_ex: 90.0
+    torsional_irregularity_ax: 1.25
+    redundancy_factor: 1.3
+    moment_arm:
+    - 240.0
+    - 240.0
+  envelope_shear_wall_demand:
+  - - 0.41039062499999995
+    - 0.41039062499999995
+- name: grid3
+  direction: Y
+  geometry:
+    wall_lengths:
+    - - 48.0
+      - 48.0
+    pinching4_index:
+    - - 5
+      - 7
+    tributary_length:
+    - - 60.0
+      - 40.0
+    tributary_width:
+    - - 75.0
+      - 45.2
+  loads:
+    shear_wall_load:
+    - - 8.075
+      - 8.075
+    tributary_load_ratio:
+    - 0.125
+    - 0.125
+  material_properties:
+    initial_moisture_content: 15.0
+    final_moisture_content: 10.0
+    wood_modulus_of_elasticity: 1700000.0
+    nail_spacing:
+    - - 3.0
+      - 3.0
+    nail_size:
+    - - 10d
+      - 10d
+    panel_thickness:
+    - - 15/32in
+      - 15/32in
+    take_up_deflection:
+    - 0.03
+    chord_area:
+    - 105.0
+    sheathing_material_type: ''
+    sheathing_type: ''
+  design_constraints:
+    user_defined_drift_limit: 0.02
+    user_defined_dc_ratio: 0.9
+    user_defined_dc_ratio_flag_tiedown: false
+    user_defined_dc_ratio_tiedown: 0.9
+    tie_down_system_flag: true
+  rigid_diaphragm_assumption:
+    accidental_torsion_ex: 90.0
+    torsional_irregularity_ax: 1.25
+    redundancy_factor: 1.3
+    moment_arm:
+    - 240.0
+    - 240.0
+  envelope_shear_wall_demand:
+  - - 0.7075775069224682
+    - 0.7075775069224682
+design_outputs:
+  x_panels:
+    length:
+    - - 48.0
+      - 108.0
+      - 48.0
+      - 216.0
+      - 48.0
+      - 48.0
+      - 96.0
+      - 48.0
+      - 48.0
+      - 108.0
+      - 96.0
+      - 216.0
+      - 48.0
+    height:
+    - - 120.0
+      - 120.0
+      - 120.0
+      - 120.0
+      - 120.0
+      - 120.0
+      - 120.0
+      - 120.0
+      - 120.0
+      - 120.0
+      - 120.0
+      - 120.0
+      - 120.0
+    material_number:
+      default:
+      - - 3
+        - 17
+        - 3
+        - 17
+        - 3
+        - 8
+        - 8
+        - 8
+        - 3
+        - 17
+        - 3
+        - 17
+        - 3
+      - - 18
+        - 18
+        - 18
+        - 18
+        - 18
+        - 15
+        - 15
+        - 15
+        - 18
+        - 18
+        - 18
+        - 18
+        - 18
+      HWS_GWB:
+      - - 3
+        - 17
+        - 3
+        - 17
+        - 3
+        - 8
+        - 8
+        - 8
+        - 3
+        - 17
+        - 3
+        - 17
+        - 3
+      - - 18
+        - 18
+        - 18
+        - 18
+        - 18
+        - 15
+        - 15
+        - 15
+        - 18
+        - 18
+        - 18
+        - 18
+        - 18
+      Stucco_GWB:
+      - - 3
+        - 17
+        - 3
+        - 17
+        - 3
+        - 3
+        - 3
+        - 3
+        - 3
+        - 17
+        - 3
+        - 17
+        - 3
+      - - 16
+        - 16
+        - 16
+        - 16
+        - 16
+        - 15
+        - 15
+        - 15
+        - 16
+        - 16
+        - 16
+        - 16
+        - 16
+      Stucco_Plaster:
+      - - 3
+        - 19
+        - 3
+        - 19
+        - 3
+        - 8
+        - 8
+        - 8
+        - 3
+        - 19
+        - 3
+        - 19
+        - 3
+      - - 16
+        - 16
+        - 16
+        - 16
+        - 16
+        - 15
+        - 15
+        - 15
+        - 16
+        - 16
+        - 16
+        - 16
+        - 16
+  z_panels:
+    length:
+    - - 48.0
+      - 288.0
+      - 48.0
+      - 96.0
+      - 96.0
+      - 48.0
+      - 192.0
+      - 48.0
+    height:
+    - - 120.0
+      - 120.0
+      - 120.0
+      - 120.0
+      - 120.0
+      - 120.0
+      - 120.0
+      - 120.0
+    material_number:
+      default:
+      - - 8
+        - 17
+        - 8
+        - 8
+        - 8
+        - 8
+        - 17
+        - 8
+      - - 18
+        - 18
+        - 18
+        - 15
+        - 15
+        - 18
+        - 18
+        - 18
+      HWS_GWB:
+      - - 8
+        - 17
+        - 8
+        - 8
+        - 8
+        - 8
+        - 17
+        - 8
+      - - 18
+        - 18
+        - 18
+        - 15
+        - 15
+        - 18
+        - 18
+        - 18
+      Stucco_GWB:
+      - - 3
+        - 17
+        - 3
+        - 3
+        - 3
+        - 3
+        - 17
+        - 3
+      - - 16
+        - 16
+        - 16
+        - 15
+        - 15
+        - 16
+        - 16
+        - 16
+      Stucco_Plaster:
+      - - 8
+        - 19
+        - 8
+        - 8
+        - 8
+        - 8
+        - 19
+        - 8
+      - - 16
+        - 16
+        - 16
+        - 15
+        - 15
+        - 16
+        - 16
+        - 16

@@ -18,6 +18,12 @@ __author__ = 'Laxman Dahal'
 import pandas as pd
 import numpy as np
 import os
+import sys
+
+cwd = os.path.dirname(__file__)
+code_dir = os.path.dirname(cwd)
+sys.path.append(os.path.join(code_dir, 'schema'))
+from loader import load_building_config, save_building_config, as_matrix
 
 from ShearWallDriftCheck import ShearWallDriftCheck
 
@@ -104,43 +110,44 @@ class FinalShearWallDesign():
         :return: instantiates required class variables and attributes 
         """
 
-        # self.pinching4IndexShearWall = np.genfromtxt("pinching4Index_shearWall%d.txt"%self.wallIndex).astype(int)
-        ##### Changelog (12/29/2021): Moving pinching4index into geometry folder. Trying to make it work with only one .txt file input 
-        os.chdir(
-            self.BaseDirectory
-            + "/%s_direction_wall" % self.direction
-            + "/%s" % self.wall_line_name
-            + "/Geometry"
-        )
-        
-        
-        self.pinching4IndexShearWall = np.genfromtxt("pinching4Index.txt").astype(int)
+        # Sourced from the archetype's building_config.yaml (Codes/schema/) instead of the
+        # BuildingInfo/<archetype>/*.txt tree. as_matrix reproduces the exact array shape
+        # np.genfromtxt() would have produced, so the reshape branches below are unchanged.
+        self.config = load_building_config(self.BaseDirectory)
+        wall_lines = self.config.x_wall_lines if self.direction == "X" else self.config.y_wall_lines
+        wl = next((w for w in wall_lines if w.name == self.wall_line_name), None)
+        if wl is None:
+            raise ValueError(
+                f"No wall line named {self.wall_line_name!r} in {self.direction}_wall_lines "
+                f"for {self.caseID!r}"
+            )
+        self.wl = wl
 
-        # if self.numFloors == 1:
-        #     no_of_walls = self.no_of_walls
-        # else:
+        self.pinching4IndexShearWall = as_matrix(wl.geometry.pinching4_index).astype(int)
+
         if self.numFloors == 1:
-            # print(self.wallLength, self.wallLength.dtype)
             self.no_of_walls = self.pinching4IndexShearWall.size
         else:
             self.no_of_walls = self.pinching4IndexShearWall.size / self.pinching4IndexShearWall.shape[0]
 
-        # no_of_walls = self.pinching4IndexShearWall.size / self.pinching4IndexShearWall.shape[0]
-        if self.numFloors > 1: 
+        if self.numFloors > 1:
             if self.no_of_walls == 1:
-                self.pinching4IndexShearWall = np.genfromtxt("pinching4Index.txt").astype(int)[:,None]
+                self.pinching4IndexShearWall = as_matrix(wl.geometry.pinching4_index).astype(int)[:, None]
             else:
-                self.pinching4IndexShearWall = np.genfromtxt("pinching4Index.txt").astype(int)
+                self.pinching4IndexShearWall = as_matrix(wl.geometry.pinching4_index).astype(int)
         else:
             if self.no_of_walls == 1:
-                # self.pinching4IndexShearWall = [np.genfromtxt("pinching4Index.txt").astype(int)]
-                self.pinching4IndexShearWall = np.array([[int(np.genfromtxt("pinching4Index.txt"))]])[:None]
+                self.pinching4IndexShearWall = np.array([[int(as_matrix(wl.geometry.pinching4_index))]])[:None]
             else:
-                # self.pinching4IndexShearWall = np.genfromtxt("pinching4Index.txt").astype(int)[:,None]
-                self.pinching4IndexShearWall = np.array([list(np.genfromtxt("pinching4Index.txt"))]).astype(int)[:None]
+                self.pinching4IndexShearWall = np.array([list(as_matrix(wl.geometry.pinching4_index))]).astype(int)[:None]
 
-        os.chdir(self.BaseDirectory + "/StructuralProperties" + "/%sWoodPanels"%self.direction)
-        self.pinching4MaterialNumber = np.genfromtxt("Pinching4MaterialNumber_%s.txt"%self.mat_nsc_ext_int)
+        self.panels = self.config.design_outputs.x_panels if self.direction == "X" else self.config.design_outputs.z_panels
+        if self.panels.material_number is None or self.mat_nsc_ext_int not in self.panels.material_number:
+            raise ValueError(
+                f"design_outputs.material_number has no {self.mat_nsc_ext_int!r} entry for "
+                f"{self.caseID!r} {self.direction} panels"
+            )
+        self.pinching4MaterialNumber = as_matrix(self.panels.material_number[self.mat_nsc_ext_int])
 
     def DesignIteration(self, df_inputs):
         '''
@@ -174,6 +181,17 @@ class FinalShearWallDesign():
         
         self.tiedown_design = pd.DataFrame(temp2)
 
+        if self.panels.length is None or self.panels.height is None:
+            raise ValueError(
+                f"design_outputs.length/height missing for {self.caseID!r} {self.direction} panels -- "
+                "cannot write final wall design back"
+            )
+        # length/height are always stored as real nested lists (never squeezed by np.genfromtxt's
+        # single-row/column quirk the way as_matrix()'d reads are), so build plain 2-D arrays here
+        # rather than reusing as_matrix -- these get indexed [row, col] below regardless of shape.
+        length_matrix = np.array(self.panels.length, dtype=float)
+        height_matrix = np.array(self.panels.height, dtype=float)
+
         tag = self.sw_design['OpenSees Tag'].values
         tag = tag[::-1] ## this makes first row of the output of the pinching4 number to be roof instead of first floor
         # print(self.wall_line_name, self.wallIndex, tag)
@@ -181,17 +199,31 @@ class FinalShearWallDesign():
                 kk = 0 + i //2
                 for j in range(len(self.pinching4IndexShearWall[[kk]])):
                     # print(i, self.pinching4IndexShearWall[[kk]][j])
-                    self.pinching4MaterialNumber[i, self.pinching4IndexShearWall[[kk]][j][self.wallIndex]] = tag[kk]
-                    # print(self.pinching4MaterialNumber)
+                    col = self.pinching4IndexShearWall[[kk]][j][self.wallIndex]
+                    self.pinching4MaterialNumber[i, col] = tag[kk]
+                    # Closes the length/height staleness bug: previously only material_number
+                    # got regenerated after a design run, while length/height sat unchanged even
+                    # when reDesignFlag lengthened the wall. Same (floor, column) mapping as the
+                    # material-number write above, but unreversed row order -- self.finalWallLength[kk]
+                    # already corresponds to floor kk in the same bottom-up convention length.txt
+                    # used on disk (only the *material* row order is intentionally roof-first, per
+                    # the comment above). finalWallLength/finalWallHeight are in feet (design-side
+                    # convention, e.g. ComputeDesignForce.py divides wallLengths.txt by 12); the
+                    # design_outputs matrices are in inches, matching length.txt/height.txt on disk
+                    # and every downstream consumer (BuildingModelClass.py, utils_opensees.py) --
+                    # verified against a fresh migration of MFD6B's pre-existing length.txt/height.txt.
+                    length_matrix[kk, col] = self.finalWallLength[kk] * 12
+                    height_matrix[kk, col] = self.finalWallHeight[kk] * 12
 
-        os.chdir(self.BaseDirectory + "/StructuralProperties" + "/%sWoodPanels"%self.direction)
-        # print(self.pinching4MaterialNumber)
-        ######## Logchange: 06/27/2022
-        #### issue: in trying to save the pinching4 as pinching4MaterialNumber.txt, the program was overwriting the saved
-        ####        pinching4 number after each loop thus resulting in the same values as the input pinching4 numbers
-        np.savetxt("Pinching4MaterialNumber_%s.txt"%self.mat_nsc_ext_int, X = self.pinching4MaterialNumber.astype(int),
-                    delimiter=" ", fmt="%i")
-        np.savetxt('Pinching4MaterialNumber.txt', X = self.pinching4MaterialNumber.astype(int), delimiter=" ", fmt="%i")
+        finish_key = self.mat_nsc_ext_int
+        if self.panels.material_number is None:
+            self.panels.material_number = {}
+        self.panels.material_number[finish_key] = self.pinching4MaterialNumber.astype(int).tolist()
+        self.panels.material_number["default"] = self.pinching4MaterialNumber.astype(int).tolist()
+        self.panels.length = length_matrix.tolist()
+        self.panels.height = height_matrix.tolist()
+
+        save_building_config(self.config, self.BaseDirectory)
         # self.driftRecord = pd.DataFrame(drift)
         # return self.sw_final_design
         return self.finalWallLength
