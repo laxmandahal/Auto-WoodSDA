@@ -1,10 +1,14 @@
 import numpy as np
-import os 
+import os
 import pandas as pd
+import sys
 
 cwd = os.path.dirname(__file__)
 code_dir = os.path.dirname(cwd)
 root_dir = os.path.dirname(code_dir)
+
+sys.path.append(os.path.join(code_dir, 'schema'))
+from loader import load_building_config, as_matrix, as_vector
 
 class BuildingModel(object):
 
@@ -64,29 +68,34 @@ class BuildingModel(object):
       self.ID = CaseID
 ##################################################################################################
 # Read in Geometry
-      os.chdir(os.path.join(BaseDirectory, 'Geometry'))
+# Sourced from the archetype's building_config.yaml (Codes/schema/) instead of the
+# BuildingInfo/<archetype>/*.txt tree. as_matrix/as_vector reproduce the exact array
+# shape np.genfromtxt() would have produced (including its single-row/column squeeze),
+# so every reshape/slice branch below this point is unchanged.
+      config = load_building_config(BaseDirectory)
+      geo = config.geometry
 
-      self.numberOfStories = np.genfromtxt('numberOfStories.txt').astype(int)
-      self.storyHeights = np.genfromtxt('storyHeights.txt').tolist()
+      self.numberOfStories = np.array(geo.number_of_stories).astype(int)
+      self.storyHeights = as_vector(geo.story_heights).tolist()
       self.floorHeights = np.cumsum(np.insert(self.storyHeights,0, 0))
       if self.numberOfStories == 1:
           self.storyHeights = [self.storyHeights]
 
-      self.floorMaximumXDimension = np.genfromtxt('floorMaximumXDimension.txt')
-      self.floorMaximumZDimension = np.genfromtxt('floorMaximumZDimension.txt')
-      self.floorAreas = np.genfromtxt('floorAreas.txt')
+      self.floorMaximumXDimension = as_vector(geo.floor_max_x_dimension)
+      self.floorMaximumZDimension = as_vector(geo.floor_max_z_dimension)
+      self.floorAreas = as_vector(geo.floor_areas)
 
-      self.leaningColumnNodesOpenSeesTags = np.genfromtxt('leaningColumnNodesOpenSeesTags.txt').astype(int)
-      self.leaningColumnNodesXCoordinates = np.genfromtxt('leaningColumnNodesXCoordinates.txt')
-      self.leaningColumnNodesZCoordinates = np.genfromtxt('leaningColumnNodesZCoordinates.txt')
+      self.leaningColumnNodesOpenSeesTags = as_matrix(geo.leaning_column_node_tags).astype(int)
+      self.leaningColumnNodesXCoordinates = as_matrix(geo.leaning_column_node_x)
+      self.leaningColumnNodesZCoordinates = as_matrix(geo.leaning_column_node_z)
 
-      self.numberOfXDirectionWoodPanels = np.genfromtxt('numberOfXDirectionWoodPanels.txt').astype(int)
-      self.numberOfZDirectionWoodPanels = np.genfromtxt('numberOfZDirectionWoodPanels.txt').astype(int)
+      self.numberOfXDirectionWoodPanels = as_vector(geo.n_x_panels).astype(int)
+      self.numberOfZDirectionWoodPanels = as_vector(geo.n_z_panels).astype(int)
 
-      self.XDirectionWoodPanelsXCoordinates = np.genfromtxt('XDirectionWoodPanelsXCoordinates.txt')
-      self.XDirectionWoodPanelsZCoordinates = np.genfromtxt('XDirectionWoodPanelsZCoordinates.txt')
-      self.ZDirectionWoodPanelsXCoordinates = np.genfromtxt('ZDirectionWoodPanelsXCoordinates.txt')
-      self.ZDirectionWoodPanelsZCoordinates = np.genfromtxt('ZDirectionWoodPanelsZCoordinates.txt')
+      self.XDirectionWoodPanelsXCoordinates = as_matrix(geo.x_panel_x_coords)
+      self.XDirectionWoodPanelsZCoordinates = as_matrix(geo.x_panel_z_coords)
+      self.ZDirectionWoodPanelsXCoordinates = as_matrix(geo.z_panel_x_coords)
+      self.ZDirectionWoodPanelsZCoordinates = as_matrix(geo.z_panel_z_coords)
 
       if self.numberOfStories == 1:
           self.numberOfXDirectionWoodPanels = self.numberOfXDirectionWoodPanels.reshape(-1,)
@@ -119,36 +128,35 @@ class BuildingModel(object):
       self.ZDirectionWoodPanelsTopTag = temp4
           
 
-##################################################################################################        
+##################################################################################################
 # Read in Loads
-      os.chdir(os.path.join(BaseDirectory, 'Loads'))
-      self.floorWeights = np.genfromtxt('floorWeights.txt'); # (kips)
-      self.liveLoads = np.genfromtxt('liveLoads.txt'); # (kips per square inch)
-      self.leaningcolumnLoads = np.genfromtxt('leaningcolumnLoads.txt'); # (kips)
+      loads = config.loads
+      self.floorWeights = as_vector(loads.floor_weights) # (kips)
+      self.liveLoads = as_vector(loads.live_loads) # (kips per square inch)
+      self.leaningcolumnLoads = as_matrix(loads.leaning_column_loads) # (kips)
       if self.numberOfStories == 1:
           self.leaningcolumnLoads = self.leaningcolumnLoads.reshape(1,-1)
           self.floorWeights = self.floorWeights.reshape(-1,)
 
-################################################################################################        
+################################################################################################
 # Read in Pushover Analysis Parameters
-      os.chdir(os.path.join(BaseDirectory, *['AnalysisParameters','StaticAnalysis']))
-      Increment = np.genfromtxt('PushoverIncrementSize.txt')
-      XDriftLimit = np.genfromtxt('PushoverXDrift.txt')
-      ZDriftLimit = np.genfromtxt('PushoverZDrift.txt')
+      static = config.static_analysis
+      Increment = as_vector([static.pushover_increment])
+      XDriftLimit = as_vector([static.pushover_x_drift])
+      ZDriftLimit = as_vector([static.pushover_z_drift])
 
       self.PushoverParameter = {'Increment': Increment,
                                 'PushoverXDrift': XDriftLimit,
                                 'PushoverZDrift': ZDriftLimit}
 
-##################################################################################################        
+##################################################################################################
 # Read in Dynaimic Analysis Parameters
-      os.chdir(os.path.join(BaseDirectory, *['AnalysisParameters','DynamicAnalysis']))
-      DriftLimit = np.genfromtxt('CollapseDriftLimit.txt')
-      DemolitionLimit = np.genfromtxt('DemolitionDriftLimit.txt')
+      dynamic = config.dynamic_analysis
+      DriftLimit = as_vector([dynamic.collapse_drift_limit])
+      DemolitionLimit = as_vector([dynamic.demolition_drift_limit])
 
-      with open('dampingModel.txt', 'r') as myfile:
-        dampingModel = myfile.read()  #For now, just use Rayleigh damping
-      dampingRatio = np.genfromtxt('dampingRatio.txt')
+      dampingModel = dynamic.damping_model  #For now, just use Rayleigh damping
+      dampingRatio = as_vector([dynamic.damping_ratio])
 
       self.DynamicParameter = {'CollapseLimit': DriftLimit,
                                'DemolitionLimit': DemolitionLimit,
@@ -199,19 +207,25 @@ class BuildingModel(object):
                                'rForce': rForce,
                                'uForce': uForce}
                             
-##################################################################################################        
+##################################################################################################
 # Read in Structural Panel Property
-      os.chdir(os.path.join(BaseDirectory,  *['StructuralProperties','XWoodPanels']))
-      self.XPanelLength = np.genfromtxt('length.txt')
-      self.XPanelHeight = np.genfromtxt('height.txt')
-      self.XPanelMaterial = np.genfromtxt('Pinching4MaterialNumber.txt')
+      x_panels = config.design_outputs.x_panels
+      z_panels = config.design_outputs.z_panels
+      if x_panels.length is None or z_panels.length is None or x_panels.material_number is None or z_panels.material_number is None:
+          raise ValueError(
+              f"BuildingConfig for {CaseID!r} has no design_outputs yet -- run the design "
+              "module at least once (or migrate an already-designed archetype) before "
+              "instantiating BuildingModel"
+          )
+      self.XPanelLength = as_matrix(x_panels.length)
+      self.XPanelHeight = as_matrix(x_panels.height)
+      self.XPanelMaterial = as_matrix(x_panels.material_number['default'])
 
-      os.chdir(os.path.join(BaseDirectory,  *['StructuralProperties','YWoodPanels']))
-      self.ZPanelLength = np.genfromtxt('length.txt')
-      self.ZPanelHeight = np.genfromtxt('height.txt')
-      self.ZPanelMaterial = np.genfromtxt('Pinching4MaterialNumber.txt')
+      self.ZPanelLength = as_matrix(z_panels.length)
+      self.ZPanelHeight = as_matrix(z_panels.height)
+      self.ZPanelMaterial = as_matrix(z_panels.material_number['default'])
 
-      if self.numberOfStories == 1: 
+      if self.numberOfStories == 1:
           self.XPanelHeight = self.XPanelHeight.reshape(1, -1)
           self.XPanelLength = self.XPanelLength.reshape(1, -1)
           self.ZPanelHeight = self.ZPanelHeight.reshape(1, -1)
