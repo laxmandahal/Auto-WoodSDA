@@ -26,6 +26,9 @@ cwd = os.path.dirname(__file__)
 code_dir = os.path.dirname(cwd)
 root_dir = os.path.dirname(code_dir)
 
+sys.path.append(os.path.join(code_dir, 'schema'))
+from loader import load_building_config, as_matrix, as_vector
+
 
 class ComputeSeismicForce(object):
     ''' 
@@ -95,10 +98,15 @@ class ComputeSeismicForce(object):
         self.ID = CaseID
         ##################################################################################################
         # Read in Geometry
-        os.chdir(os.path.join(BaseDirectory, 'Geometry'))
-        # os.chdir(BaseDirectory + "/Geometry")
-        self.numberOfStories = np.genfromtxt("numberOfStories.txt").astype(int)
-        self.storyHeights = np.genfromtxt("storyHeights.txt")#.tolist() #height of each floor in inches
+        # Sourced from the archetype's building_config.yaml (Codes/schema/) instead of the
+        # BuildingInfo/<archetype>/*.txt tree. as_matrix/as_vector reproduce the exact array
+        # shape np.genfromtxt() would have produced (including its single-row/column
+        # squeeze), so every reshape/slice branch below this point is unchanged.
+        config = load_building_config(BaseDirectory)
+        geo = config.geometry
+
+        self.numberOfStories = np.array(geo.number_of_stories).astype(int)
+        self.storyHeights = as_vector(geo.story_heights)  # height of each floor in inches
         #height of a floor that starts with [0, h1, h2,..., hn]
         self.floorHeights = np.cumsum(np.insert(self.storyHeights, 0, 0))
         #height of a floor that starts with [h1, h2,..., hn]
@@ -106,53 +114,39 @@ class ComputeSeismicForce(object):
         if self.numberOfStories == 1:
             self.storyHeights = int(self.storyHeights)
 
-        self.floorMaximumXDimension = np.genfromtxt("floorMaximumXDimension.txt")
-        self.floorMaximumZDimension = np.genfromtxt("floorMaximumZDimension.txt")
-        self.floorArea = np.genfromtxt("floorAreas.txt")
+        self.floorMaximumXDimension = as_vector(geo.floor_max_x_dimension)
+        self.floorMaximumZDimension = as_vector(geo.floor_max_z_dimension)
+        self.floorArea = as_vector(geo.floor_areas)
 
-        self.leaningColumnNodesOpenSeesTags = np.genfromtxt("leaningColumnNodesOpenSeesTags.txt").astype(int)
-        self.leaningColumnNodesXCoordinates = np.genfromtxt("leaningColumnNodesXCoordinates.txt")
-        self.leaningColumnNodesZCoordinates = np.genfromtxt("leaningColumnNodesZCoordinates.txt")
+        self.leaningColumnNodesOpenSeesTags = as_matrix(geo.leaning_column_node_tags).astype(int)
+        self.leaningColumnNodesXCoordinates = as_matrix(geo.leaning_column_node_x)
+        self.leaningColumnNodesZCoordinates = as_matrix(geo.leaning_column_node_z)
 
-        self.numberOfXDirectionWoodPanels = np.genfromtxt(
-            "numberOfXDirectionWoodPanels.txt"
-        ).astype(int)
-        self.numberOfZDirectionWoodPanels = np.genfromtxt(
-            "numberOfZDirectionWoodPanels.txt"
-        ).astype(int)
+        self.numberOfXDirectionWoodPanels = as_vector(geo.n_x_panels).astype(int)
+        self.numberOfZDirectionWoodPanels = as_vector(geo.n_z_panels).astype(int)
 
-        self.XDirectionWoodPanelsXCoordinates = np.genfromtxt(
-            "XDirectionWoodPanelsXCoordinates.txt"
-        )
-        self.XDirectionWoodPanelsZCoordinates = np.genfromtxt(
-            "XDirectionWoodPanelsZCoordinates.txt"
-        )
-        self.ZDirectionWoodPanelsXCoordinates = np.genfromtxt(
-            "ZDirectionWoodPanelsXCoordinates.txt"
-        )
-        self.ZDirectionWoodPanelsZCoordinates = np.genfromtxt(
-            "ZDirectionWoodPanelsZCoordinates.txt"
-        )
+        self.XDirectionWoodPanelsXCoordinates = as_matrix(geo.x_panel_x_coords)
+        self.XDirectionWoodPanelsZCoordinates = as_matrix(geo.x_panel_z_coords)
+        self.ZDirectionWoodPanelsXCoordinates = as_matrix(geo.z_panel_x_coords)
+        self.ZDirectionWoodPanelsZCoordinates = as_matrix(geo.z_panel_z_coords)
 
         ##################################################################################################
         # Read in Loads
-        # os.chdir(BaseDirectory + "\Loads")
-        os.chdir(os.path.join(BaseDirectory, 'Loads'))
-        self.floorWeights = np.genfromtxt("floorWeights.txt") * self.seismic_weight_factor # (kips)
-        self.liveLoads = np.genfromtxt("liveLoads.txt") * self.seismic_weight_factor # (kips per square inch)
-        self.leaningcolumnLoads = np.genfromtxt("leaningcolumnLoads.txt") * self.seismic_weight_factor # (kips)
-        self.interiorWallWeight = np.genfromtxt("interiorWallWeights.txt") * self.seismic_weight_factor #(psf)
+        loads = config.loads
+        self.floorWeights = as_vector(loads.floor_weights) * self.seismic_weight_factor # (kips)
+        self.liveLoads = as_vector(loads.live_loads) * self.seismic_weight_factor # (kips per square inch)
+        self.leaningcolumnLoads = as_matrix(loads.leaning_column_loads) * self.seismic_weight_factor # (kips)
+        self.interiorWallWeight = as_vector([loads.interior_wall_weight]) * self.seismic_weight_factor #(psf)
 
         if self.numberOfStories == 1:
             self.leaningcolumnLoads = self.leaningcolumnLoads.reshape(1, -1)
             self.floorWeights = self.floorWeights.reshape(-1,)
         ################################################################################################
         # Read in Pushover Analysis Parameters
-        # os.chdir(BaseDirectory + "\AnalysisParameters\StaticAnalysis")
-        os.chdir(os.path.join(BaseDirectory, *['AnalysisParameters', 'StaticAnalysis']))
-        Increment = np.genfromtxt("PushoverIncrementSize.txt")
-        XDriftLimit = np.genfromtxt("PushoverXDrift.txt")
-        ZDriftLimit = np.genfromtxt("PushoverZDrift.txt")
+        static = config.static_analysis
+        Increment = as_vector([static.pushover_increment])
+        XDriftLimit = as_vector([static.pushover_x_drift])
+        ZDriftLimit = as_vector([static.pushover_z_drift])
 
         self.PushoverParameter = {
             "Increment": Increment,
@@ -162,14 +156,12 @@ class ComputeSeismicForce(object):
 
         ##################################################################################################
         # Read in Dynaimic Analysis Parameters
-        # os.chdir(BaseDirectory + "\AnalysisParameters\DynamicAnalysis")
-        os.chdir(os.path.join(BaseDirectory, *['AnalysisParameters', 'DynamicAnalysis']))
-        DriftLimit = np.genfromtxt("CollapseDriftLimit.txt")
-        DemolitionLimit = np.genfromtxt("DemolitionDriftLimit.txt")
+        dynamic = config.dynamic_analysis
+        DriftLimit = as_vector([dynamic.collapse_drift_limit])
+        DemolitionLimit = as_vector([dynamic.demolition_drift_limit])
 
-        with open("dampingModel.txt", "r") as myfile:
-            dampingModel = myfile.read()  # For now, just use Rayleigh damping
-            dampingRatio = np.genfromtxt("dampingRatio.txt")
+        dampingModel = dynamic.damping_model  # For now, just use Rayleigh damping
+        dampingRatio = as_vector([dynamic.damping_ratio])
 
         self.DynamicParameter = {
             "CollapseLimit": DriftLimit,
@@ -225,17 +217,21 @@ class ComputeSeismicForce(object):
 
         ######  ############################################################################################
         # Read in Structural Panel Property
-        # os.chdir(BaseDirectory + "/StructuralProperties/XWoodPanels")
-        os.chdir(os.path.join(BaseDirectory, *['StructuralProperties', 'XWoodPanels']))
-        self.XPanelLength = np.genfromtxt("length.txt")
-        self.XPanelHeight = np.genfromtxt("height.txt")
-        # self.XPanelMaterial = np.genfromtxt("Pinching4MaterialNumber.txt")
+        x_panels = config.design_outputs.x_panels
+        z_panels = config.design_outputs.z_panels
+        if x_panels.length is None or z_panels.length is None:
+            raise ValueError(
+                f"BuildingConfig for {CaseID!r} has no design_outputs (x_panels/z_panels length) yet -- "
+                "run the design module at least once (or migrate an already-designed archetype) before "
+                "instantiating ComputeSeismicForce"
+            )
+        self.XPanelLength = as_matrix(x_panels.length)
+        self.XPanelHeight = as_matrix(x_panels.height)
+        # self.XPanelMaterial = as_matrix(x_panels.material_number[self.mat_nsc_ext_int])  # 2 rows/story, see PanelDesignOutputs
 
-        # os.chdir(BaseDirectory + "/StructuralProperties/YWoodPanels")
-        os.chdir(os.path.join(BaseDirectory, *['StructuralProperties', 'YWoodPanels']))
-        self.ZPanelLength = np.genfromtxt("length.txt")
-        self.ZPanelHeight = np.genfromtxt("height.txt")
-        # self.ZPanelMaterial = np.genfromtxt("Pinching4MaterialNumber.txt")
+        self.ZPanelLength = as_matrix(z_panels.length)
+        self.ZPanelHeight = as_matrix(z_panels.height)
+        # self.ZPanelMaterial = as_matrix(z_panels.material_number[self.mat_nsc_ext_int])
 
         if self.numberOfStories == 1:
             self.XPanelLength = self.XPanelLength.reshape(1, -1)
@@ -244,76 +240,65 @@ class ComputeSeismicForce(object):
             self.ZPanelHeight = self.ZPanelHeight.reshape(1, -1)
         ##################################################################################################
 
-       # os.chdir(self.BaseDirectory+ "/%s_direction_wall" % self.direction+ "/%s" % self.wall_line_name+ "/Geometry")
+        wall_lines = config.x_wall_lines if self.direction == "X" else config.y_wall_lines
+        wl = next((w for w in wall_lines if w.name == self.wall_line_name), None)
+        if wl is None:
+            raise ValueError(
+                f"No wall line named {self.wall_line_name!r} in {self.direction}_wall_lines "
+                f"for {CaseID!r}"
+            )
 
-        os.chdir(os.path.join(BaseDirectory, *["%s_direction_wall" % self.direction, "%s" % self.wall_line_name,"Geometry"]))
-
-        # self.story_height = np.genfromtxt("storyHeights.txt")
-        #self.tribuitaryWidth = np.genfromtxt("tribuitaryWidth.txt")[:, self.wallIndex]  # each column represents each SW line in X direction
-        self.wallLength = np.genfromtxt("wallLengths.txt") #.astype(float)[:, self.wallIndex] / 12
-        # self.no_of_walls = self.wallLength.size / self.wallLength.shape[0]
+        self.wallLength = as_matrix(wl.geometry.wall_lengths)
         if self.numberOfStories == 1:
-            # print(self.wallLength, self.wallLength.dtype)
             self.no_of_walls = self.wallLength.size
         else:
             self.no_of_walls = self.wallLength.size / self.wallLength.shape[0]
-        
-        # print(self.no_of_walls)
-        if self.no_of_walls > 1: 
-            #self.wallLength = (np.genfromtxt("wallLengths.txt").astype(float)[:, self.wallIndex] / 12)[::-1]
+
+        if self.no_of_walls > 1:
             if self.numberOfStories == 1:
-                self.wallLength = (np.genfromtxt("wallLengths.txt").astype(float)[self.wallIndex] / 12)#[::-1]
+                self.wallLength = (as_matrix(wl.geometry.wall_lengths).astype(float)[self.wallIndex] / 12)
             else:
-                self.wallLength = (np.genfromtxt("wallLengths.txt").astype(float)[:, self.wallIndex] / 12)[::-1]
-                
-            # print(self.wallLength)
+                self.wallLength = (as_matrix(wl.geometry.wall_lengths).astype(float)[:, self.wallIndex] / 12)[::-1]
         else:
             if self.numberOfStories == 1:
-                # self.wallLength = (np.genfromtxt("wallLengths.txt").astype(list)[self.wallIndex] / 12)#[::-1]
-                self.wallLength = np.genfromtxt("wallLengths.txt") / 12 #.astype(list)[self.wallIndex] / 12)#[::-1]
+                self.wallLength = as_matrix(wl.geometry.wall_lengths) / 12
             else:
-                self.wallLength = (np.genfromtxt("wallLengths.txt").astype(list)[:,None][:, self.wallIndex] / 12)[::-1]
-           
+                self.wallLength = (as_matrix(wl.geometry.wall_lengths).astype(list)[:, None][:, self.wallIndex] / 12)[::-1]
 
         if self.reDesignFlag:
             self.wallLength += 0.5
         else:
             pass
-        
 
         # read in shear wall lineal load
-        os.chdir(os.path.join(BaseDirectory, *["%s_direction_wall" % self.direction, "%s" % self.wall_line_name,"Loads"]))
         if self.no_of_walls > 1:
             if self.numberOfStories == 1:
-                self.loads = np.genfromtxt("shearWall_load.txt")[self.wallIndex] * self.seismic_weight_factor
+                self.loads = as_matrix(wl.loads.shear_wall_load)[self.wallIndex] * self.seismic_weight_factor
             else:
-                self.loads = np.genfromtxt("shearWall_load.txt")[:, self.wallIndex] * self.seismic_weight_factor
+                self.loads = as_matrix(wl.loads.shear_wall_load)[:, self.wallIndex] * self.seismic_weight_factor
 
-            self.loadRatio = np.genfromtxt("tribuitaryLoadRatio.txt")[self.wallIndex]
+            self.loadRatio = as_vector(wl.loads.tributary_load_ratio)[self.wallIndex]
 
         else:
             if self.numberOfStories == 1:
-                self.loads = np.genfromtxt("shearWall_load.txt") * self.seismic_weight_factor
+                self.loads = as_matrix(wl.loads.shear_wall_load) * self.seismic_weight_factor
             else:
-                self.loads = np.genfromtxt("shearWall_load.txt")[:,None][:, self.wallIndex] * self.seismic_weight_factor
-            self.loadRatio = np.genfromtxt("tribuitaryLoadRatio.txt")
-        
+                self.loads = as_matrix(wl.loads.shear_wall_load)[:, None][:, self.wallIndex] * self.seismic_weight_factor
+            self.loadRatio = as_vector(wl.loads.tributary_load_ratio)
 
         # reading material inputs
-        os.chdir(os.path.join(BaseDirectory, *["%s_direction_wall" % self.direction, "%s" % self.wall_line_name,"MaterialProperties"]))
-        self.initial_moisture_content = np.genfromtxt(
-            "initial_moisture_content.txt"
-        ).astype(float)
-        self.final_moisture_content = np.genfromtxt(
-            "final_moisture_content.txt"
-        ).astype(float)
-        self.elastic_modulus = np.genfromtxt("wood_modulusOfElasticity.txt").astype(int)
-        self.nailSpacing = open("preferred_nail_spacing.txt").read()
-
-        self.nailSize = open("preferred_nail_size.txt", "r").read()
-        self.panelThickness = open("preferred_panel_thickness.txt", "r").read()
-        self.takeup_deflection = np.genfromtxt("takeUpDeflection.txt")
-        self.chordArea = np.genfromtxt("chordArea.txt")
+        mp = wl.material_properties
+        self.initial_moisture_content = as_vector([mp.initial_moisture_content]).astype(float)
+        self.final_moisture_content = as_vector([mp.final_moisture_content]).astype(float)
+        self.elastic_modulus = as_vector([mp.wood_modulus_of_elasticity]).astype(int)
+        # nailSpacing/nailSize/panelThickness are set but never read again in this class (dead
+        # state, confirmed by grep) -- kept for attribute-compatibility with any external caller,
+        # not shape-matched to the old raw-string reads since nothing here depends on their format.
+        self.nailSpacing = mp.nail_spacing
+        self.nailSize = mp.nail_size
+        self.panelThickness = mp.panel_thickness
+        self.takeup_deflection = as_vector(mp.take_up_deflection)
+        self.chordArea = as_vector(mp.chord_area)
 
         ##################################################################################################
         # Define read in Seismic Design Parameter
