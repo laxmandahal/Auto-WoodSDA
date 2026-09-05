@@ -6,6 +6,6 @@
 # packages (scipy, statsmodels, sympy, seaborn, matlab.engine, etc.) not
 # captured here yet.
 numpy
-pandas
+pandas>=2.2  # pandas <2.2 is ABI-incompatible with numpy>=2.0 and fails to import
 pydantic>=2
 pyyaml

@@ -20,6 +20,11 @@ import os
 import re
 import sys
 
+cwd = os.path.dirname(__file__)
+code_dir = os.path.dirname(cwd)
+sys.path.append(os.path.join(code_dir, 'schema'))
+from loader import load_building_config, as_matrix, as_vector
+
 from global_variables import shearwall_database
 from global_variables import tiedown_database
 from ComputeDesignForce import ComputeSeismicForce
@@ -171,140 +176,119 @@ class DesignShearWall:
         :return: instantiates required class variables and attributes 
         """
 
-        # read in the geometric properties
-        os.chdir(
-            self.BaseDirectory
-            + "/%s_direction_wall" % self.direction
-            + "/%s" % self.wall_line_name
-            + "/Geometry"
-        )
-        # self.wallLength = np.genfromtxt('wallLengths.txt')
+        # Sourced from the archetype's building_config.yaml (Codes/schema/) instead of the
+        # BuildingInfo/<archetype>/*.txt tree. as_matrix/as_vector reproduce the exact array
+        # shape np.genfromtxt() would have produced, so the reshape/slice branches below are
+        # unchanged from the original file-reading logic.
+        config = load_building_config(self.BaseDirectory)
+        wall_lines = config.x_wall_lines if self.direction == "X" else config.y_wall_lines
+        wl = next((w for w in wall_lines if w.name == self.wall_line_name), None)
+        if wl is None:
+            raise ValueError(
+                f"No wall line named {self.wall_line_name!r} in {self.direction}_wall_lines "
+                f"for {self.caseID!r}"
+            )
+        self.wl = wl
 
-        # self.story_height = np.genfromtxt("storyHeights.txt")[self.floorIndex]
-        # each column represents each SW line in X direction
-        # tribWidth = np.genfromtxt("tribuitaryWidth.txt")
-        # no_of_walls = tribWidth.size / tribWidth.shape[0] 
         if self.no_of_walls > 1:
             if self.numFloors == 1:
-                self.tribuitaryWidth = np.genfromtxt("tribuitaryWidth.txt")[self.wallIndex]
+                self.tribuitaryWidth = as_matrix(wl.geometry.tributary_width)[self.wallIndex]
             # each column represents each SW line in Y direction
-                self.tribuitaryLength = np.genfromtxt("tribuitaryLength.txt")[self.wallIndex]
+                self.tribuitaryLength = as_matrix(wl.geometry.tributary_length)[self.wallIndex]
             else:
-                self.tribuitaryWidth = np.genfromtxt("tribuitaryWidth.txt")[:, self.wallIndex]
+                self.tribuitaryWidth = as_matrix(wl.geometry.tributary_width)[:, self.wallIndex]
                 # each column represents each SW line in Y direction
-                self.tribuitaryLength = np.genfromtxt("tribuitaryLength.txt")[:, self.wallIndex]
+                self.tribuitaryLength = as_matrix(wl.geometry.tributary_length)[:, self.wallIndex]
         else:
-            self.tribuitaryWidth = np.genfromtxt("tribuitaryWidth.txt")
+            self.tribuitaryWidth = as_matrix(wl.geometry.tributary_width)
             # each column represents each SW line in Y direction
-            self.tribuitaryLength = np.genfromtxt("tribuitaryLength.txt")
+            self.tribuitaryLength = as_matrix(wl.geometry.tributary_length)
 
         # reading material inputs
-        os.chdir(
-            self.BaseDirectory
-            + "/%s_direction_wall" % self.direction
-            + "/%s" % self.wall_line_name
-            + "/MaterialProperties"
-        )
+        mp = wl.material_properties
 
-        #initial moisture content of the wood (stud/frame). Used to compute shrinkage due to differential Unit: percent (%) 
-        self.initial_moisture_content = np.genfromtxt("initial_moisture_content.txt").astype(float)
+        #initial moisture content of the wood (stud/frame). Used to compute shrinkage due to differential Unit: percent (%)
+        self.initial_moisture_content = as_vector([mp.initial_moisture_content]).astype(float)
         #final moisture content of the wood. Unit: percent
-        self.final_moisture_content = np.genfromtxt("final_moisture_content.txt").astype(float)
+        self.final_moisture_content = as_vector([mp.final_moisture_content]).astype(float)
         #elastic modulus of the wood (stud/frame)
-        self.elastic_modulus = np.genfromtxt("wood_modulusOfElasticity.txt").astype(int)
+        self.elastic_modulus = as_vector([mp.wood_modulus_of_elasticity]).astype(int)
 
         ## NOTE: Nail size and spacing, and panel thickness are selected by program (default). Only specify these quantities if those
         #specific specification is desired
 
         #desired nail spacing
-        # self.nailSpacing = open("preferred_nail_spacing.txt").read()[self.wallIndex]
-        nailspacing = np.genfromtxt('preferred_nail_spacing.txt')
-        #desired nail size
-        nailsize = open("preferred_nail_size.txt", "r").read()
-        #desired panel thickness
-        panelthickness = open("preferred_panel_thickness.txt", "r").read()
-        takeup_deflection = np.genfromtxt("takeUpDeflection.txt")
-        chord_area = np.genfromtxt("chordArea.txt")
+        nailspacing = as_matrix(mp.nail_spacing)
+        # desired nail size / panel thickness -- stored in the schema as a real per-story x
+        # per-wall matrix (mp.nail_size/mp.panel_thickness), unlike the raw multi-line string
+        # the original code read and had to np.array(...).split().reshape() at each use site.
+        # NOTE: the original no_of_walls>1 & numFloors==1 branch indexed that raw string
+        # directly (nailsize[self.wallIndex]), which is single-*character* indexing, not a
+        # per-wall lookup -- a latent bug. The no_of_walls==1 branches also produced a
+        # numpy-array-wrapped value (e.g. array(['10d'])) instead of a plain string, an
+        # incidental side effect of .split().reshape() rather than deliberate design. Both are
+        # confirmed dead in practice: userDefinedDetailingTag (the only thing that reads
+        # self.nailSize/self.panelThickness) is never True in any current driver script. Fixed
+        # here to consistently index a plain string from the matrix in every branch.
+        nailsize = np.array(mp.nail_size, dtype=object)
+        panelthickness = np.array(mp.panel_thickness, dtype=object)
+        takeup_deflection = as_vector(mp.take_up_deflection)
+        chord_area = as_vector(mp.chord_area)
 
         if self.no_of_walls > 1:
             if self.numFloors == 1:
                 self.nailSpacing = nailspacing[self.wallIndex].astype(int)
                 self.nailSize = nailsize[self.wallIndex]
-                # self.nailSize = np.array(nailsize.split()).reshape(int(self.numFloors), int(self.no_of_walls))#[self.wallIndex]
-                # self.panelThickness = np.array(panelthickness.split()).reshape(int(self.numFloors), int(self.no_of_walls))[self.wallIndex]
                 self.panelThickness = panelthickness[self.wallIndex]
                 self.takeup_deflection = takeup_deflection
                 self.chordArea = chord_area
             else:
                 self.nailSpacing = nailspacing[:, self.wallIndex][self.floorIndex].astype(int)
-                self.nailSize = np.array(nailsize.split()).reshape(int(self.numFloors), int(self.no_of_walls))[:, self.wallIndex][self.floorIndex]
-                self.panelThickness = np.array(panelthickness.split()).reshape(int(self.numFloors), int(self.no_of_walls))[:, self.wallIndex][self.floorIndex]
+                self.nailSize = nailsize[:, self.wallIndex][self.floorIndex]
+                self.panelThickness = panelthickness[:, self.wallIndex][self.floorIndex]
                 self.takeup_deflection = takeup_deflection[self.floorIndex]
                 self.chordArea = chord_area[self.floorIndex]
         else:
             if self.numFloors == 1:
                 self.nailSpacing = nailspacing.astype(int)
-                self.nailSize = np.array(nailsize.split()).reshape(int(self.numFloors), int(self.no_of_walls))
-                self.panelThickness = np.array(panelthickness.split()).reshape(int(self.numFloors), int(self.no_of_walls))
+                self.nailSize = nailsize[0]
+                self.panelThickness = panelthickness[0]
                 self.takeup_deflection = takeup_deflection
                 self.chordArea = chord_area
             else:
                 self.nailSpacing = nailspacing[self.floorIndex].astype(int)
-                self.nailSize = np.array(nailsize.split()).reshape(int(self.numFloors), int(self.no_of_walls))[self.floorIndex]
-                self.panelThickness = np.array(panelthickness.split()).reshape(int(self.numFloors), int(self.no_of_walls))[self.floorIndex]
+                self.nailSize = nailsize[self.floorIndex][0]
+                self.panelThickness = panelthickness[self.floorIndex][0]
                 self.takeup_deflection = takeup_deflection[self.floorIndex]
                 self.chordArea = chord_area[self.floorIndex]
-        
-        
-        
-        ##takeup_deflection (inches) often provided by manufacturers
-        # self.takeup_deflection = np.genfromtxt("takeUpDeflection.txt")[self.floorIndex]
-        # ##chord area (in^2) often provided by manufacturer
-        # self.chordArea = np.genfromtxt("chordArea.txt").astype(list)[self.floorIndex]
+
         #M aterial type of the sheathing. Options: Plywood or OSB
-        self.sheathingMaterial = open("sheathingMaterialType.txt", "r").read()
+        self.sheathingMaterial = mp.sheathing_material_type
         # Grade of the sheathing. Options: Structural I or WSP. Note Str I is higher grade sheathing.
-        self.sheathingType = open("sheathingType.txt", "r").read()
+        self.sheathingType = mp.sheathing_type
 
         # reading user imposed design constraints
-        os.chdir(
-            self.BaseDirectory
-            + "/%s_direction_wall" % self.direction
-            + "/%s" % self.wall_line_name
-            + "/DesignConstraints"
-        )
+        dc = wl.design_constraints
         #user-defined drift limit criteria. Often specified if stricter requirement than ASCE is deisred (less than 2%)
-        self.userDefinedDrift = np.loadtxt("userDefinedDriftLimit.txt")
-        #user-defined D/C ratio. Often desired to be less than 90% 
-        self.userDefinedDCRatio = np.loadtxt("userDefinedDCRatio.txt")
-        # Flag to indicate if D/C ratio is desired fot Tie-downs 
-        self.userDefinedDCRatioFlag_TieDown = np.loadtxt("userDefinedDCRatioFlag_TieDown.txt")
+        self.userDefinedDrift = as_vector([dc.user_defined_drift_limit])
+        #user-defined D/C ratio. Often desired to be less than 90%
+        self.userDefinedDCRatio = as_vector([dc.user_defined_dc_ratio])
+        # Flag to indicate if D/C ratio is desired fot Tie-downs
+        self.userDefinedDCRatioFlag_TieDown = dc.user_defined_dc_ratio_flag_tiedown
         #Desired D/C ratio for tie-down tesign
-        self.userDefinedDCRatio_TieDown = np.loadtxt("userDefinedDCRatio_TieDown.txt")
+        self.userDefinedDCRatio_TieDown = as_vector([dc.user_defined_dc_ratio_tiedown])
 
-        self.tieDownSystemTag = np.loadtxt("tieDownSystemFlag.txt")
-        # self.Fx = np.genfromtxt('Fx_ToTestTheCode.txt')
-        
+        self.tieDownSystemTag = dc.tie_down_system_flag
 
         # reading properties for Rigid Diaphragm Assumption
-        os.chdir(
-            self.BaseDirectory
-            + "/%s_direction_wall" % self.direction
-            + "/%s" % self.wall_line_name
-            + "/RigidDiaphragmAssumption"
-        )
-        self.accidentalTorsion = np.genfromtxt('AccidentalTorsion(ex).txt') / 12 #unit: inches converted to ft 
-        self.torsionalIrregularity = np.genfromtxt('TorsionalIrregularity(Ax).txt')
-        self.redundancyFactor = np.genfromtxt('RedundancyFactor.txt')
-        if self.no_of_walls > 1: 
-            self.momentArm = np.genfromtxt('MomentArm.txt')[self.wallIndex] / 12
+        rd = wl.rigid_diaphragm_assumption
+        self.accidentalTorsion = as_vector([rd.accidental_torsion_ex]) / 12 #unit: inches converted to ft
+        self.torsionalIrregularity = as_vector([rd.torsional_irregularity_ax])
+        self.redundancyFactor = as_vector([rd.redundancy_factor])
+        if self.no_of_walls > 1:
+            self.momentArm = as_vector(rd.moment_arm)[self.wallIndex] / 12
         else:
-            self.momentArm = np.genfromtxt('MomentArm.txt') / 12
-        # self.pinching4IndexShearWall = np.genfromtxt("pinching4Index_ShearWall.txt")
-        # self.pinching4IndexNonStructural = np.genfromtxt("pinching4Index_nsc.txt")
-
-        # os.chdir(self.BaseDirectory + "/StructuralProperties" + "/%sWoodPanels")
-        # self.pinching4MaterialNumber = np.genfromtxt("Pinching4MaterialNumber.txt")
+            self.momentArm = as_vector(rd.moment_arm) / 12
 
 
     def find_shearwall_candidate(self, shearwall_database):

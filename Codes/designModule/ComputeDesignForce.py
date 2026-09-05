@@ -247,6 +247,7 @@ class ComputeSeismicForce(object):
                 f"No wall line named {self.wall_line_name!r} in {self.direction}_wall_lines "
                 f"for {CaseID!r}"
             )
+        self.wl = wl  # used by SW_shear_demand() when envelopeAnalysis=True
 
         self.wallLength = as_matrix(wl.geometry.wall_lengths)
         if self.numberOfStories == 1:
@@ -633,10 +634,12 @@ class ComputeSeismicForce(object):
                 #/ self.wallsPerLine
             )
         else:
-            # os.chdir(self.BaseDirectory + "/%s_direction_wall" % self.direction + "/%s" % self.wall_line_name)
-            os.chdir(os.path.join(self.BaseDirectory, *["%s_direction_wall" % self.direction, "%s" % self.wall_line_name]))
-
-            self.envelopeShearWallDemand = np.genfromtxt("envelopeShearWallDemand.txt")[:,self.wallIndex]
+            if self.wl.envelope_shear_wall_demand is None:
+                raise ValueError(
+                    f"envelopeAnalysis=True but wall line {self.wall_line_name!r} has no "
+                    "envelope_shear_wall_demand in its BuildingConfig"
+                )
+            self.envelopeShearWallDemand = as_matrix(self.wl.envelope_shear_wall_demand)[:, self.wallIndex]
             self.story_force_per_wall = np.ediff1d(self.envelopeShearWallDemand, to_begin=self.envelopeShearWallDemand[0]) * self.wallLength
 
 
