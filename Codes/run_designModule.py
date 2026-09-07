@@ -20,8 +20,8 @@ sys.path.append(os.path.join(cwd, 'designModule'))
 from check_user_inputs import check_and_complete_inputs
 from StiffnessBasedDesign import RDADesignIterationClass
 
-##Modules required for OpenSees Modeling 
-sys.path.append(os.path.join(cwd, 'modelingModule'))
+##Modules required for OpenSees Modeling
+sys.path.append(os.path.join(cwd, 'structuralModule'))
 from BuildingModelClass import BuildingModel
 from utils_opensees import *
 
