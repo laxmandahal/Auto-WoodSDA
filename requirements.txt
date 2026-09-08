@@ -1,11 +1,40 @@
-# Core dependencies for the design/structural/schema pipeline
-# (Codes/designModule, Codes/structuralModule, Codes/schema).
+# Full dependency audit for the design/structural/damage/loss pipeline
+# (Codes/designModule, Codes/structuralModule, Codes/schema, Codes/damageModule,
+# Codes/lossModule) plus the notebook/plotting stack used to run and inspect it.
 #
-# This is not yet a full audit of the repo's dependencies -- lossModule
-# (pelicun, ATC-138/MATLAB Engine) and damageModule pull in additional
-# packages (scipy, statsmodels, sympy, seaborn, matlab.engine, etc.) not
-# captured here yet.
+# pelicun (Codes/lossModule/Loss_Pelicun/pelicun_3_1_master_new) is vendored
+# in-repo, not a pip package -- its own dependencies (numpy/pandas/scipy) are
+# already covered below.
+#
+# NOT covered here: ATC-138's functional-recovery methodology
+# (Codes/lossModule/Loss_ATC138) needs a licensed MATLAB install plus the
+# matching MATLAB Engine API for Python (`matlabengine` on PyPI, version-pinned
+# to your MATLAB release -- see MathWorks' own install instructions); there's
+# no plain pip path for MATLAB itself.
+
+# --- Design / structural / schema ---
 numpy
 pandas>=2.2  # pandas <2.2 is ABI-incompatible with numpy>=2.0 and fails to import
 pydantic>=2
 pyyaml
+requests  # Codes/designModule/check_user_inputs.py
+
+# --- Structural module: OpenSeesPy analyses (eigen/pushover/dynamic) ---
+# openseespy<3.8.0.0's macOS wheel (openseespymac) was mistagged `py3-none-any`
+# but actually bundled x86_64-only binaries -- it silently failed to import on
+# Apple Silicon. 3.8.0.0 ships a real native arm64 wheel (openseespymac
+# `macosx_13_0_arm64`) and requires Python>=3.10.
+openseespy>=3.8.0.0
+
+# --- Plotting / notebooks (damage-module plotting, both driver notebooks) ---
+matplotlib
+jupyter
+ipykernel
+nbconvert  # only needed to execute notebooks headlessly (e.g. `jupyter nbconvert --execute`)
+
+# --- Damage module (EDP extraction, collapse/demolition fragility fitting) ---
+scipy
+statsmodels
+sympy
+seaborn
+numdifftools
