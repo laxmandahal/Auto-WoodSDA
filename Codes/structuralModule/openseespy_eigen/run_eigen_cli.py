@@ -2,11 +2,14 @@
 """
 Standalone CLI for the OpenSeesPy EigenValueAnalysis port. NOT wired into
 Codes/run_designModule.py -- that driver does `from utils_opensees import *` at
-module scope and must keep working in the arm64 base env, which has no openseespy
-installed. Run this under the x86_64 opensees_x86 env instead:
+module scope and must keep working in a base env with no openseespy installed.
+Run this in any env with the requirements.txt dependencies installed (see that
+file's openseespy>=3.8.0.0 note -- on Apple Silicon Macs this needs a native
+arm64 Python>=3.10 env; earlier openseespymac releases only shipped x86_64
+binaries mistagged as universal wheels, which is why this docstring used to
+point at a Rosetta x86_64 conda env -- no longer necessary):
 
-    /Users/laxmandahal/miniforge3/envs/opensees_x86/bin/python \
-        Codes/structuralModule/openseespy_eigen/run_eigen_cli.py --buildingID MFD6B
+    python Codes/structuralModule/openseespy_eigen/run_eigen_cli.py --buildingID MFD6B
 """
 
 import argparse
