@@ -21,9 +21,12 @@ Needs Python>=3.10 (same reason as `openseespy` -- see `requirements.txt`).
   materials/design constraints, and analysis parameters. Every save goes through the real
   `BuildingConfig` Pydantic model (`Codes/schema/building_config.py`), so validation is
   exactly as strict as any other path that touches this schema.
-- **GM Set Assembler** -- not yet built (planned next: assembling a
-  `BuildingModels/GM_sets/<name>/` ground-motion set from raw records, including the ASCE 7
-  scaling procedure).
+- **GM Set Assembler** -- assemble a `BuildingModels/GM_sets/<name>/<level>/` ground-motion
+  set from raw PEER NGA `.AT2` records: parses them, computes a per-pair scale factor against
+  an ASCE 7 MCER target spectrum (a simplified, per-pair version of ASCE 7-16 Section
+  16.2.3.1's procedure -- **not** a substitute for a qualified engineer's ground-motion
+  selection/scaling review), and writes the exact file structure
+  `Codes/structuralModule/openseespy_dynamic/ground_motion.py` already reads.
 
 ## v1 scope (deliberate, see the session's plan)
 
@@ -40,14 +43,25 @@ Needs Python>=3.10 (same reason as `openseespy` -- see `requirements.txt`).
   labels fall back to `line 1`, `line 2`, ... and a warning is shown; `Save & Validate` will
   still correctly reject the resulting shape mismatch either way.
 
+Ground-motion scaling needs an SDOF pseudo-acceleration response spectrum of each uploaded
+record, computed via Newmark-beta integration -- validated against the T->0 rigid-oscillator
+limit (Sa should converge to PGA), not against a reference implementation (none was available
+to compare against). Treat scale factors as a starting point to sanity-check, not a final
+answer to use unreviewed.
+
 ## Layout
 
 ```
 Codes/gui/
-    app.py                        # landing page
-    pages/1_Archetype_Editor.py   # main editor
+    app.py                          # landing page
+    pages/
+        1_Archetype_Editor.py       # building_config.yaml editor
+        2_GM_Set_Assembler.py       # ground-motion set assembly
     lib/
-        config_io.py              # thin wrapper over Codes/schema/loader.py
-        geometry_preview.py       # 2D plan-view + 3D wireframe (Plotly, no openseespy needed)
-        widgets.py                # st.data_editor helpers for vector/matrix schema fields
+        config_io.py                # thin wrapper over Codes/schema/loader.py
+        geometry_preview.py         # 2D plan-view + 3D wireframe (Plotly, no openseespy needed)
+        widgets.py                  # st.data_editor helpers for vector/matrix schema fields
+        response_spectrum.py        # SDOF pseudo-acceleration spectrum (Newmark-beta)
+        gm_scaling.py                # ASCE 7 target spectrum, .AT2 parsing, scale factors,
+                                     # GM_sets/ output writer
 ```
