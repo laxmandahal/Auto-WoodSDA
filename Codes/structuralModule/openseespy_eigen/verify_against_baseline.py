@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Verification script for the OpenSeesPy EigenValueAnalysis port. Run under the
-x86_64 opensees_x86 env:
+Verification script for the OpenSeesPy EigenValueAnalysis port. Run in any env
+with the requirements.txt dependencies installed (see that file's
+openseespy>=3.8.0.0 note re: Apple Silicon):
 
-    /Users/laxmandahal/miniforge3/envs/opensees_x86/bin/python \
-        Codes/structuralModule/openseespy_eigen/verify_against_baseline.py
+    python Codes/structuralModule/openseespy_eigen/verify_against_baseline.py
 
 No OpenSees Tcl binary is available on this machine (the committed .exe files
 under BuildingModels/ are Windows PE binaries), so this performs the two
