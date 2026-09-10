@@ -2,10 +2,10 @@
 """
 Standalone CLI for the OpenSeesPy Dynamic/NRHA port (phase 3 of 3). NOT wired
 into Codes/run_designModule.py -- see openseespy_eigen/run_eigen_cli.py's
-docstring for why. Run this under the x86_64 opensees_x86 env:
+docstring for why. Run this in any env with the requirements.txt dependencies
+installed (see that file's openseespy>=3.8.0.0 note re: Apple Silicon):
 
-    /Users/laxmandahal/miniforge3/envs/opensees_x86/bin/python \
-        Codes/structuralModule/openseespy_dynamic/run_dynamic_cli.py \
+    python Codes/structuralModule/openseespy_dynamic/run_dynamic_cli.py \
         --buildingID s1_48x32 --gmSet BoelterHall --hazardLevel 1 --gmIndex 0 --pairing 1
 
 --globalCounter is also accepted as an alternative to --hazardLevel/--gmIndex,

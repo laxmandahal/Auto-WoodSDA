@@ -2,10 +2,10 @@
 """
 Standalone CLI for the OpenSeesPy Pushover port (phase 2 of 3). NOT wired into
 Codes/run_designModule.py -- see openseespy_eigen/run_eigen_cli.py's docstring
-for why. Run this under the x86_64 opensees_x86 env:
+for why. Run this in any env with the requirements.txt dependencies installed
+(see that file's openseespy>=3.8.0.0 note re: Apple Silicon):
 
-    /Users/laxmandahal/miniforge3/envs/opensees_x86/bin/python \
-        Codes/structuralModule/openseespy_pushover/run_pushover_cli.py \
+    python Codes/structuralModule/openseespy_pushover/run_pushover_cli.py \
         --buildingID MFD6B --direction X
 """
 
