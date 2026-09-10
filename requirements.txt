@@ -38,3 +38,13 @@ statsmodels
 sympy
 seaborn
 numdifftools
+
+# --- Input-authoring GUI (Codes/gui/, `streamlit run Codes/gui/app.py`) ---
+# Local-only -- no hosting required. streamlit's own dependency resolution can
+# pull in an old altair release that's incompatible with it on some Python
+# versions; if `streamlit run` fails on import with an altair error, upgrade
+# both (`pip install --upgrade streamlit altair`). Needs Python>=3.10 for the
+# same reason openseespy does (see above) -- avoid 3.9.7 specifically,
+# streamlit itself refuses to install on that exact patch version.
+streamlit
+plotly
