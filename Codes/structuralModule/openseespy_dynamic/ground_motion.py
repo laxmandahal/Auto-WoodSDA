@@ -88,9 +88,13 @@ def resolve_gm(gm_set_dir, hazard_level, gm_index):
 
     with open(os.path.join(info_dir, 'GMFileNames.txt')) as f:
         names = [line.strip() for line in f]
-    time_steps = np.loadtxt(os.path.join(info_dir, 'GMTimeSteps.txt'))
-    num_points = np.loadtxt(os.path.join(info_dir, 'GMNumPoints.txt'))
-    scale_factors = np.loadtxt(os.path.join(info_dir, 'BiDirectionMCEScaleFactors.txt'))
+    # np.loadtxt squeezes a single-line file down to a 0-D array (not a 1-D
+    # array of length 1) -- BiDirectionMCEScaleFactors.txt has exactly one
+    # line per PAIR, so a hazard level with only 1 GM pair hits this; wrap in
+    # atleast_1d so single-index access below works regardless of set size.
+    time_steps = np.atleast_1d(np.loadtxt(os.path.join(info_dir, 'GMTimeSteps.txt')))
+    num_points = np.atleast_1d(np.loadtxt(os.path.join(info_dir, 'GMNumPoints.txt')))
+    scale_factors = np.atleast_1d(np.loadtxt(os.path.join(info_dir, 'BiDirectionMCEScaleFactors.txt')))
 
     x_line = 2 * gm_index      # 0-based line index for the H1/X component
     z_line = 2 * gm_index + 1  # 0-based line index for the H2/Z component
