@@ -18,6 +18,7 @@ __author__ = "Laxman Dahal"
 from ShearWallDesignClass import DesignShearWall
 from global_variables import shearwall_database
 import sys
+import numpy as np
 import pandas as pd
 
 class ShearWallDriftCheck:
@@ -188,7 +189,11 @@ class ShearWallDriftCheck:
             self.wallLength = self.wallName.wallLength
         
         
-        self.wallName.sw_dict["Drift(in)"] = float(self.drift)
+        # self.drift comes through as a size-1 numpy array (not a scalar); numpy>=2.1
+        # raises TypeError on float() of a 1-D array, so unwrap explicitly. .item()
+        # keeps the old "one value expected" contract -- it errors just as loudly as
+        # the old code did if the shape is ever unexpectedly larger.
+        self.wallName.sw_dict["Drift(in)"] = float(np.asarray(self.drift).item())
         # store the final shear wall design
         self.shearWallDesign = pd.DataFrame([self.wallName.sw_dict])
         # store the final tie down design
