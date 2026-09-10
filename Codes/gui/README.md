@@ -1,9 +1,8 @@
 # autoWoodSDA Input-Authoring GUI
 
-A local Streamlit app for authoring the inputs autoWoodSDA needs, in place of
-hand-editing `building_config.yaml` (or the old scattered `.txt` tree)
-directly. Runs entirely on your own machine -- nothing is hosted or uploaded
-anywhere, so there's no hosting cost.
+A local Streamlit app for editing an archetype's `building_config.yaml`, in
+place of hand-editing that (large) file directly. Runs entirely on your own
+machine -- nothing is hosted or uploaded anywhere, so there's no hosting cost.
 
 ## Run it
 
@@ -14,18 +13,23 @@ streamlit run Codes/gui/app.py
 
 Needs Python>=3.10 (same reason as `openseespy` -- see `requirements.txt`).
 
-## Pages
+## Scope
 
-- **Archetype Editor** -- edit an existing archetype's full `building_config.yaml`:
-  geometry (with a live 2D plan-view and 3D wireframe preview), loads, per-wall-line
-  materials/design constraints, and analysis parameters. Every save goes through the real
-  `BuildingConfig` Pydantic model (`Codes/schema/building_config.py`), so validation is
-  exactly as strict as any other path that touches this schema.
-- **GM Set Assembler** -- not yet built (planned next: assembling a
-  `BuildingModels/GM_sets/<name>/` ground-motion set from raw records, including the ASCE 7
-  scaling procedure).
+**Archetype Editor** -- edit an existing archetype's full `building_config.yaml`: geometry
+(with a live 2D plan-view and 3D wireframe preview), loads, per-wall-line materials/design
+constraints, and analysis parameters. Every save goes through the real `BuildingConfig`
+Pydantic model (`Codes/schema/building_config.py`), so validation is exactly as strict as
+any other path that touches this schema.
 
-## v1 scope (deliberate, see the session's plan)
+Ground-motion sets are **not** handled here. The pipeline assumes you supply your own
+site-specific records under `BuildingModels/GM_sets/<name>/<level>/`, in the layout
+`Codes/structuralModule/openseespy_dynamic/ground_motion.py` reads (documented in that
+module's docstring). A GM-set assembler with automatic ASCE 7 scaling was prototyped and
+dropped -- robustly parsing/scaling arbitrary real PEER records turned out to need more
+hardening than it was worth, given researchers in this space generally already have their
+records selected and scaled.
+
+## Known limitations (deliberate)
 
 - Editing one of the archetype layouts already listed in
   `Databases/Baseline_archetype_info_w_periods.json`. Authoring a brand-new layout from

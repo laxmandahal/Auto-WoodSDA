@@ -20,22 +20,23 @@ st.title("autoWoodSDA Input-Authoring GUI")
 st.markdown(
     """
 This is a local tool (runs entirely on your own machine -- nothing is hosted or uploaded
-anywhere) for authoring the inputs autoWoodSDA needs, in place of hand-editing
-`building_config.yaml` / the ground-motion-set `.txt` tree directly.
+anywhere) for authoring an archetype's `building_config.yaml`, in place of hand-editing it
+directly.
 
-**Pages** (see the sidebar):
-
-- **Archetype Editor** -- edit an existing archetype's full `building_config.yaml`
-  (geometry, loads, wall-line materials, analysis parameters) with a live 2D plan-view and
-  3D geometry preview. v1 scope: editing one of the archetype layouts already defined in
-  `Databases/Baseline_archetype_info_w_periods.json` -- authoring a brand-new layout from
-  scratch is a planned follow-up (it needs an eigen-analysis bootstrap step this page
-  doesn't attempt).
-- **GM Set Assembler** -- assemble a `BuildingModels/GM_sets/<name>/` ground-motion set from
-  raw records (scaling + the 4 required metadata files), currently a fully manual process.
+Open **Archetype Editor** in the sidebar to edit an existing archetype's full config
+(geometry, loads, wall-line materials, analysis parameters) with a live 2D plan-view and
+3D geometry preview. v1 scope: editing one of the archetype layouts already defined in
+`Databases/Baseline_archetype_info_w_periods.json` -- authoring a brand-new layout from
+scratch is a planned follow-up (it needs an eigen-analysis bootstrap step this page
+doesn't attempt).
 
 Every save goes through the same `BuildingConfig` Pydantic model
 (`Codes/schema/building_config.py`) every other part of the pipeline uses, so a config saved
 here is validated exactly as strictly as one produced any other way.
+
+Ground-motion inputs are out of scope for this tool -- the pipeline assumes you supply your
+own site-specific records under `BuildingModels/GM_sets/<name>/<level>/` in the format
+`Codes/structuralModule/openseespy_dynamic/ground_motion.py` reads (that module's docstring
+documents the exact layout).
 """
 )
