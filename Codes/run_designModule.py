@@ -32,25 +32,41 @@ from utils_opensees import *
 def design_and_generate_model(
     building_id: str,
     baseline_building_info: dict,
-    save_design_csv=False, 
+    save_design_csv=False,
     generate_static_models=False,
     run_pushover=False,
-    generate_dynamic_models=True
+    generate_dynamic_models=True,
+    engine: str = "tcl",
 ):
     '''
     This function creates code-compliant design as well as the 3D OpenSees model(s).
-    The `Buildings_input_info.csv` needs to be defined in the parent directory. 
+    The `Buildings_input_info.csv` needs to be defined in the parent directory.
 
-    Note: Opensees need to be installed to run this function.
+    The design itself (writing `BuildingInfo/<id>/building_config.yaml`) is engine-agnostic
+    and always runs. `engine` only selects how the structural analyses are handled:
+
+      - "tcl" (default): the original path -- `utils_opensees.py` writes `.tcl` model files
+        into `BuildingModels/<id>/<AnalysisType>/` and (for eigen, and pushover when
+        `run_pushover=True`) shells out to an external `OpenSees` binary. Needs no
+        openseespy install.
+      - "openseespy": runs eigen + pushover in-process via
+        `structuralModule/openseespy_analyses.py` (no `.tcl`, no external binary; needs
+        `openseespy>=3.8.0.0`), saving results under `BuildingModels/<id>/OpenSeesPyResults/`
+        and attaching them to the returned object as `.ops_results`. NRHA/dynamic is NOT run
+        by this path -- it is per-ground-motion; use
+        `structuralModule/openseespy_dynamic/run_dynamic_cli.py`.
 
     Args:
         building_id (str): ID of the building being analyzed. It exist in the Buildings_input_info.csv file and should match the name of the inputs foldes in "BuildingInfo" folder.
         baseline_building_info (dict): Design variant databse that consists of building information such as number of wall lines, number of walls, etc.
         save_design_csv (bool, optional): Specification to save the final design of te building. Defaults to False.
         generate_static_models (bool, optional): Flag to control Modal and Pushover model creation. Defaults to False.
-        run_pushover (bool, optional): Flag to run pushover analysis.. Defaults to False.
-        generate_dynamic_models (bool, optional): Flag to control opensees model to run dynamic analysis. Defaults to True.
+        run_pushover (bool, optional): Flag to run pushover analysis (tcl engine only -- the openseespy engine always runs pushover in-process when static analyses are requested). Defaults to False.
+        generate_dynamic_models (bool, optional): tcl engine: generate the dynamic `.tcl` model. openseespy engine: no-op for the analysis itself (see above), but still triggers the eigen solve so modal periods are available. Defaults to True.
+        engine (str, optional): "tcl" or "openseespy". Defaults to "tcl".
     '''
+    if engine not in ("tcl", "openseespy"):
+        raise ValueError(f"engine must be 'tcl' or 'openseespy', got {engine!r}")
     df_inputs = pd.read_csv(os.path.join(root_dir, 'Buildings_input_info.csv'))
     df_inputs = df_inputs[df_inputs['BuildingID']==building_id]
 
@@ -115,26 +131,51 @@ def design_and_generate_model(
     
     archetype_dir = os.path.join(ModelDirectory, building_id)
     Path(archetype_dir).mkdir(parents=True, exist_ok=True)
+
+    # The tcl generators (and read_in_txt_inputs, above) os.chdir() around and never
+    # restore -- fine for the batch subprocess flow, but it leaks CWD in a notebook
+    # session. Restore it after the analysis dispatch.
+    _original_cwd = os.getcwd()
     os.chdir(archetype_dir)
-    
-    if generate_static_models:
-        ## generate and run eigenvalue analysis
-        periods = generateModalAnalysisModel(ID=building_id, 
-                                            BuildingModel=ModelClass, 
-                                            BaseDirectory=root_dir, 
-                                            NumModes=4
-                                            )
-        generatePushoverAnalysisModel(ID=building_id, 
-                                        BuildingModel=ModelClass, 
-                                        BaseDirectory=root_dir,
-                                        GenerateModelSwitch=True, 
-                                        RunPushoverSwitch=run_pushover)
-    # create dynamic model
-    if generate_dynamic_models:
-        generateDynamicAnalysisModel(ID=building_id, 
-                                    BuildingModel=ModelClass, 
-                                    BaseDirectory=root_dir, 
-                                    ModalPeriod=periods)
+    try:
+        if engine == "tcl":
+            if generate_static_models:
+                ## generate and run eigenvalue analysis
+                periods = generateModalAnalysisModel(ID=building_id,
+                                                    BuildingModel=ModelClass,
+                                                    BaseDirectory=root_dir,
+                                                    NumModes=4
+                                                    )
+                generatePushoverAnalysisModel(ID=building_id,
+                                                BuildingModel=ModelClass,
+                                                BaseDirectory=root_dir,
+                                                GenerateModelSwitch=True,
+                                                RunPushoverSwitch=run_pushover)
+            # create dynamic model
+            if generate_dynamic_models:
+                generateDynamicAnalysisModel(ID=building_id,
+                                            BuildingModel=ModelClass,
+                                            BaseDirectory=root_dir,
+                                            ModalPeriod=periods)
+        else:  # engine == "openseespy"
+            from openseespy_analyses import run_static_analyses, save_static_results
+            do_eigen = generate_static_models or generate_dynamic_models
+            do_pushover = generate_static_models
+            ops_results = run_static_analyses(ModelClass, do_eigen=do_eigen, do_pushover=do_pushover)
+            output_dir = os.path.join(archetype_dir, "OpenSeesPyResults")
+            save_static_results(ops_results, output_dir)
+            # keep the populated BuildingModel around so a caller (e.g. the demo
+            # notebook's NRHA cell) can reuse it without re-running read_in_txt_inputs
+            ops_results["building_model"] = ModelClass
+            building_design.ops_results = ops_results
+            if ops_results["periods"] is not None:
+                print(f"OpenSeesPy periods (s): {[round(float(p), 4) for p in ops_results['periods']]}")
+            if generate_dynamic_models:
+                print("NRHA (dynamic) with engine='openseespy' is per-ground-motion -- run "
+                      "Codes/structuralModule/openseespy_dynamic/run_dynamic_cli.py (or the "
+                      f"demo notebook loop). Results/periods written to {output_dir}")
+    finally:
+        os.chdir(_original_cwd)
 
     finish = time.time()
     print(f'Model creation for {building_id} took {finish - start} seconds')
@@ -149,6 +190,15 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     # #defining the arguments to be parsed
     parser.add_argument('--buildingID', type=str, default='MFD6B')
+    parser.add_argument('--engine', choices=['tcl', 'openseespy'], default='tcl',
+                        help="'tcl' (default): write .tcl model files. 'openseespy': run "
+                             "eigen + pushover in-process (needs openseespy).")
+    parser.add_argument('--run-static', dest='run_static', action='store_true',
+                        help="Also do the modal + pushover analyses (default: off).")
+    parser.add_argument('--run-pushover', dest='run_pushover', action='store_true',
+                        help="tcl engine only: actually invoke OpenSees on the pushover .tcl.")
+    parser.add_argument('--no-run-dynamic', dest='no_run_dynamic', action='store_true',
+                        help="Skip the dynamic model step (default: it runs).")
     # parser.add_argument('--bldg_idx', type=int, default=1)
 
     # # #parse command-line arguments
@@ -163,9 +213,10 @@ if __name__ == '__main__':
     design_summary = design_and_generate_model(building_id=args.buildingID,
                               baseline_building_info=baseline_BIM,
                               save_design_csv=False,
-                              generate_static_models=False,
-                              run_pushover=False,
-                              generate_dynamic_models=True
+                              generate_static_models=args.run_static,
+                              run_pushover=args.run_pushover,
+                              generate_dynamic_models=not args.no_run_dynamic,
+                              engine=args.engine,
                               )
 
 

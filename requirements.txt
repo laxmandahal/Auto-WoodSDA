@@ -20,6 +20,9 @@ pyyaml
 requests  # Codes/designModule/check_user_inputs.py
 
 # --- Structural module: OpenSeesPy analyses (eigen/pushover/dynamic) ---
+# Needed for `run_designModule.py --engine openseespy`, the openseespy_* CLIs,
+# and the openseespy driver notebook. The default `--engine tcl` path needs
+# none of this -- it only writes .tcl files.
 # openseespy<3.8.0.0's macOS wheel (openseespymac) was mistagged `py3-none-any`
 # but actually bundled x86_64-only binaries -- it silently failed to import on
 # Apple Silicon. 3.8.0.0 ships a real native arm64 wheel (openseespymac
