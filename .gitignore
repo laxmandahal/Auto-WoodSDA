@@ -10,6 +10,7 @@ __pycache__/
 **/ModelSingleScaleOutputBiDirection/
 **/Static-Pushover-Output-Model3D-XPushoverDirection/
 **/Static-Pushover-Output-Model3D-ZPushoverDirection/
+**/OpenSeesPyResults/
 **/ATC138Output/
 **/PelicunOutput/
 **/MFD6B_FEMA_P695/
