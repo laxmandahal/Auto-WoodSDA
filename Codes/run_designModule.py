@@ -68,7 +68,14 @@ def design_and_generate_model(
     if engine not in ("tcl", "openseespy"):
         raise ValueError(f"engine must be 'tcl' or 'openseespy', got {engine!r}")
     df_inputs = pd.read_csv(os.path.join(root_dir, 'Buildings_input_info.csv'))
-    df_inputs = df_inputs[df_inputs['BuildingID']==building_id]
+    # Match on BuildingID or Layout Type (same fallback the openseespy_* CLIs already use,
+    # e.g. openseespy_eigen/run_eigen_cli.py) -- Buildings_input_info.csv's BuildingID is
+    # sometimes a full run-variant name (e.g. "s1_48x32_Stucco_GWB_Normal_Vs10") distinct
+    # from the archetype's actual BuildingInfo/<name>/ folder, which instead matches its
+    # Layout Type ("s1_48x32"). Without this fallback, passing the folder name as
+    # --buildingID (the only name that resolves BuildingInfo/<building_id>/ correctly)
+    # returns an empty df_inputs.
+    df_inputs = df_inputs[(df_inputs['BuildingID'] == building_id) | (df_inputs['Layout Type'] == building_id)]
 
     # the specified inputs are checked and any missing inputs are defaulted to certain values
     df_inputs_checked = check_and_complete_inputs(input_df = df_inputs)
