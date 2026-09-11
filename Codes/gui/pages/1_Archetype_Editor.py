@@ -2,10 +2,10 @@
 """
 Archetype Editor -- edit an existing archetype's building_config.yaml.
 
-v1 scope (confirmed in planning): editing one of the archetype layouts already
-in Databases/Baseline_archetype_info_w_periods.json. No new-layout authoring
-here (that needs an eigen-analysis bootstrap step for that catalog's Periods
-field -- a v2 addition).
+Editing only -- an archetype must already exist on disk (see config_io.list_archetypes()).
+To author a brand-new layout's wall-line skeleton from scratch, use the New Archetype page
+(2_New_Archetype.py) first; it creates a valid, on-disk starting point with placeholder
+values that this page can then refine.
 
 Working state lives in st.session_state as a plain JSON-able dict (not a live
 BuildingConfig instance) so every widget can read/write it directly without
@@ -38,7 +38,8 @@ st.title("Archetype Editor")
 # --- Sidebar: pick an archetype, load it into session state ---------------
 archetypes = config_io.list_archetypes()
 if not archetypes:
-    st.error(f"No archetypes with a building_config.yaml found under {config_io.BUILDING_INFO_DIR}")
+    st.error(f"No archetypes with a building_config.yaml found under {config_io.BUILDING_INFO_DIR} "
+             "-- use the New Archetype page to create one.")
     st.stop()
 
 chosen = st.sidebar.selectbox("Archetype", archetypes, key="archetype_select")
