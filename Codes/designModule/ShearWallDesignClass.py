@@ -220,18 +220,16 @@ class DesignShearWall:
         #desired nail spacing
         nailspacing = as_matrix(mp.nail_spacing)
         # desired nail size / panel thickness -- stored in the schema as a real per-story x
-        # per-wall matrix (mp.nail_size/mp.panel_thickness), unlike the raw multi-line string
-        # the original code read and had to np.array(...).split().reshape() at each use site.
-        # NOTE: the original no_of_walls>1 & numFloors==1 branch indexed that raw string
-        # directly (nailsize[self.wallIndex]), which is single-*character* indexing, not a
-        # per-wall lookup -- a latent bug. The no_of_walls==1 branches also produced a
-        # numpy-array-wrapped value (e.g. array(['10d'])) instead of a plain string, an
-        # incidental side effect of .split().reshape() rather than deliberate design. Both are
-        # confirmed dead in practice: userDefinedDetailingTag (the only thing that reads
-        # self.nailSize/self.panelThickness) is never True in any current driver script. Fixed
-        # here to consistently index a plain string from the matrix in every branch.
-        nailsize = np.array(mp.nail_size, dtype=object)
-        panelthickness = np.array(mp.panel_thickness, dtype=object)
+        # per-wall matrix (mp.nail_size/mp.panel_thickness). Routed through as_matrix (with
+        # dtype=object, since these hold strings like "10d"/"15/32in") so they get the same
+        # single-row/single-column squeeze as nailspacing above -- without it, a single-story
+        # archetype with >1 wall on a line (e.g. s1_48x32) left the story axis unsqueezed and
+        # nailsize[self.wallIndex] indexed that axis instead of the wall axis: wallIndex=0
+        # silently returned the whole per-story row instead of one wall's value, and
+        # wallIndex>=1 raised IndexError, killing the whole design run. With the squeeze in
+        # place, indexing matches nailspacing's already-correct pattern in every branch.
+        nailsize = as_matrix(mp.nail_size, dtype=object)
+        panelthickness = as_matrix(mp.panel_thickness, dtype=object)
         takeup_deflection = as_vector(mp.take_up_deflection)
         chord_area = as_vector(mp.chord_area)
 
@@ -251,14 +249,14 @@ class DesignShearWall:
         else:
             if self.numFloors == 1:
                 self.nailSpacing = nailspacing.astype(int)
-                self.nailSize = nailsize[0]
-                self.panelThickness = panelthickness[0]
+                self.nailSize = nailsize
+                self.panelThickness = panelthickness
                 self.takeup_deflection = takeup_deflection
                 self.chordArea = chord_area
             else:
                 self.nailSpacing = nailspacing[self.floorIndex].astype(int)
-                self.nailSize = nailsize[self.floorIndex][0]
-                self.panelThickness = panelthickness[self.floorIndex][0]
+                self.nailSize = nailsize[self.floorIndex]
+                self.panelThickness = panelthickness[self.floorIndex]
                 self.takeup_deflection = takeup_deflection[self.floorIndex]
                 self.chordArea = chord_area[self.floorIndex]
 
