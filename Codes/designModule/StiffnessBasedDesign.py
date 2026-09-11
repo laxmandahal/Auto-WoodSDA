@@ -115,7 +115,6 @@ class RDADesignIterationClass():
         for x in range(self.numStory):
             self.shearWallShearX_AllFloor[x], self.shearWallShearY_AllFloor[x], self.totalStoryForceX_All[x], self.totalStoryForceY_All[x] = self.BatchDesign(wall_line_name, numWallsPerLine, x)
 
-        self.saveData()
         self.UltimateDesign()
 
     def BatchDesign(self, wall_line_name, numWallsPerLine, floorIndex):
@@ -199,34 +198,6 @@ class RDADesignIterationClass():
 
         return self.designShearDemandX, self.designShearDemandY , self.totalStoryForceX, self.totalStoryForceY
       
-    def saveData(self):
-        # NOTE: this writes into the legacy BuildingInfo/<archetype>/<dir>_direction_wall/
-        # <wall_line>/ .txt tree, which the mainline schema-migrated pipeline otherwise no
-        # longer reads or writes. envelopeShearWallDemand.txt specifically has no active
-        # reader in that pipeline -- ComputeDesignForce.py's own envelope-demand path
-        # (SW_shear_demand(), gated by `if self.envelopeAnalysis`) reads a schema field
-        # instead, and that field is only ever populated by the one-time migration script,
-        # never refreshed by a live run, since envelopeAnalysis defaults to False for the
-        # standard ELF/LRFD design scheme every archetype here actually uses. The only real
-        # consumer of this .txt file is the separate, unmigrated
-        # ComputeDesignForce_ATC116_designLevels.py (reads it directly via
-        # np.genfromtxt) -- kept here for that reason, confirmed with the user 2026-09-07.
-        allshearwall = np.concatenate((self.shearWallShearX_AllFloor, self.shearWallShearY_AllFloor), axis = 1)
-        total_walls = np.insert(np.cumsum(self.numWallsPerLine), 0, 0)
-
-        for ii in range(len(self.wall_line_name)):
-            temp = np.zeros([self.numStory, self.numWallsPerLine[ii]], dtype= float)
-            os.chdir(self.BaseDirectory + "/%s_direction_wall" % self.direction[ii] + "/%s" % self.wall_line_name[ii])
-
-            startIndex = total_walls[ii]
-            endIndex = total_walls[ii + 1]
-
-            temp[:] = allshearwall[:,startIndex:endIndex]
-            # print(temp)
-            # print('sw line {}, shearwall no {}, start-end index {}'.format(self.wall_line_name[ii], ii, [startIndex, endIndex]))
-            np.savetxt('envelopeShearWallDemand.txt', temp, delimiter=' ')
-                #with open ('sehsh.txt', 'wb') as f: pickle.dump(temp, f)
-
     def UltimateDesign(self):
         d = []
         wallname = []
