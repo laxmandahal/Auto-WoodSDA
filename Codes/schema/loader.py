@@ -46,7 +46,7 @@ def save_building_config(config, base_directory):
         yaml.safe_dump(validated.model_dump(mode="json"), f, sort_keys=False, default_flow_style=False)
 
 
-def as_matrix(nested_list):
+def as_matrix(nested_list, dtype=float):
     """list[list[...]] -> ndarray, squeezed the way np.genfromtxt squeezes a
     2-D text block: a single row or single column collapses to 1-D, and a
     single row-and-column collapses to a 0-D array.
@@ -60,8 +60,13 @@ def as_matrix(nested_list):
     and exactly what ComputeDesignForce.py's self.floorHeights computation
     does with it. Confirmed via direct comparison: arr[0,0] broke
     single-story seismic force calculations silently (empty array, no
-    exception); .reshape(()) reproduces genfromtxt's real 0-D ndarray."""
-    arr = np.array(nested_list, dtype=float)
+    exception); .reshape(()) reproduces genfromtxt's real 0-D ndarray.
+
+    `dtype` defaults to float for the numeric fields every other caller
+    passes; ShearWallDesignClass.py passes dtype=object for nail_size/
+    panel_thickness, which hold strings ("10d", "15/32in") and can't go
+    through the default np.array(..., dtype=float)."""
+    arr = np.array(nested_list, dtype=dtype)
     if arr.shape[0] == 1 and arr.shape[1] == 1:
         return arr.reshape(())
     if arr.shape[0] == 1:
