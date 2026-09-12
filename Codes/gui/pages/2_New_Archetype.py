@@ -99,11 +99,12 @@ with tabs[2]:
     st.caption("One global value each, broadcast to every story/column -- refine per-floor "
                "afterward in the Archetype Editor's Loads tab.")
     c1, c2, c3 = st.columns(3)
-    floor_weight = c1.number_input("Floor weight (kips)", min_value=0.0, value=50.0, key="na_floor_weight")
+    floor_weight = c1.number_input("Floor weight (kips)", min_value=0.0, value=50.0, step=1.0,
+                                    key="na_floor_weight")
     leaning_column_load = c2.number_input("Leaning column load per node (kips)", min_value=0.0, value=5.0,
-                                           key="na_lc_load")
+                                           step=1.0, key="na_lc_load")
     interior_wall_weight = c3.number_input("Interior wall weight (psf)", min_value=0.0, value=10.0,
-                                            key="na_interior_wall_weight")
+                                            step=1.0, key="na_interior_wall_weight")
 
 # --- Site & Seismic ---------------------------------------------------------------
 with tabs[3]:
@@ -115,12 +116,27 @@ with tabs[3]:
     wall_material = c2.text_input("Wall material", value="Stucco_GWB", key="na_wall_material")
     seismic_weight = c3.selectbox("Seismic weight", ["Light", "Normal", "Heavy"], index=1, key="na_seismic_weight")
     c1, c2 = st.columns(2)
-    latitude = c1.number_input("Latitude", value=33.9721, format="%.4f", key="na_lat")
-    longitude = c2.number_input("Longitude", value=-118.42177, format="%.5f", key="na_lon")
+    # Plain text fields, not number_input -- a +/- stepper makes no sense for a coordinate
+    # you look up once and paste in, and stepping by degrees would move the site miles per
+    # click. Parsed (and validated) below, in the Create tab.
+    latitude_str = c1.text_input("Latitude", value="33.9721", key="na_lat")
+    longitude_str = c2.text_input("Longitude", value="-118.42177", key="na_lon")
 
 # --- Create -----------------------------------------------------------------------
 with tabs[4]:
     conflicts = na.archetype_id_conflicts(archetype_id) if archetype_id else ["Enter an Archetype ID first."]
+
+    try:
+        latitude = float(latitude_str)
+    except ValueError:
+        latitude = None
+        conflicts.append(f"Latitude {latitude_str!r} isn't a number.")
+    try:
+        longitude = float(longitude_str)
+    except ValueError:
+        longitude = None
+        conflicts.append(f"Longitude {longitude_str!r} isn't a number.")
+
     if conflicts:
         for reason in conflicts:
             st.warning(reason)
