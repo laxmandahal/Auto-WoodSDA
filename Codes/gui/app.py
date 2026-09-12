@@ -25,10 +25,15 @@ directly.
 
 Open **Archetype Editor** in the sidebar to edit an existing archetype's full config
 (geometry, loads, wall-line materials, analysis parameters) with a live 2D plan-view and
-3D geometry preview. v1 scope: editing one of the archetype layouts already defined in
-`Databases/Baseline_archetype_info_w_periods.json` -- authoring a brand-new layout from
-scratch is a planned follow-up (it needs an eigen-analysis bootstrap step this page
-doesn't attempt).
+3D geometry preview.
+
+Open **New Archetype** to author a brand-new grid-plan layout from scratch: define the
+wall-line skeleton (grid-line counts per direction, walls per line), and it creates a
+valid, on-disk archetype (`BuildingInfo/<id>/building_config.yaml`, a `Buildings_input_info
+.csv` row, and a `Databases/Baseline_archetype_info_w_periods.json` catalog entry) with
+flat placeholder defaults for everything else -- review and correct those in the Archetype
+Editor before running a real design. Periods are estimated with ASCE 7's low-rise
+`T = 0.1 x NumStories` shortcut, not a real eigen analysis.
 
 Every save goes through the same `BuildingConfig` Pydantic model
 (`Codes/schema/building_config.py`) every other part of the pipeline uses, so a config saved
