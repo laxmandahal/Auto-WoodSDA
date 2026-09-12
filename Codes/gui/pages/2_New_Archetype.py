@@ -51,11 +51,11 @@ with tabs[0]:
                                        "(avoids the mismatch fixed in PR #14).")
     c1, c2 = st.columns(2)
     n_stories = c1.number_input("Number of stories", min_value=1, max_value=12, value=1, step=1, key="na_stories")
-    story_height = c2.number_input("Story height (in)", min_value=1.0, value=120.0, key="na_story_height")
+    story_height = c2.number_input("Story height (in)", min_value=1.0, value=120.0, step=1.0, key="na_story_height")
 
     c1, c2 = st.columns(2)
-    footprint_x = c1.number_input("Footprint X dimension (in)", min_value=1.0, value=480.0, key="na_fx")
-    footprint_z = c2.number_input("Footprint Z dimension (in)", min_value=1.0, value=384.0, key="na_fz")
+    footprint_x = c1.number_input("Footprint X dimension (in)", min_value=1.0, value=480.0, step=1.0, key="na_fx")
+    footprint_z = c2.number_input("Footprint Z dimension (in)", min_value=1.0, value=384.0, step=1.0, key="na_fz")
 
 # --- Wall-Line Skeleton --------------------------------------------------------
 with tabs[1]:
