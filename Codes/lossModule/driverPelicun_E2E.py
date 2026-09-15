@@ -21,14 +21,11 @@ baseDir = os.path.dirname(code_dir)
 
 
 sys.path.append(os.path.join(baseDir, *['Codes', 'lossModule', 'Loss_Pelicun']))
-sys.path.append(os.path.join(baseDir, *['Codes', 'lossModule', 'Loss_Pelicun', 'pelicun_3_1_master_new']))
 sys.path.append(os.path.join(baseDir, *['Codes', 'lossModule', 'Loss_ATC138']))
 
 from create_edp_df import create_demands_df_pelicun
 from generateLossModel import generateConfgFile_pelicun3p1new
-from Run_pelicun_v3p1_new import run_pelicun
-# from Run_pelicun_v3p1 import compile_demand_data, pelicun_assessment1
-# from pelicun_3_1.assessment import Assessment
+from pelicun.tools.DL_calculation import run_pelicun
 # from create_comp_ds_list import create_comp_ds_from_DMG
 from create_building_model_file import create_building_model
 # from create_default_optional_inputs import create_optional_inputs
@@ -152,10 +149,19 @@ def main(
         Path(os.path.join(ATC138Input_dir, f'IL_{hazard_level}')).mkdir(parents=True, exist_ok=True)
         
 
-        run_pelicun(config_path = DL_input_path,
-                    edp_file_dir=edp_input_path,
-                    output_fp=outputDir
-                    )
+        # Matches the real CLI's (pelicun.tools.DL_calculation.main) own argparse
+        # defaults exactly -- see that module's `main()` for the source of these.
+        run_pelicun(
+            config_path=DL_input_path,
+            demand_file=edp_input_path,
+            output_path=outputDir,
+            realizations=None,       # falls back to the config's own DL.Demands.SampleSize
+            auto_script_path=None,
+            custom_model_dir=None,
+            output_format=None,
+            detailed_results=True,
+            coupled_edp=False,
+        )
         ## remove extra files from the directory
         # delete_files_from_directory(outputDir, keep=['DMG_sample.csv', 
         #                                         'DL_summary.csv', 

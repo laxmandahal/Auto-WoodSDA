@@ -138,7 +138,12 @@ def generateConfgFile_pelicun3p1new(baselineID,
         d_baseline['DL']['Demands']['InferResidualDrift']["1"] = "0.0075"
         d_baseline['DL']['Demands']['InferResidualDrift']["method"] = "0.0075"
     else:
-        d_baseline['DL']['Demands']['InferResidualDrift'] = ""
+        # An empty string was valid for "skip residual-drift inference" in the old
+        # vendored pelicun 3.1; the real, current package enforces a JSON schema on
+        # this config (confirmed the hard way -- "'' is not of type 'object'") that
+        # requires InferResidualDrift to be an object with a "method" key whenever
+        # it's present at all, so the equivalent "skip it" is to omit the key.
+        del d_baseline['DL']['Demands']['InferResidualDrift']
     d_baseline['DL']['Demands']['SampleSize'] = "%s"%numRealization
     d_baseline['DL']['Losses']['BldgRepair']['ReplacementCost']['Median'] = "%s"%replacementCost
     d_baseline['DL']['Losses']['BldgRepair']['ReplacementTime']['Median'] = "%s"%replacementTime
