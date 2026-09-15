@@ -10,18 +10,26 @@ Run this in any env with the requirements.txt dependencies installed:
 
 Runs every ground motion at every hazard level found under
 BuildingModels/GM_sets/<gmSet>/, in both pairings by default, in parallel across
---workers OS processes. Writes BuildingModels/<buildingID>/OpenSeesPyResults/MSA/
-<gmSet>/{edp_results.csv, hazard_level_summary.csv} and prints the summary table.
+--workers OS processes. Writes Results/<buildingID>/EDP_data/{SDR,RDR,PFA,
+CollapseCount,CollapseFragility,edp_results,hazard_level_summary}.csv -- see
+msa_orchestrator.save_msa_results's docstring for exactly what each file is -- and
+prints the hazard-level summary table.
 """
 
 import argparse
 import os
 import sys
 
-cwd = os.path.dirname(os.path.abspath(__file__))
+cwd = os.path.dirname(os.path.abspath(__file__))                      # .../openseespy_dynamic
+_structural_module_dir = os.path.dirname(cwd)                         # .../structuralModule
+_codes_dir = os.path.dirname(_structural_module_dir)                  # .../Codes
+_root_dir = os.path.dirname(_codes_dir)                                # repo root
+schema_dir = os.path.join(_codes_dir, 'schema')
 sys.path.append(cwd)
+sys.path.append(schema_dir)
 
 from msa_orchestrator import run_msa, save_msa_results, summarize_by_hazard_level  # noqa: E402
+from loader import load_building_config  # noqa: E402
 
 
 def main():
@@ -45,10 +53,15 @@ def main():
         args.buildingID, args.gmSet, pairings=pairings, num_workers=args.workers,
         gm_limit=args.gmLimit, num_modes=args.numModes, max_run_time=args.maxRunTime,
     )
-    edp_csv_path, summary_csv_path = save_msa_results(df, args.buildingID, args.gmSet)
 
-    print(f"\nWrote {edp_csv_path}")
-    print(f"Wrote {summary_csv_path}")
+    base_dir = os.path.join(_root_dir, 'BuildingInfo', args.buildingID)
+    num_stories = load_building_config(base_dir).geometry.number_of_stories
+
+    paths = save_msa_results(df, args.buildingID, args.gmSet, num_stories)
+
+    print("\nWrote:")
+    for name, path in paths.items():
+        print(f"  {name}: {path}")
     print("\nHazard-level summary:")
     print(summarize_by_hazard_level(df).to_string(index=False))
 

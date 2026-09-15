@@ -7,12 +7,16 @@ as "later, separate work" when the single-GM port landed.
 
 Replaces the two `for GM_ID in range(...): os.system('OpenSees ...')` loops in
 Codes/woodSDA_driver_E2E.ipynb (cell 20) plus the EDP-extraction cell right after it
-(cell 22, ExtractMaxEDP.ExtractSDR/ExtractRDR/ExtractPFA) with one call: no .tcl
-files, no external OpenSees binary, no hardcoded GM_Num/Scale_Sa_GM strings (ground_
-motion.py already derives hazard levels/GM counts from the GM_sets/<name>/ folder
-structure), and no separate post-hoc collapse-counting pass (collapse_flag already
-comes out of the analysis itself, using the archetype's own dynamic_analysis
-.collapse_drift_limit as the check threshold instead of the legacy hardcoded 0.1).
+(cell 22, ExtractMaxEDP.ExtractSDR/ExtractRDR/ExtractPFA) and the collapse-fragility
+fit (Codes/damageModule/MLEClass.py, driven from Codes/postProcessing/Plot_Results
+.ipynb) with one call: no .tcl files, no external OpenSees binary, no hardcoded
+GM_Num/Scale_Sa_GM strings (ground_motion.py already derives hazard levels/GM counts
+from the GM_sets/<name>/ folder structure), and no separate post-hoc collapse-counting
+pass (collapse_flag already comes out of the analysis itself, using the archetype's
+own dynamic_analysis.collapse_drift_limit as the check threshold instead of the legacy
+hardcoded 0.1). Writes the same Results/<id>/EDP_data/{SDR,RDR,PFA,CollapseCount,
+CollapseFragility}.csv scheme the real, committed Results/MFD6B/EDP_data/ already has
+example output for -- see save_msa_results/to_legacy_edp_frames.
 
 Parallel by OS process, not thread: model_builders.build_model() calls ops.wipe()
 first thing, and generateDynamicAnalysisModel_ops() calls build_model() as its very
@@ -61,6 +65,30 @@ def enumerate_units_of_work(gm_set_dir, pairings=(1, 2), gm_limit=None):
     return units
 
 
+def _compute_pga_g(result, pairing):
+    """Peak ground acceleration (g) actually driving each physical axis, matching
+    ExtractMaxEDP.ExtractPGA's math (peak abs raw-record value x MCE scale factor --
+    ground_motion.py's own docstring confirms raw record values are already in g, so
+    no further unit conversion is needed here). `result['ground_motion']['gm_x_file'/
+    'gm_z_file']` are the RAW H1/H2 assignment (resolve_gm never swaps them); the
+    physical X/Z drive assignment flips with `pairing` exactly like
+    ground_motion.define_ground_motion_loading's own DOF swap, so mirror it here."""
+    import numpy as np
+    from ground_motion import GM_SCALE_G
+
+    gm = result['ground_motion']
+    mce_scale_factor = gm['scale_factor'] / GM_SCALE_G  # strip the g->in/s^2 conversion back out
+
+    def peak_g(path):
+        return float(np.max(np.abs(np.loadtxt(path)))) * mce_scale_factor
+
+    pga_h1 = peak_g(gm['gm_x_file'])
+    pga_h2 = peak_g(gm['gm_z_file'])
+    if pairing == 1:
+        return pga_h1, pga_h2  # H1 drives X, H2 drives Z
+    return pga_h2, pga_h1      # pairing == 2: H2 drives X, H1 drives Z
+
+
 def _run_one_unit(building_id, base_dir, gm_set_dir, unit, collapse_drift_limit,
                    demolition_drift_limit, num_modes, max_run_time):
     """The unit of work dispatched to each worker process. Module-level (not a
@@ -100,6 +128,7 @@ def _run_one_unit(building_id, base_dir, gm_set_dir, unit, collapse_drift_limit,
         row["residual_drift_z"] = summary["residual_drift_z"]
         row["final_time"] = summary["final_time"]
         row["gm_time"] = summary["gm_time"]
+        row["pga_x_g"], row["pga_z_g"] = _compute_pga_g(result, unit["pairing"])
         for i, v in enumerate(summary["peak_sdr_x"]):
             row[f"sdr_x_story{i + 1}"] = v
         for i, v in enumerate(summary["peak_sdr_z"]):
@@ -167,8 +196,8 @@ def run_msa(building_id, gm_set_name, pairings=(1, 2), num_workers=None, gm_limi
 
 def summarize_by_hazard_level(df):
     """One row per hazard level: n_gm, n_ok, n_failed, n_collapse, collapse_fraction,
-    n_demolition, demolition_fraction. Raw counts/fractions only -- fitting a fragility
-    curve to these is a separate, later step (not this module's job)."""
+    n_demolition, demolition_fraction. This is the source data fit_collapse_fragility
+    fits a curve to (n_collapse/n_gm per level) -- see save_msa_results."""
     rows = []
     for level in sorted(df["hazard_level"].unique(), key=int):
         group = df[df["hazard_level"] == level]
@@ -185,20 +214,117 @@ def summarize_by_hazard_level(df):
     return pd.DataFrame(rows)
 
 
-def save_msa_results(df, building_id, gm_set_name):
-    """Writes BuildingModels/<building_id>/OpenSeesPyResults/MSA/<gm_set_name>/
-    edp_results.csv (the full per-run table) and hazard_level_summary.csv (per-hazard-
-    level counts/fractions) -- following the OpenSeesPyResults/ convention the
-    eigen/pushover port already established, not the legacy Results/<id>/EDP_data/
-    path (tied to the Tcl-recorder pipeline and its currently-broken Pelicun consumer).
-    Returns (edp_csv_path, summary_csv_path)."""
-    out_dir = os.path.join(_ROOT_DIR, 'BuildingModels', building_id, 'OpenSeesPyResults', 'MSA', gm_set_name)
+def to_legacy_edp_frames(df, num_stories):
+    """Reshapes the long-format per-run `df` (one row per (hazard_level, gm_index,
+    pairing), as returned by run_msa) into the same headerless 4-file scheme
+    Results/MFD6B/EDP_data/ already has real committed examples of (confirmed by
+    reading them directly): SDR/RDR/PFA each have columns [HazardLevel, Direction,
+    GM_number, ...], with a block of "Direction 1" (X) rows for every GM followed by
+    a block of "Direction 2" (Z) rows at each hazard level (ExtractMaxEDP.ExtractSDR's
+    layout) -- not interleaved per-GM. CollapseCount is one row per hazard level.
+
+    "GM_number" here is a flat 1-based index over every (gm_index, pairing)
+    combination at that hazard level, sorted by (gm_index, pairing) -- i.e. both
+    pairings count as distinct "GM runs", matching ProcessMSAResults.py's own
+    "should be multiplied by 2 if GMs are flipped" comment. This is a documented
+    interpretation of a genuinely ambiguous legacy convention (see the PR description
+    for the pre-existing ambiguity this resolves), not a re-derivation of a
+    previously-unambiguous rule.
+
+    Rows with a recorded 'error' (a failed run) are excluded entirely -- there's no
+    valid EDP to report for them.
+
+    Returns (sdr_df, rdr_df, pfa_df, collapse_count_df), each ready for
+    `to_csv(header=False, index=False)`.
+    """
+    ok = df[df["error"].isna()].copy()
+    ok["hazard_level_int"] = ok["hazard_level"].astype(int)
+    ok = ok.sort_values(["hazard_level_int", "gm_index", "pairing"])
+    ok["gm_number"] = ok.groupby("hazard_level_int").cumcount() + 1
+
+    sdr_rows, rdr_rows, pfa_rows, collapse_rows = [], [], [], []
+    for level, group in ok.groupby("hazard_level_int"):
+        n_collapse = int(group["collapse_flag"].fillna(False).sum())
+        collapse_rows.append({"n_collapse": n_collapse})
+
+        for _, r in group.iterrows():
+            sdr_rows.append([level, 1, r["gm_number"]] + [r[f"sdr_x_story{s + 1}"] for s in range(num_stories)])
+            rdr_rows.append([level, 1, r["gm_number"], r["residual_drift_x"]])
+            pfa_rows.append([level, 1, r["gm_number"], r["pga_x_g"]]
+                             + [r[f"pfa_x_g_floor{s + 1}"] for s in range(num_stories)])
+        for _, r in group.iterrows():
+            sdr_rows.append([level, 2, r["gm_number"]] + [r[f"sdr_z_story{s + 1}"] for s in range(num_stories)])
+            rdr_rows.append([level, 2, r["gm_number"], r["residual_drift_z"]])
+            pfa_rows.append([level, 2, r["gm_number"], r["pga_z_g"]]
+                             + [r[f"pfa_z_g_floor{s + 1}"] for s in range(num_stories)])
+
+    sdr_df = pd.DataFrame(sdr_rows)
+    rdr_df = pd.DataFrame(rdr_rows)
+    pfa_df = pd.DataFrame(pfa_rows)
+    collapse_count_df = pd.DataFrame(collapse_rows)
+    return sdr_df, rdr_df, pfa_df, collapse_count_df
+
+
+def save_msa_results(df, building_id, gm_set_name, num_stories):
+    """Writes Results/<building_id>/EDP_data/ -- the same location and (for SDR/RDR/
+    PFA/CollapseCount) the same headerless schema as the real, committed
+    Results/MFD6B/EDP_data/ example. Also writes CollapseFragility.csv (median,
+    dispersion -- one value per line, matching that real file's shape exactly) if
+    BuildingModels/GM_sets/<gm_set_name>/hazard_level_im.json exists; skips it with a
+    printed warning if not (EDP extraction doesn't need it, only the fragility fit
+    does -- see ground_motion.read_hazard_level_im's docstring for why that file is a
+    separate, explicit sidecar rather than something derived automatically).
+
+    Additionally writes edp_results.csv (the full long-format per-run table -- errors,
+    wall-clock time, etc., which the legacy 4-file scheme has no room for) and
+    hazard_level_summary.csv (counts/fractions) alongside them -- genuinely new files,
+    not part of the legacy scheme, but useful diagnostics kept in the same place.
+
+    Returns a dict of the paths written."""
+    from ground_motion import read_hazard_level_im
+
+    out_dir = os.path.join(_ROOT_DIR, 'Results', building_id, 'EDP_data')
     os.makedirs(out_dir, exist_ok=True)
+    paths = {}
 
-    edp_csv_path = os.path.join(out_dir, 'edp_results.csv')
-    summary_csv_path = os.path.join(out_dir, 'hazard_level_summary.csv')
+    n_failed = int(df["error"].notna().sum())
+    if n_failed:
+        print(f"WARNING: {n_failed} of {len(df)} runs failed and are excluded from "
+              f"SDR/RDR/PFA/CollapseCount.csv -- see edp_results.csv's 'error' column.")
 
-    df.to_csv(edp_csv_path, index=False)
-    summarize_by_hazard_level(df).to_csv(summary_csv_path, index=False)
+    sdr_df, rdr_df, pfa_df, collapse_count_df = to_legacy_edp_frames(df, num_stories)
+    for name, frame in [("SDR", sdr_df), ("RDR", rdr_df), ("PFA", pfa_df), ("CollapseCount", collapse_count_df)]:
+        path = os.path.join(out_dir, f"{name}.csv")
+        frame.to_csv(path, header=False, index=False)
+        paths[name] = path
 
-    return edp_csv_path, summary_csv_path
+    paths["edp_results"] = os.path.join(out_dir, "edp_results.csv")
+    df.to_csv(paths["edp_results"], index=False)
+
+    summary_df = summarize_by_hazard_level(df)
+    paths["hazard_level_summary"] = os.path.join(out_dir, "hazard_level_summary.csv")
+    summary_df.to_csv(paths["hazard_level_summary"], index=False)
+
+    gm_set_dir = os.path.join(_ROOT_DIR, 'BuildingModels', 'GM_sets', gm_set_name)
+    hazard_level_im = read_hazard_level_im(gm_set_dir)
+    if not hazard_level_im:
+        print(f"No hazard_level_im.json found under {gm_set_dir} -- skipping "
+              f"CollapseFragility.csv (EDP data was still written).")
+        return paths
+
+    missing = [lvl for lvl in summary_df["hazard_level"] if lvl not in hazard_level_im]
+    if missing:
+        print(f"hazard_level_im.json is missing hazard level(s) {missing} -- skipping "
+              f"CollapseFragility.csv.")
+        return paths
+
+    sys.path.append(os.path.join(_CODES_DIR, 'damageModule'))
+    from fit_collapse_fragility import fit_lognormal_fragility
+
+    im_values = [hazard_level_im[lvl] for lvl in summary_df["hazard_level"]]
+    median, dispersion = fit_lognormal_fragility(im_values, summary_df["n_collapse"], summary_df["n_gm"])
+    paths["CollapseFragility"] = os.path.join(out_dir, "CollapseFragility.csv")
+    pd.DataFrame([median, dispersion]).to_csv(paths["CollapseFragility"], header=False, index=False)
+    print(f"Collapse fragility: median Sa={median:.4f}, dispersion={dispersion:.4f}")
+
+    return paths
