@@ -8,17 +8,24 @@ def to_fema_cmp_id(pelicun_id):
 
 
 def normalize_comp_units(
-    pelicun_results_fp: str, 
+    pelicun_results_fp: str,
     cmp_lib_fp: str
 ):
-    df_dmg = pd.read_csv(os.path.join(pelicun_results_fp, 'DMG_sample.csv'), index_col=0)
+    # The real pelicun package (unlike the old vendored copy this was written
+    # against) zip-compresses its raw "Sample" outputs by default -- pandas reads a
+    # .zip path directly (auto-detected from the extension), so this only needs the
+    # right filename, no explicit compression handling. Written back out as a plain
+    # .csv: this normalized file is a new, secondary artifact of this repo's own
+    # pipeline, not one of pelicun's own outputs, so there's no reason to preserve
+    # its compression.
+    df_dmg = pd.read_csv(os.path.join(pelicun_results_fp, 'DMG_sample.zip'), index_col=0)
 
     components_lib = pd.read_csv(os.path.join(cmp_lib_fp, 'static_tables', 'component_attributes.csv'))
 
     cols_to_modify = [word for word in df_dmg.columns if word[0] in ('A', 'B', 'C', 'D', 'E', 'F')]
     for cmp_name in cols_to_modify:
         df_dmg[cmp_name] = df_dmg[cmp_name] / components_lib[components_lib['fragility_id']==to_fema_cmp_id(cmp_name)]['unit_qty'].values
-    
+
     df_dmg.to_csv(os.path.join(pelicun_results_fp, 'DMG_sample.csv'))
 
 

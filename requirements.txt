@@ -2,10 +2,6 @@
 # (Codes/designModule, Codes/structuralModule, Codes/schema, Codes/damageModule,
 # Codes/lossModule) plus the notebook/plotting stack used to run and inspect it.
 #
-# pelicun (Codes/lossModule/Loss_Pelicun/pelicun_3_1_master_new) is vendored
-# in-repo, not a pip package -- its own dependencies (numpy/pandas/scipy) are
-# already covered below.
-#
 # NOT covered here: ATC-138's functional-recovery methodology
 # (Codes/lossModule/Loss_ATC138) needs a licensed MATLAB install plus the
 # matching MATLAB Engine API for Python (`matlabengine` on PyPI, version-pinned
@@ -41,6 +37,15 @@ statsmodels
 sympy
 seaborn
 numdifftools
+
+# --- Loss module: Pelicun (FEMA P-58 damage/loss assessment) ---
+# Real installable package (https://github.com/NHERI-SimCenter/pelicun), replacing
+# a 45MB vendored/forked copy of pelicun 3.1 that existed only because that old
+# version's DL_calculation.run_pelicun() didn't take explicit demand-file/output-path
+# arguments (needed to call it once per hazard level in a loop) -- current pelicun
+# already does. simcenter-dlml (the damage/loss model-library data) installs
+# automatically as pelicun's own dependency; no separate download step.
+pelicun>=3.10,<4.0
 
 # --- Input-authoring GUI (Codes/gui/, `streamlit run Codes/gui/app.py`) ---
 # Local-only -- no hosting required. streamlit's own dependency resolution can
