@@ -47,6 +47,25 @@ def list_hazard_levels(gm_set_dir):
     return sorted(levels, key=int)
 
 
+def read_hazard_level_im(gm_set_dir):
+    """Reads BuildingModels/GM_sets/<name>/hazard_level_im.json -- {"<level>": Sa_g}
+    -- the target intensity (Sa, in g) each hazard level's GM set was scaled to.
+    Not derivable from the GroundMotionInfo/*.txt files (those hold per-GM MCE scale
+    factors, not the hazard level's own target IM), so unlike list_hazard_levels/
+    num_gm_pairs this genuinely needs an explicit sidecar file -- the old Tcl-era
+    pipeline never had a structural place for this either (it was always a hardcoded
+    external string, e.g. the notebook's Scale_Sa_GM). Returns {} if the file doesn't
+    exist (callers that need it, e.g. collapse-fragility fitting, should treat that as
+    "not available" rather than raising -- EDP extraction itself doesn't need this)."""
+    import json
+
+    im_path = os.path.join(gm_set_dir, 'hazard_level_im.json')
+    if not os.path.isfile(im_path):
+        return {}
+    with open(im_path) as f:
+        return json.load(f)
+
+
 def num_gm_pairs(gm_set_dir, hazard_level):
     """Number of GM pairs in a hazard level, from GMFileNames.txt's line count / 2
     -- replaces the hardcoded GMset_Num literal in RunNRHAXx.tcl/RunNRHAZz.tcl."""
