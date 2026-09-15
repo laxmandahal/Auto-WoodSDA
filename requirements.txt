@@ -1,12 +1,6 @@
 # Full dependency audit for the design/structural/damage/loss pipeline
 # (Codes/designModule, Codes/structuralModule, Codes/schema, Codes/damageModule,
 # Codes/lossModule) plus the notebook/plotting stack used to run and inspect it.
-#
-# NOT covered here: ATC-138's functional-recovery methodology
-# (Codes/lossModule/Loss_ATC138) needs a licensed MATLAB install plus the
-# matching MATLAB Engine API for Python (`matlabengine` on PyPI, version-pinned
-# to your MATLAB release -- see MathWorks' own install instructions); there's
-# no plain pip path for MATLAB itself.
 
 # --- Design / structural / schema ---
 numpy
@@ -46,6 +40,14 @@ numdifftools
 # already does. simcenter-dlml (the damage/loss model-library data) installs
 # automatically as pelicun's own dependency; no separate download step.
 pelicun>=3.10,<4.0
+
+# --- Loss module: ATC-138 functional recovery (OpenPBEE's Python port of the
+# original MATLAB PBEE-Recovery methodology) ---
+# Replaces the old MATLAB/matlabengine-driven Loss_ATC138/PBEE-Recovery vendored
+# tree -- atc138 is a real, installable PyPI package
+# (https://github.com/OpenPBEE/Functional-Recovery-Python), no MATLAB license
+# needed anymore.
+atc138>=1.4,<2.0
 
 # --- Input-authoring GUI (Codes/gui/, `streamlit run Codes/gui/app.py`) ---
 # Local-only -- no hosting required. streamlit's own dependency resolution can
