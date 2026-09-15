@@ -2,8 +2,9 @@
 """
 Reduces one run_dynamic_analysis() result down to the EDPs (engineering demand
 parameters) a loss-assessment pipeline actually wants: peak story drift ratio
-(SDR) per story and peak floor acceleration (PFA) per floor, in both horizontal
-directions, plus the collapse flag.
+(SDR) per story, residual drift ratio (RDR, building-wide) and peak floor
+acceleration (PFA) per floor, in both horizontal directions, plus the collapse
+flag. Used per-GM-run by msa_orchestrator.py to build a full MSA's EDP table.
 
 Unlike collapse_solver.check_collapse (a faithful port of MaxDriftTesterBiDirection,
 including its story-1-always-zero quirk -- see that function's docstring), this is
@@ -38,6 +39,25 @@ def peak_story_drift_ratio(history, story_heights):
     return peak_for(disp_x), peak_for(disp_z)
 
 
+def residual_drift_ratio(history, story_heights):
+    """Returns (residual_drift_x, residual_drift_z), each a single building-wide
+    scalar: the inter-story drift ratio at the LAST timestep (not a peak), maxed
+    across all stories. Matches ExtractMaxEDP.ExtractRDR's definition exactly
+    (legacy damageModule -- residual drift after shaking ends, one number per
+    direction, not per story)."""
+    n_stories = len(story_heights)
+
+    def residual_for(disp):
+        disp = np.asarray(disp)
+        if len(disp) == 0:
+            return 0.0
+        last = disp[-1]
+        drifts = [(last[i + 1] - last[i]) / story_heights[i] for i in range(n_stories)]
+        return float(np.max(np.abs(drifts))) if drifts else 0.0
+
+    return residual_for(history['story_disp_x']), residual_for(history['story_disp_z'])
+
+
 def peak_floor_acceleration(history, g=386.088):
     """Returns (peak_pfa_x, peak_pfa_z) in units of g, one value per floor
     (1..N, ground floor excluded -- see collapse_solver.run_dynamic_analysis's
@@ -56,6 +76,7 @@ def summarize_dynamic(result, story_heights):
     dynamic_runner.generateDynamicAnalysisModel_ops, a superset of it)."""
     history = result['history']
     sdr_x, sdr_z = peak_story_drift_ratio(history, story_heights)
+    rdr_x, rdr_z = residual_drift_ratio(history, story_heights)
     pfa_x, pfa_z = peak_floor_acceleration(history)
     return {
         'ok': result['ok'],
@@ -63,6 +84,8 @@ def summarize_dynamic(result, story_heights):
         'collapse_dof': result['collapse_dof'],
         'final_time': result['final_time'],
         'gm_time': result['gm_time'],
+        'residual_drift_x': rdr_x,
+        'residual_drift_z': rdr_z,
         'peak_sdr_x': sdr_x,
         'peak_sdr_z': sdr_z,
         'peak_pfa_x_g': pfa_x,
