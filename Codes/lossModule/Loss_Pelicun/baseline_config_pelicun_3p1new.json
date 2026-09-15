@@ -34,7 +34,6 @@
             "CollapseLimits": {
                 "PID": "0.06"
             },
-            "DemandFilePath": "Loss_Pelicun/pelicun_3_1_master_new/examples/001/demands_s4.csv",
             "InferResidualDrift": {
                 "1": "0.0075",
                 "2": "0.0075",
@@ -57,6 +56,21 @@
                     "Median": "15000",
                     "Theta_1": "0.0004",
                     "Unit": "worker_day"
+                }
+            }
+        },
+        "Outputs": {
+            "Demand": {"Sample": true, "Statistics": true},
+            "Asset": {"Sample": true, "Statistics": true},
+            "Damage": {"Sample": true, "Statistics": true},
+            "Loss": {
+                "Repair": {
+                    "Sample": true,
+                    "Statistics": true,
+                    "GroupedSample": true,
+                    "GroupedStatistics": true,
+                    "AggregateSample": true,
+                    "AggregateStatistics": true
                 }
             }
         }

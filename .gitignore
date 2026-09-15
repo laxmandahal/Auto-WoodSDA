@@ -18,6 +18,11 @@ __pycache__/
 **/MFD6B_collapse_10/
 **/LossAnalysis1/
 
+# pelicun writes these to the CWD by default on every run_pelicun() call
+# (--log_file defaults to True in its own CLI, same default used here)
+pelicun_log.txt
+pelicun_log_warnings.txt
+
 OpenSees.exe
 OpenSeesMP.exe
 
