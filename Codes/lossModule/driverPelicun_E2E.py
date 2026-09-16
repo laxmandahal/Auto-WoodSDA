@@ -21,18 +21,10 @@ baseDir = os.path.dirname(code_dir)
 
 
 sys.path.append(os.path.join(baseDir, *['Codes', 'lossModule', 'Loss_Pelicun']))
-sys.path.append(os.path.join(baseDir, *['Codes', 'lossModule', 'Loss_ATC138']))
 
 from create_edp_df import create_demands_df_pelicun
 from generateLossModel import generateConfgFile_pelicun3p1new
 from pelicun.tools.DL_calculation import run_pelicun
-# from create_comp_ds_list import create_comp_ds_from_DMG
-from create_building_model_file import create_building_model
-# from create_default_optional_inputs import create_optional_inputs
-from create_default_optional_inputs import create_optional_inputs_updated
-from create_tenant_unit_list import create_tenant_unit_list
-
-from normalize_cmp_units import normalize_comp_units
 
 def delete_files_from_directory(directory, keep):
     baseDir = os.getcwd()
@@ -44,15 +36,6 @@ def delete_files_from_directory(directory, keep):
     finally:
         os.chdir(baseDir)
 
-occ_type_to_id_mapping = {
-    'single-unit residential': 7,
-    'single unit residential': 7,
-    'sfd':7,
-    'multi-unit residential': 1,
-    'multi unit residential': 1,
-    'mfd':1
-    }
-
 def main(
 	buildingID: str,
     HAZARD_LEVEL: List[float],
@@ -61,7 +44,6 @@ def main(
     per_story_area: float,
     occupancy_type: str = 'Single-Unit Residential',
     collapse_limit: float=0.1,
-    norm_cmp_qty: bool = True,
     im_period: float = 0.3
 ):
     start = time.time()
@@ -94,18 +76,11 @@ def main(
     # num_stairs_per_floor = 2
     # num_elevators = 1
 
-    if num_story == 1: 
-        num_stairs_per_floor = 1
-        num_elevators = 0
+    if num_story == 1:
         replacement_cost = 450 * total_plan_area * num_story
     else:
-        num_stairs_per_floor = 2
-        num_elevators = 1
         replacement_cost = 387 * total_plan_area * num_story
 
-    occupancy_id = occ_type_to_id_mapping[occupancy_type.lower()]
-    
-    
     ## create loss_model_config.json file that is used as an input by pelicun 3.1 most updated version (cloned: Oct 2023)
     ## Note: loss model config file is hazard-level-agnostic 
     generateConfgFile_pelicun3p1new(baselineID, 
@@ -121,10 +96,6 @@ def main(
 
     # resultDir = os.path.join(baseDir, 'Results', 'HiFi_FMA')
     resultDir = os.path.join(baseDir, 'Results')
-    # specify file path for the atc 138 input files
-    # ATC138Input_dir = os.path.join(baseDir, *['BuildingModels', REGIONAL_STRATEGY, ID, 'LossAnalysis', 'ATC138Input'])
-    ATC138Input_dir = os.path.join(baseDir, *['Results', ID, 'LossAnalysis', 'ATC138Input'])
-    static_table_fp = os.path.join(baseDir, 'Codes', 'lossModule', 'Loss_ATC138', 'PBEE-Recovery')
 
     for hazard_level in range(1, len(HAZARD_LEVEL)+1):
         # hazard_level = 1
@@ -142,13 +113,6 @@ def main(
         outputDir = os.path.join(baseDir, *['Results', ID, 'LossAnalysis', 'PelicunOutput', f'IL_{hazard_level}'])
         Path(outputDir).mkdir(parents=True, exist_ok=True)
 
-        # creating output directory for the ATC-138 to save the files
-        # ATC138Output_dir = os.path.join(baseDir, *['BuildingModels', REGIONAL_STRATEGY, ID, 'LossAnalysis', 'ATC138Output',  f'IL_{hazard_level}'])
-        ATC138Output_dir = os.path.join(baseDir, *['Results', ID, 'LossAnalysis', 'ATC138Output',  f'IL_{hazard_level}'])
-        Path(ATC138Output_dir).mkdir(parents=True, exist_ok=True)
-        Path(os.path.join(ATC138Input_dir, f'IL_{hazard_level}')).mkdir(parents=True, exist_ok=True)
-        
-
         # Matches the real CLI's (pelicun.tools.DL_calculation.main) own argparse
         # defaults exactly -- see that module's `main()` for the source of these.
         run_pelicun(
@@ -162,54 +126,8 @@ def main(
             detailed_results=True,
             coupled_edp=False,
         )
-        ## remove extra files from the directory
-        # delete_files_from_directory(outputDir, keep=['DMG_sample.csv', 
-        #                                         'DL_summary.csv', 
-        #                                         'DV_bldg_repair_sample.csv',
-        #                                         'DEM_sample.csv'
-        #                                         ])
-        if norm_cmp_qty:
-            normalize_comp_units(outputDir, static_table_fp)
         print(f'Finished PELICUN Loss of {buildingID} @ IL-{hazard_level} ')
 
-    # it saves building_model.json file inside the "ATC138Input" folder
-    ## Note: building model .json file is hazard-level agnostic
-    create_building_model(baseDir, ID, num_story, total_plan_area, 
-                        area_per_story=[per_story_area]*num_story, 
-                        height_per_story=[10]*num_story, 
-                        edge_lengths=[[per_story_area],]*num_story,
-                        struct_bay_area_per_story=[100]*num_story, 
-                        stairs_per_story=[num_stairs_per_floor]*num_story, 
-                        building_value = replacement_cost, 
-                        num_entry_doors=2, 
-                        num_elevators=num_elevators, 
-                        peak_occupancy_rate = 3.1/1000)
-
-    create_optional_inputs_updated(
-        ATC138Input_dir, inspection=True, financing=True, permitting=True, engineering=True, contractor=True,
-        long_lead_time=False, design_time_f=0.04, design_time_r=200, design_time_t=1.3, design_time_w=8,
-        eng_design_min_days=14, eng_design_max_days=365, 
-        essential_facility=False, borp_equivalent=False, engineer_on_retainer=False, 
-        contractor_relationship='good', contractor_retainer_time=3, funding_source='private', 
-        capital_available_ratio=0.1, impeding_factors_beta=0.6, impedance_truncation=2, 
-        default_lead_time=182, include_surge=1, is_dense_urban_area=1, site_pga=1, pga_de=1,
-        scaffolding_lead_time=5, scaffolding_erect_time=2,
-        door_racking_repair_day=3, flooding_cleanup_day=5, flooding_repair_day=90,
-        max_workers_per_sqft_story=0.001, max_workers_per_sqft_story_temp_repair=0.005,
-        max_workers_per_sqft_building = 0.00025, max_workers_building_min=20, max_workers_building_max=260, 
-        allow_tmp_repairs=True, allow_shoring=True,
-        calculate_red_tag=True, red_tag_clear_time=7, red_tag_clear_beta=0.6, 
-        include_local_stability_impact=True, flooding_impact=True, egress_threshold=0.5,fire_watch=True, 
-        local_fire_damage_threshold=0.25, min_egress_paths=2, exterior_safety_threshold=0.1, interior_safety_threshold=0.25, 
-        door_access_width_ft=9, heat_utility='gas', water_pressure_max_story=num_story, electrical=False, 
-        water_potable=False, water_sanitary=False, hvac_ventilation=False, hvac_heating=False,
-        hvac_cooling=False, hvac_exhaust=False
-        )
-    tenant_unit_df = create_tenant_unit_list(ATC138Input_dir, num_story, [per_story_area]*num_story, 
-                            [per_story_area / 10]*num_story, 
-                            occupancyID=occupancy_id
-                            )
-    print(f'Generated ATC-138 input files for {buildingID}...')
     finish = time.time()
     print('Loss module for %s Took %s Seconds'%(ID, (finish-start)))
 
