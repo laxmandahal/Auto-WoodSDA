@@ -1,156 +1,142 @@
-import matlab.engine
-
-import os
-import numpy as np 
-import argparse
+import glob
 import json
-from pathlib import Path
+import os
+import re
+import shutil
 import sys
 import time
-from typing import List
 
 cwd = os.path.dirname(__file__)
 code_dir = os.path.dirname(cwd)
 baseDir = os.path.dirname(code_dir)
-# baseDir = r'/u/home/l/laxmanda/project-hvburton/autoWoodSDA/'
-# baseDir = r'/Users/laxmandahal/Desktop/UCLA/Phd/Research/woodSDA/autoWoodSDA_public'
 
-# sys.path.append(os.path.join(baseDir, *['Codes', 'Loss_ATC138', 'PBEE-Recovery-ubc-study']))
-sys.path.append(os.path.join(baseDir, *['Codes', 'lossModule', 'Loss_ATC138', 'PBEE-Recovery']))
+sys.path.append(os.path.join(baseDir, *['Codes', 'lossModule', 'Loss_ATC138']))
+sys.path.append(os.path.join(baseDir, 'Codes', 'schema'))
 
-# atcDir = os.path.join(baseDir, 'Codes', 'Loss_ATC138', 'PBEE-Recovery-ubc_study')
-atcDir = os.path.join(baseDir, 'Codes', 'lossModule', 'Loss_ATC138', 'PBEE-Recovery')
+from pelicun_bridge import bridge_pelicun_output, write_general_inputs, write_optional_inputs
+from create_tenant_unit_list import create_tenant_unit_list
+from loader import load_building_config
 
-def delete_files_from_directory(
-    directory: str, 
-    files_to_remove: List[str]
-):
-    cwd = os.getcwd()
-    try:
-        os.chdir(directory)
-        for file in os.listdir():
-            if file in files_to_remove:
-                os.remove(file)
-    finally:
-        os.chdir(cwd)
+from atc138 import driver as atc138_driver
 
-
-# def main(
-# 	bldg_idx: int
-
-# ):
-#     start = time.time()
-
-#     bldg_idx = int(bldg_idx) - 1
-
-#     BuildingList = np.genfromtxt(os.path.join(baseDir, 'BuildingModels', 'ID_for_NRHA',
-#                                           f'ArchetypeIDs_for_NRHA_{REGIONAL_STRATEGY}.txt'), dtype=str)
-#     print(f'Initiating ATC_138 Loss of {BuildingList[bldg_idx]} (idx: {bldg_idx})')
-#     ID = BuildingList[bldg_idx]
-
-#     # for hazard_level in range(1, len(HAZARD_LEVEL)+1):
-#     hazard_level = 1
-#     atcDir_perBldg = os.path.join(baseDir, 'Results', REGIONAL_STRATEGY, ID, 'LossAnalysis')
-#     with open (os.path.join(atcDir, 'driver_convert_PELICUN_woodSDA.m'), 'r') as matfile:
-#         matCode = matfile.readlines()
-#     matCode[30] = 'REGIONAL_STRATEGY = "%s" ;\n'%REGIONAL_STRATEGY
-#     matCode[31] = 'ID = "%s" ;\n'%ID
-#     matCode[32] = 'haz_level = "IL_%s" ;\n'%hazard_level
-#     matCode[33] = 'baseDirectory = "%s";\n'%baseDir
-#     with open (os.path.join(atcDir_perBldg, 'driver_convert_PELICUN_woodSDA_auto.m'), 'w') as matfile:
-#         matCode = matfile.writelines(matCode)
-
-#     with open (os.path.join(atcDir, 'build_inputs_main.m'), 'r') as matfile:
-#         inputs_builder = matfile.readlines()
-#     inputs_builder[60] = 'REGIONAL_STRATEGY = "%s" ;\n'%REGIONAL_STRATEGY
-#     inputs_builder[61] = 'ID = "%s" ;\n'%ID
-#     inputs_builder[62] = 'haz_level = "IL_%s" ;\n'%hazard_level
-#     inputs_builder[64] = 'baseDirectory = "%s";\n'%baseDir
-#     with open (os.path.join(atcDir_perBldg, 'build_input_main_auto.m'), 'w') as matfile:
-#         inputs_builder = matfile.writelines(inputs_builder)
+# Same occupancy-string -> tenant-unit occupancy_id mapping driverPelicun_E2E.py
+# uses for the FEMA P-58 loss model's OccupancyType string.
+occ_type_to_id_mapping = {
+    'single-unit residential': 7,
+    'single unit residential': 7,
+    'sfd': 7,
+    'multi-unit residential': 1,
+    'multi unit residential': 1,
+    'mfd': 1,
+}
 
 
-#     os.chdir(atcDir_perBldg)
-#     eng = matlab.engine.start_matlab()
-#     eng.driver_convert_PELICUN_woodSDA_auto(nargout=0)
-#     eng.build_input_main_auto(nargout=0)
-#     eng.quit()
-
-#     os.chdir(atcDir_perBldg)
-#     eng = matlab.engine.start_matlab()
-#     with open (os.path.join(atcDir, 'driver_PBEErecovery_woodSDA.m'), 'r') as matfile:
-#         atc_recovery_main = matfile.readlines()
-#     atc_recovery_main[18] = "REGIONAL_STRATEGY = '%s'; \n"%REGIONAL_STRATEGY
-#     atc_recovery_main[19] = 'ID = "%s" ;\n'%ID
-#     atc_recovery_main[20] = 'haz_level = "IL_%s" ;\n'%hazard_level
-#     atc_recovery_main[21] = 'baseDirectory = "%s";\n'%baseDir
-#     with open (os.path.join(atcDir_perBldg, 'driver_PBEErecovery_woodSDA_auto.m'), 'w') as matfile:
-#         atc_recovery_main = matfile.writelines(atc_recovery_main)
-#     eng.driver_PBEErecovery_woodSDA_auto(nargout=0)
-
-#     finish = time.time()
-#     print(f'Finished ATC-138 Loss of {BuildingList[bldg_idx]} (idx: {bldg_idx}) in {finish - start} seconds')
-
-#     files_to_delete = ['driver_convert_PELICUN_woodSDA_auto.m', 
-#                        'build_input_main_auto.m', 
-#                        'driver_PBEErecovery_woodSDA_auto.m']
-#     delete_files_from_directory(atcDir_perBldg, files_to_delete)
+def _hazard_levels_on_disk(pelicun_output_root):
+    levels = []
+    for path in glob.glob(os.path.join(pelicun_output_root, 'IL_*')):
+        match = re.fullmatch(r'IL_(\d+)', os.path.basename(path))
+        if match:
+            levels.append(int(match.group(1)))
+    return sorted(levels)
 
 
+def main(buildingID: str, seed: int = 985):
+    """Run the ATC-138 functional-recovery assessment for every hazard level this
+    archetype already has real Pelicun output for.
 
-def main_hazard_agnostic(
-	buildingID: int
-):
+    Replaces the old MATLAB main_hazard_agnostic(buildingID): reads the building's
+    own geometry/replacement-cost/occupancy back from the Pelicun config + schema
+    files it already wrote, so it keeps the same single-argument call signature.
+    """
     start = time.time()
+    ID = buildingID
 
-    BuildingList = ['MFD6B']
-    print(f'Initiating ATC_138 Loss of {buildingID}')
-    # ID = buildingID
-    
-    atcDir_perBldg = os.path.join(baseDir, 'Results', buildingID, 'LossAnalysis')
-    with open (os.path.join(atcDir, 'main_mainfile.m'), 'r') as matfile:
-        matCode = matfile.readlines()
-    # matCode[5] = 'REGIONAL_STRATEGY = "%s" ;\n'%REGIONAL_STRATEGY
-    matCode[7] = 'ID = "%s" ;\n'%buildingID
-    matCode[10] = 'baseDirectory = "%s";\n'%baseDir
-    with open (os.path.join(atcDir, f'main_mainfile_auto.m'), 'w') as matfile:
-        matCode = matfile.writelines(matCode)
+    lossAnalysisDir = os.path.join(baseDir, 'Results', ID, 'LossAnalysis')
+    pelicunOutputRoot = os.path.join(lossAnalysisDir, 'PelicunOutput')
+    atc138InputRoot = os.path.join(lossAnalysisDir, 'ATC138Input')
+    atc138OutputRoot = os.path.join(lossAnalysisDir, 'ATC138Output')
 
+    with open(os.path.join(lossAnalysisDir, 'PelicunInput', 'model_config.json')) as f:
+        pelicun_config = json.load(f)
+    asset_cfg = pelicun_config['DL']['Asset']
+    num_stories = int(asset_cfg['NumberOfStories'])
+    total_plan_area = float(asset_cfg['PlanArea'])
+    occupancy_type = asset_cfg['OccupancyType']
+    replacement_cost = float(pelicun_config['DL']['Losses']['BldgRepair']['ReplacementCost']['Median'])
 
-    os.chdir(atcDir)
-    eng = matlab.engine.start_matlab()
-    eng.main_mainfile_auto(nargout=0)
-    eng.quit()
+    building_config = load_building_config(os.path.join(baseDir, 'BuildingInfo', ID))
+    geometry = building_config.geometry
+    per_story_area = geometry.floor_areas[0]
+    story_height_ft = geometry.story_heights[0] / 12.0
+    length_side_1_ft = geometry.floor_max_x_dimension[0] / 12.0
+    length_side_2_ft = geometry.floor_max_z_dimension[0] / 12.0
 
-    
+    # Same stairs/elevators heuristic driverPelicun_E2E.py already uses -- no
+    # richer source for these exists anywhere in the schema today.
+    if num_stories == 1:
+        stairs_per_story = 1
+        num_elevators = 0
+    else:
+        stairs_per_story = 2
+        num_elevators = 1
+
+    occupancy_id = occ_type_to_id_mapping[occupancy_type.lower()]
+
+    print(f'Initiating ATC-138 functional-recovery assessment of {ID}...')
+
+    create_tenant_unit_list(
+        atc138InputRoot,
+        num_stories,
+        [per_story_area] * num_stories,
+        [per_story_area / 10] * num_stories,
+        occupancyID=occupancy_id,
+    )
+
+    hazard_levels = _hazard_levels_on_disk(pelicunOutputRoot)
+    if not hazard_levels:
+        raise FileNotFoundError(f'No PelicunOutput/IL_* directories found under {pelicunOutputRoot}')
+
+    cmp_marginals_fp = os.path.join(
+        baseDir, 'BuildingInfo', ID, 'ComponentsList', 'components_list_marginals.csv'
+    )
+
+    for hazard_level in hazard_levels:
+        pelicun_output_dir = os.path.join(pelicunOutputRoot, f'IL_{hazard_level}')
+        model_dir = os.path.join(atc138InputRoot, f'IL_{hazard_level}')
+        output_dir = os.path.join(atc138OutputRoot, f'IL_{hazard_level}')
+
+        bridge_pelicun_output(pelicun_output_dir, model_dir, cmp_marginals_fp)
+        write_general_inputs(
+            model_dir,
+            num_stories=num_stories,
+            plan_area_ft2=per_story_area,
+            story_height_ft=story_height_ft,
+            length_side_1_ft=length_side_1_ft,
+            length_side_2_ft=length_side_2_ft,
+            replacement_cost=replacement_cost,
+            num_elevators=num_elevators,
+            stairs_per_story=stairs_per_story,
+        )
+        write_optional_inputs(model_dir, num_stories)
+        # tenant_unit_list.csv is hazard-agnostic; copy the one shared copy into
+        # this hazard level's model_dir, same as general/optional_inputs.
+        shutil.copyfile(
+            os.path.join(atc138InputRoot, 'tenant_unit_list.csv'),
+            os.path.join(model_dir, 'tenant_unit_list.csv'),
+        )
+
+        atc138_driver.run_analysis(model_dir, output_dir, seed=seed, force_rebuild=True)
+        print(f'Finished ATC-138 Loss of {ID} @ IL-{hazard_level}')
 
     finish = time.time()
-    print(f'Finished ATC-138 Loss of {buildingID} in {finish - start} seconds')
-
-    files_to_delete = ['driver_convert_PELICUN_woodSDA_auto.m', 
-                       'build_input_main_auto.m', 
-                       'driver_PBEErecovery_woodSDA_auto.m']
-    delete_files_from_directory(atcDir_perBldg, files_to_delete)
+    print('ATC-138 module for %s took %s seconds' % (ID, (finish - start)))
 
 
+if __name__ == '__main__':
+    import argparse
 
-
-# if __name__ == '__main__':
-    # parser = argparse.ArgumentParser()
-    # #defining the arguments to be parsed
-    # parser.add_argument('--regional_strategy', type=str, default='HiFi')
-    # parser.add_argument('--bldg_idx', type=int, default=1)
-    # parser.add_argument('--runAll', type=bool, default=False)
-    # # #parse command-line arguments
-    # args = parser.parse_args()
-
-    # if args.runAll:
-    #     REGIONAL_STRATEGY = args.regional_strategy
-    #     BuildingList = np.genfromtxt(os.path.join(baseDir, 'BuildingModels', 'ID_for_NRHA',
-    #                                             f'ArchetypeIDs_for_NRHA_{REGIONAL_STRATEGY}.txt'),
-    #                                             dtype=str)
-    #     for idx in range(1, len(BuildingList)+1):
-    #         main(REGIONAL_STRATEGY, bldg_idx=idx)
-    # else:
-
-    # main_hazard_agnostic(bldg_idx=0)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--buildingID', type=str, required=True)
+    parser.add_argument('--seed', type=int, default=985)
+    args = parser.parse_args()
+    main(args.buildingID, seed=args.seed)
