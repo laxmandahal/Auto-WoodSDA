@@ -49,19 +49,46 @@ in-process, pure-Python one. If you used an earlier version of this repo, the sh
 
 ## Modules
 
-- **Design Module**: Automates the code-compliant seismic design of woodframe buildings.
-- **Structural Module**: Generates three-dimensional (3D) building model(s) and runs eigenvalue, pushover, and nonlinear response history analysis (NRHA) -- either in-process via OpenSeesPy, or by writing `.tcl` files for an external `OpenSees` binary.
-- **Damage Module**: Runs Multiple Stripe Analysis (every ground motion at every hazard level), extracts engineering demand parameters (EDPs), and performs building-level damage assessment such as collapse or demolition fragility fitting.
-- **Loss Module**: Implements [PELICUN](https://github.com/NHERI-SimCenter/pelicun) to simulate Monte Carlo loss samples per FEMA P-58 methodology. It also implements the [ATC-138 functional-recovery methodology](https://github.com/OpenPBEE/Functional-Recovery-Python) (via OpenPBEE's `atc138` Python package) to estimate reoccupancy and functional recovery times.
+- **Design Module** (`Codes/designModule/`, driven by `Codes/run_designModule.py`): Automates the code-compliant seismic design of woodframe buildings -- iteratively sizes each shear wall's assembly to satisfy strength and drift limits and produces the per-wall-line design schedule.
+- **Structural Module** (`Codes/structuralModule/`): Generates three-dimensional (3D) building model(s) and runs eigenvalue, pushover, and nonlinear response history analysis (NRHA) -- either in-process via OpenSeesPy (`openseespy_eigen/`, `openseespy_pushover/`, `openseespy_dynamic/`), or by writing `.tcl` files for an external `OpenSees` binary (`--engine tcl`).
+- **Damage Module** (`Codes/structuralModule/openseespy_dynamic/msa_orchestrator.py`, `Codes/damageModule/`): Runs Multiple Stripe Analysis (every ground motion at every hazard level, in parallel across CPU cores), extracts engineering demand parameters (EDPs) such as peak story drift and floor acceleration, and performs building-level damage assessment such as collapse or demolition fragility fitting.
+- **Loss Module** (`Codes/lossModule/`): Implements [PELICUN](https://github.com/NHERI-SimCenter/pelicun) (`Loss_Pelicun/`, driven by `driverPelicun_E2E.py`) to simulate Monte Carlo loss samples per FEMA P-58 methodology, and the [ATC-138 functional-recovery methodology](https://github.com/OpenPBEE/Functional-Recovery-Python) (`Loss_ATC138/`, driven by `driverATC138_E2E.py`, via OpenPBEE's `atc138` Python package) to estimate reoccupancy and functional recovery times.
+
+Two supporting pieces sit alongside these four: the **input schema** (`Codes/schema/`, a
+Pydantic model every module reads and writes `building_config.yaml` through) and
+**post-processing** (`Codes/postProcessing/` -- plotting and fragility-curve fitting for
+damage/loss output, e.g. `Plot_Results.ipynb`).
 
 ## Repository Structure
 
-- **BuildingInfo**: Contains each archetype's `building_config.yaml` (the validated input schema), plus its `BaselineTclFiles/` (used by the `tcl` engine) and `ComponentsList/` (FEMA P-58 component data for the loss module).
-- **BuildingModels**: Ground-motion sets (`GM_sets/`) and generated model/analysis output (`OpenSeesPyResults/`, or `.tcl` files and their outputs under the `tcl` engine).
-- **Codes**: Scripts for the design, structural, damage, and loss modules (`designModule/`, `structuralModule/`, `damageModule/`, `lossModule/`), the schema (`schema/`), the input-authoring GUI (`gui/`), and the driver notebooks.
-- **Databases**: Static reference data -- Pinching4 hysteresis parameters, the shear-wall design database, and `Baseline_archetype_info_w_periods.json` (the catalog of known grid-plan layout types and their fundamental periods).
-- **Results**: Output from the damage and loss modules (`EDP_data/`, `LossAnalysis/`) per archetype.
-- **Archive**: Retired input formats kept for reference (`BuildingInfo_legacy_txt/` -- the pre-schema `.txt` input trees).
+- **`BuildingInfo/`**: Each archetype's `building_config.yaml` (the validated input schema),
+  plus its `BaselineTclFiles/` (used by the `tcl` engine) and `ComponentsList/` (FEMA P-58
+  component data for the loss module). Two archetypes ship with real, ready-to-use data:
+  `MFD6B` (4-story multi-family) and `s1_48x32` (1-story single-family).
+- **`BuildingModels/`**: Ground-motion sets (`GM_sets/<name>/<hazard level>/`) and generated
+  model/analysis output -- `<id>/OpenSeesPyResults/` under the `openseespy` engine, or `.tcl`
+  files and their outputs under the `tcl` engine.
+- **`Codes/`**:
+  - `designModule/`, `structuralModule/` (`openseespy_eigen/`, `openseespy_pushover/`,
+    `openseespy_dynamic/`), `damageModule/`, `lossModule/` (`Loss_Pelicun/`, `Loss_ATC138/`)
+    -- the four modules, see [Modules](#modules).
+  - `schema/` -- the `BuildingConfig` Pydantic model and `building_config.yaml` load/save.
+  - `gui/` -- the input-authoring Streamlit app, see
+    [Authoring Building Input](#authoring-building-input-gui-or-manual).
+  - `postProcessing/` -- plotting and fragility-curve fitting for damage/loss output.
+  - `run_designModule.py`, `woodSDA_driver_E2E_openseespy.ipynb`,
+    `woodSDA_driver_E2E.ipynb` -- the main entry points, see
+    [Running the Pipeline](#running-the-pipeline) and
+    [End-to-End Notebooks](#end-to-end-notebooks).
+- **`Databases/`**: Static reference data -- Pinching4 hysteresis parameters, the shear-wall
+  design database, and `Baseline_archetype_info_w_periods.json` (the catalog of known
+  grid-plan layout types and their fundamental periods).
+- **`Results/`**: Output from the damage and loss modules (`EDP_data/`, `LossAnalysis/`) per
+  archetype.
+- **`Archive/`**: Retired input formats kept for reference (`BuildingInfo_legacy_txt/` -- the
+  pre-schema `.txt` input trees).
+- Repo root: `Buildings_input_info.csv` (one row per archetype -- site/seismic parameters),
+  `Exhaustive Inputs List.xlsx` (a field-by-field reference for every input), `requirements.txt`.
 
 ## Getting Started
 
@@ -80,6 +107,25 @@ cd Auto-WoodSDA
 python -m venv .venv && source .venv/bin/activate   # or conda create -n woodsda python=3.11
 pip install -r requirements.txt
 ```
+
+### Verify Your Install
+
+Two archetypes ship with real, committed input data, so you can confirm your environment
+works before authoring anything of your own: `MFD6B` (4-story multi-family) and `s1_48x32`
+(1-story single-family, registered as `s1_48x32_Stucco_GWB_Normal_Vs10` in
+`Buildings_input_info.csv`). The single-story archetype's design + eigen + pushover finishes
+in well under a minute (`MFD6B`'s own pushover takes ~10-15 min/direction -- see
+[Running the Pipeline](#running-the-pipeline)):
+
+```bash
+python Codes/run_designModule.py --buildingID s1_48x32_Stucco_GWB_Normal_Vs10 --engine openseespy --run-static
+```
+
+A successful run prints the code-compliant design confirmation, OpenSeesPy modal periods, and
+a pushover base-strength ratio for both directions with no traceback -- if you see that,
+your environment is set up correctly and you're ready for [Authoring Building
+Input](#authoring-building-input-gui-or-manual) or [Running the
+Pipeline](#running-the-pipeline) on your own archetype.
 
 ## Authoring Building Input (GUI or manual)
 
